@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: samajseva_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: samajseva
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # FastAPI Backend
+  backend:
+    build: ./backend
+    container_name: samajseva_backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgrespassword@postgres:5432/samajseva
+      PORT: 8000
+      HOST: 0.0.0.0
+      ADMIN_SECRET_KEY: admin123
+    depends_on:
+      - postgres
+
+  # React Frontend
+  frontend:
+    build: ./frontend
+    container_name: samajseva_frontend
+    restart: always
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

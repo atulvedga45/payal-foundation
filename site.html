@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Young Samaj Seva Trust - Official Website</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #0b62a4;
+            --secondary-bg: #f4f7f9;
+            --text-dark: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #ffffff;
+            color: var(--text-dark);
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+        .top-bar a {
+            color: #ffffff;
+            transition: opacity 0.2s;
+        }
+        .top-bar a:hover {
+            opacity: 0.8;
+        }
+
+        /* Navigation */
+        .navbar {
+            background-color: #ffffff;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        }
+        .navbar-brand img {
+            max-height: 50px;
+        }
+        .nav-link {
+            font-weight: 500;
+            color: var(--text-dark) !important;
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        /* Shared Section Styles */
+        section {
+            padding: 80px 0;
+        }
+        .section-header {
+            margin-bottom: 3rem;
+        }
+        .section-subtitle {
+            color: var(--primary-color);
+            text-transform: uppercase;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, var(--secondary-bg) 0%, #ffffff 100%);
+            padding: 100px 0;
+        }
+
+        /* Cards & Images */
+        /* === SLOW SMOOTH ANIMATIONS === */
+
+        /* Page Load Fade In */
+        @keyframes pageFadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        body {
+            animation: pageFadeIn 1.2s ease forwards;
+        }
+
+        /* Hero Text Drift Up */
+        @keyframes heroDriftUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .hero-section h1 {
+            animation: heroDriftUp 1.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        .hero-section p.lead {
+            animation: heroDriftUp 1.6s 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        .hero-section .d-flex.gap-3 {
+            animation: heroDriftUp 1.8s 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        /* Floating icon in team cards */
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0px); }
+            50%       { transform: translateY(-6px); }
+        }
+        .card-custom:hover .bg-primary.rounded-circle {
+            animation: floatIcon 2.5s ease-in-out infinite;
+        }
+
+        /* Scroll Reveal — elements start hidden */
+        .reveal {
+            opacity: 0;
+            transform: translateY(35px);
+            transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+                        transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Staggered delay for grid items */
+        .reveal-delay-1 { transition-delay: 0.10s; }
+        .reveal-delay-2 { transition-delay: 0.22s; }
+        .reveal-delay-3 { transition-delay: 0.34s; }
+        .reveal-delay-4 { transition-delay: 0.46s; }
+        .reveal-delay-5 { transition-delay: 0.58s; }
+        .reveal-delay-6 { transition-delay: 0.70s; }
+        .reveal-delay-7 { transition-delay: 0.82s; }
+        .reveal-delay-8 { transition-delay: 0.94s; }
+
+        /* Cards */
+        .card-custom {
+            border: none;
+            background: #ffffff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+                        box-shadow 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .card-custom:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 16px 40px rgba(11, 98, 164, 0.18);
+        }
+
+        /* Gallery images */
+        .gallery-img {
+            height: 250px;
+            object-fit: cover;
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+                        box-shadow 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .gallery-img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18);
+        }
+
+        /* Button slow hover */
+        .btn {
+            transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+                        box-shadow 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+                        background-color 0.4s ease,
+                        border-color 0.4s ease !important;
+        }
+        .btn:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 8px 24px rgba(11, 98, 164, 0.25);
+        }
+
+        /* Navbar link slow underline slide */
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 50%;
+            width: 0; height: 2px;
+            background: var(--primary-color);
+            transition: width 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+                        left   0.55s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .nav-link:hover::after {
+            width: 100%; left: 0;
+        }
+
+        /* Forms */
+        .form-control {
+            background-color: var(--secondary-bg);
+            border: 1px solid #e1e8ed;
+            padding: 0.75rem 1rem;
+        }
+        .form-control:focus {
+            box-shadow: 0 0 0 0.25rem rgba(11, 98, 164, 0.1);
+            border-color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Contact Bar -->
+    <div class="top-bar py-2">
+        <div class="container d-flex justify-content-between align-items-center flex-wrap">
+            <span><i class="fas fa-certificate me-2"></i> Reg No: G.B.B.S.D 409/2026 | F-82401 (M)</span>
+            <span><i class="fas fa-phone me-2"></i> <a href="tel:+919076349867" class="text-decoration-none">+91 90763 49867</a></span>
+        </div>
+    </div>
+
+    <!-- Main Navigation -->
+    <nav class="navbar navbar-expand-lg sticky-top z-3">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center fw-bold text-primary" href="index.php">
+                <img src="upload/logo.png" alt="Logo" class="me-3 rounded-circle border" onerror="this.src='https://via.placeholder.com/50?text=YSST'">
+                <span class="fs-5 text-dark">Young Samaj Seva Trust</span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link px-3" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="#about">About Us</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="#team">Our Team</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="#gallery">Gallery</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="#contact">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <main>
+<!-- Hero Section -->
+<section id="home" class="hero-section text-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bolder mb-3 text-dark">Empowering Communities,<br><span class="text-primary">Serving Humanity</span></h1>
+                <p class="lead mb-5 text-muted">
+                    Young Samaj Seva Trust is a registered non-profit organization dedicated to social welfare, youth empowerment, and uplifting local communities across Mumbai.
+                </p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="#contact" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">Get Involved</a>
+                    <a href="#about" class="btn btn-outline-dark btn-lg px-5 rounded-pill">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="bg-light reveal">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-4 mb-md-0 reveal reveal-delay-1">
+                <img src="upload/1 (1).jpeg" alt="Young Samaj Seva Trust" class="img-fluid rounded-4 shadow-sm" style="transition: transform 0.75s cubic-bezier(0.22,1,0.36,1);" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" onerror="this.src='https://via.placeholder.com/600x400?text=About+Image'">
+            </div>
+            <div class="col-md-6 ps-md-5 reveal reveal-delay-2">
+                <h6 class="section-subtitle">About Our Trust</h6>
+                <h2 class="fw-bold mb-4">Registered Social Welfare NGO in Mumbai</h2>
+                <p class="fs-6 text-muted mb-3">Established under the Public Trust Act (Reg No: <strong>G.B.B.S.D 409/2026 | F-82401 (M)</strong>), <strong>Young Samaj Seva Trust</strong> operates under the leadership of President <strong>Zakir Hussain</strong> and Secretary <strong>Mohd Rahim Abdul Kalam Khan</strong>.</p>
+                <p class="text-muted mb-4">Our core objective is to organize grassroots community initiatives, empower youth through skill enhancement, and extend support to underserved populations in the Greater Mumbai region.</p>
+                
+                <div class="row text-center mt-4">
+                    <div class="col-6 border-end">
+                        <h3 class="fw-bold text-primary"><i class="fas fa-hands-helping mb-2 d-block"></i>100%</h3>
+                        <p class="text-muted fw-semibold mb-0">Community Focused</p>
+                    </div>
+                    <div class="col-6">
+                        <h3 class="fw-bold text-primary"><i class="fas fa-users mb-2 d-block"></i>25+</h3>
+                        <p class="text-muted fw-semibold mb-0">Active Members</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Leadership & Members Section -->
+<section id="team">
+    <div class="container">
+        <div class="section-header text-center">
+            <h6 class="section-subtitle">Our Governance</h6>
+            <h2 class="fw-bold">Trustees & Dedicated Members</h2>
+        </div>
+        
+        <div class="row g-4">
+                        <div class="col-lg-3 col-md-4 col-sm-6 reveal reveal-delay-1">
+                <div class="card card-custom h-100 text-center p-4">
+                    <div class="card-body p-0">
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-sm" style="width:65px; height:65px; font-size: 1.5rem;">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h5 class="card-title fw-bold mb-1 text-dark">Zakir Hussain</h5>
+                        <p class="card-text text-primary fw-semibold small mb-0">President</p>
+                    </div>
+                </div>
+            </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 reveal reveal-delay-2">
+                <div class="card card-custom h-100 text-center p-4">
+                    <div class="card-body p-0">
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-sm" style="width:65px; height:65px; font-size: 1.5rem;">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h5 class="card-title fw-bold mb-1 text-dark">Mohd Rahim Abdul Kalam Khan</h5>
+                        <p class="card-text text-primary fw-semibold small mb-0">Secretary</p>
+                    </div>
+                </div>
+            </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 reveal reveal-delay-3">
+                <div class="card card-custom h-100 text-center p-4">
+                    <div class="card-body p-0">
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-sm" style="width:65px; height:65px; font-size: 1.5rem;">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h5 class="card-title fw-bold mb-1 text-dark">Masum Raja</h5>
+                        <p class="card-text text-primary fw-semibold small mb-0">Trust Member</p>
+                    </div>
+                </div>
+            </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 reveal reveal-delay-4">
+                <div class="card card-custom h-100 text-center p-4">
+                    <div class="card-body p-0">
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-sm" style="width:65px; height:65px; font-size: 1.5rem;">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h5 class="card-title fw-bold mb-1 text-dark">Mugahed</h5>
+                        <p class="card-text text-primary fw-semibold small mb-0">Trust Member</p>
+                    </div>
+                </div>
+            </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 reveal reveal-delay-5">
+                <div class="card card-custom h-100 text-center p-4">
+                    <div class="card-body p-0">
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-sm" style="width:65px; height:65px; font-size: 1.5rem;">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h5 class="card-title fw-bold mb-1 text-dark">Rajabul</h5>
+                        <p class="card-text text-primary fw-semibold small mb-0">Trust Member</p>
+                    </div>
+                </div>
+            </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 reveal reveal-delay-6">
+                <div class="card card-custom h-100 text-center p-4">
+                    <div class="card-body p-0">
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-sm" style="width:65px; height:65px; font-size: 1.5rem;">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h5 class="card-title fw-bold mb-1 text-dark">Safikul</h5>
+                        <p class="card-text text-primary fw-semibold small mb-0">Trust Member</p>
+                    </div>
+                </div>
+            </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 reveal reveal-delay-7">
+                <div class="card card-custom h-100 text-center p-4">
+                    <div class="card-body p-0">
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-sm" style="width:65px; height:65px; font-size: 1.5rem;">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h5 class="card-title fw-bold mb-1 text-dark">Taseen</h5>
+                        <p class="card-text text-primary fw-semibold small mb-0">Trust Member</p>
+                    </div>
+                </div>
+            </div>
+                        <div class="col-lg-3 col-md-4 col-sm-6 reveal reveal-delay-8">
+                <div class="card card-custom h-100 text-center p-4">
+                    <div class="card-body p-0">
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-sm" style="width:65px; height:65px; font-size: 1.5rem;">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h5 class="card-title fw-bold mb-1 text-dark">Golam Mainuddin</h5>
+                        <p class="card-text text-primary fw-semibold small mb-0">Trust Member</p>
+                    </div>
+                </div>
+            </div>
+                    </div>
+    </div>
+</section>
+
+<!-- Gallery / Our Work Section -->
+<section id="gallery" class="bg-light">
+    <div class="container">
+        <div class="section-header text-center">
+            <h6 class="section-subtitle">Our Impact</h6>
+            <h2 class="fw-bold">Glimpse of Our Initiatives</h2>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4 reveal reveal-delay-1">
+                <img src="upload/1 (1).jpeg" alt="Trust Activity 1" class="gallery-img" onerror="this.src='https://via.placeholder.com/400x300?text=Activity+1'">
+            </div>
+            <div class="col-md-4 reveal reveal-delay-2">
+                <img src="upload/1 (2).jpeg" alt="Trust Activity 2" class="gallery-img" onerror="this.src='https://via.placeholder.com/400x300?text=Activity+2'">
+            </div>
+            <div class="col-md-4 reveal reveal-delay-3">
+                <img src="upload/1 (3).jpeg" alt="Trust Activity 3" class="gallery-img" onerror="this.src='https://via.placeholder.com/400x300?text=Activity+3'">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="reveal">
+    <div class="container">
+        <div class="row g-5 bg-white shadow-sm p-4 p-md-5 rounded-4 border">
+            <!-- Contact Details -->
+            <div class="col-md-5 border-end border-light">
+                <h6 class="section-subtitle">Get In Touch</h6>
+                <h2 class="fw-bold mb-4">Contact Information</h2>
+                
+                <div class="d-flex mb-4 align-items-start">
+                    <div class="text-primary me-3 pt-1"><i class="fas fa-map-marker-alt fs-4"></i></div>
+                    <div>
+                        <h6 class="fw-bold mb-1">Registered Address</h6>
+                        <p class="text-muted mb-0">Gala No D 1, Aana Sagar Scrap Market, Kurla-Andheri Road, Naaz Hotel, Jarimari, Sakinaka, Mumbai - 400072</p>
+                    </div>
+                </div>
+                
+                <div class="d-flex mb-4 align-items-start">
+                    <div class="text-primary me-3 pt-1"><i class="fas fa-phone fs-4"></i></div>
+                    <div>
+                        <h6 class="fw-bold mb-1">Phone Number</h6>
+                        <p class="mb-0"><a href="tel:+919076349867" class="text-decoration-none text-muted">+91 90763 49867</a></p>
+                    </div>
+                </div>
+                
+                <div class="d-flex align-items-start">
+                    <div class="text-primary me-3 pt-1"><i class="fas fa-file-contract fs-4"></i></div>
+                    <div>
+                        <h6 class="fw-bold mb-1">Registration Details</h6>
+                        <p class="text-muted mb-0">G.B.B.S.D 409/2026 | F-82401 (M)</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Form -->
+            <div class="col-md-7">
+                <h3 class="fw-bold mb-4 text-dark">Send Us a Message</h3>
+                <form action="#" method="POST">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control rounded-3" placeholder="Your Name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="tel" class="form-control rounded-3" placeholder="Your Phone Number" required>
+                        </div>
+                        <div class="col-12">
+                            <input type="email" class="form-control rounded-3" placeholder="Your Email Address">
+                        </div>
+                        <div class="col-12">
+                            <textarea class="form-control rounded-3" rows="5" placeholder="How can we help you?" required></textarea>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary px-5 py-2 fw-bold rounded-pill shadow-sm">Send Message</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+</main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-auto">
+        <div class="container text-center">
+            <p class="mb-2 fw-semibold">&copy; 2026 Young Samaj Seva Trust. All Rights Reserved.</p>
+            <p class="text-white-50 mb-0 small">Registered under N.G.O. Act, Govt. of Maharashtra (Reg No: G.B.B.S.D 409/2026 | F-82401 (M))</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Smooth Slow Scroll Reveal -->
+    <script>
+        // Intersection Observer — triggers .visible when element enters viewport
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    // keep it visible once shown (no re-hide)
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.12,       // trigger when 12% of element is in view
+            rootMargin: '0px 0px -40px 0px'
+        });
+
+        // Observe every element with class 'reveal'
+        document.querySelectorAll('.reveal').forEach(el => {
+            revealObserver.observe(el);
+        });
+    </script>
+</body>
+</html>
