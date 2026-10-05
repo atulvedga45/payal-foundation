@@ -19,7 +19,8 @@ def get_engine_and_session():
 
     # Try PostgreSQL or configured URL
     try:
-        test_engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+        connect_args = {"connect_timeout": 1} if "postgres" in DATABASE_URL else {}
+        test_engine = create_engine(DATABASE_URL, pool_pre_ping=True, connect_args=connect_args)
         # Verify connection
         with test_engine.connect() as conn:
             pass

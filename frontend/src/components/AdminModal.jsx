@@ -93,13 +93,14 @@ export default function AdminModal({ isOpen, onClose, homeStats, onUpdateHomeSta
     setLoginError('');
     try {
       const res = await adminLogin(password);
-      if (res.token) {
-        setToken(res.token);
-        localStorage.setItem('admin_token', res.token);
+      if (res && (res.token || res.success)) {
+        const adminToken = res.token || 'admin123';
+        setToken(adminToken);
+        localStorage.setItem('admin_token', adminToken);
         loadAllAdminData();
       }
     } catch (err) {
-      setLoginError('Invalid password. Default password is: admin123');
+      setLoginError('चुकीचा पासवर्ड! कृपया योग्य पासवर्ड प्रविष्ट करा (Default: admin123)');
     }
   };
 
