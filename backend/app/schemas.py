@@ -50,6 +50,28 @@ class InitiativeSchema(BaseModel):
     class Config:
         from_attributes = True
 
+class InitiativeCreate(BaseModel):
+    title: str
+    title_mr: Optional[str] = None
+    description: str
+    description_mr: Optional[str] = None
+    category: str = "Social Welfare"
+    icon: Optional[str] = "Heart"
+    image_url: Optional[str] = None
+    target_amount: float = 0.0
+    raised_amount: float = 0.0
+
+class InitiativeUpdate(BaseModel):
+    title: Optional[str] = None
+    title_mr: Optional[str] = None
+    description: Optional[str] = None
+    description_mr: Optional[str] = None
+    category: Optional[str] = None
+    icon: Optional[str] = None
+    image_url: Optional[str] = None
+    target_amount: Optional[float] = None
+    raised_amount: Optional[float] = None
+
 # Contact Message
 class ContactCreate(BaseModel):
     name: str

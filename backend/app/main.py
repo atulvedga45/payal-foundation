@@ -1,13 +1,20 @@
+import os
+import shutil
+import time
 from contextlib import asynccontextmanager
 from typing import List
-from fastapi import FastAPI, Depends, HTTPException, Header, status
+from fastapi import FastAPI, Depends, HTTPException, Header, status, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
 from . import models, schemas, crud
 from .database import engine, Base, get_db, SessionLocal
 from .seed_data import seed_initial_data
 from .config import ADMIN_SECRET_KEY, CORS_ORIGINS
+
+UPLOADS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "public", "uploads"))
+os.makedirs(UPLOADS_DIR, exist_ok=True)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -27,6 +34,9 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+
+# Mount uploads static folder
+app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
 
 # CORS Middleware
 app.add_middleware(
@@ -118,3 +128,47 @@ def update_home_stats_endpoint(
     authorized: bool = Depends(verify_admin)
 ):
     return crud.update_home_stats(db, stats_update)
+
+# Initiative Admin Endpoints
+@app.post("/api/admin/initiatives", response_model=schemas.InitiativeSchema)
+def add_initiative_endpoint(
+    initiative: schemas.InitiativeCreate,
+    db: Session = Depends(get_db),
+    authorized: bool = Depends(verify_admin)
+):
+    return crud.create_initiative(db, initiative)
+
+@app.put("/api/admin/initiatives/{initiative_id}", response_model=schemas.InitiativeSchema)
+def update_initiative_endpoint(
+    initiative_id: int,
+    initiative: schemas.InitiativeUpdate,
+    db: Session = Depends(get_db),
+    authorized: bool = Depends(verify_admin)
+):
+    updated = crud.update_initiative(db, initiative_id, initiative)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Initiative not found")
+    return updated
+
+@app.delete("/api/admin/initiatives/{initiative_id}")
+def delete_initiative_endpoint(
+    initiative_id: int,
+    db: Session = Depends(get_db),
+    authorized: bool = Depends(verify_admin)
+):
+    success = crud.delete_initiative(db, initiative_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Initiative not found")
+    return {"success": True, "message": "Initiative deleted successfully"}
+
+# Image Upload Endpoint
+@app.post("/api/admin/upload-image")
+async def upload_image_endpoint(
+    file: UploadFile = File(...),
+    authorized: bool = Depends(verify_admin)
+):
+    clean_name = f"{int(time.time())}_{file.filename.replace(' ', '_')}"
+    file_path = os.path.join(UPLOADS_DIR, clean_name)
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    return {"url": f"/uploads/{clean_name}", "filename": clean_name}

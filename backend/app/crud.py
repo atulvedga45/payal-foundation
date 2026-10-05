@@ -8,7 +8,44 @@ def get_trustees(db: Session):
     return db.query(models.Trustee).order_by(models.Trustee.order.asc(), models.Trustee.id.asc()).all()
 
 def get_initiatives(db: Session):
-    return db.query(models.Initiative).all()
+    return db.query(models.Initiative).order_by(models.Initiative.id.asc()).all()
+
+def create_initiative(db: Session, init: schemas.InitiativeCreate):
+    db_obj = models.Initiative(
+        title=init.title,
+        title_mr=init.title_mr,
+        description=init.description,
+        description_mr=init.description_mr,
+        category=init.category,
+        icon=init.icon or "Heart",
+        image_url=init.image_url,
+        target_amount=init.target_amount,
+        raised_amount=init.raised_amount
+    )
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj
+
+def update_initiative(db: Session, initiative_id: int, init_data: schemas.InitiativeUpdate):
+    db_obj = db.query(models.Initiative).filter(models.Initiative.id == initiative_id).first()
+    if not db_obj:
+        return None
+    data = init_data.model_dump(exclude_unset=True) if hasattr(init_data, "model_dump") else init_data.dict(exclude_unset=True)
+    for field, val in data.items():
+        if val is not None:
+            setattr(db_obj, field, val)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj
+
+def delete_initiative(db: Session, initiative_id: int):
+    db_obj = db.query(models.Initiative).filter(models.Initiative.id == initiative_id).first()
+    if not db_obj:
+        return False
+    db.delete(db_obj)
+    db.commit()
+    return True
 
 def create_contact_message(db: Session, contact: schemas.ContactCreate):
     db_obj = models.ContactMessage(

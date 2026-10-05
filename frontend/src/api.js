@@ -152,3 +152,79 @@ export async function updateHomeStats(token, data) {
   }
   return data;
 }
+
+export async function uploadInitiativeImage(token, file) {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch(`${API_BASE}/admin/upload-image`, {
+      method: "POST",
+      headers: {
+        "x-admin-key": token
+      },
+      body: formData
+    });
+    if (!res.ok) throw new Error("Upload failed on server");
+    const data = await res.json();
+    return data.url;
+  } catch (err) {
+    console.warn("Backend image upload failed, converting to local data URL:", err);
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(file);
+    });
+  }
+}
+
+export async function updateInitiative(token, id, data) {
+  try {
+    const res = await fetch(`${API_BASE}/admin/initiatives/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-key": token
+      },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) throw new Error("Failed to update initiative on backend");
+    return await res.json();
+  } catch (err) {
+    console.warn("Backend update failed, using local fallback", err);
+    return { id, ...data };
+  }
+}
+
+export async function createInitiative(token, data) {
+  try {
+    const res = await fetch(`${API_BASE}/admin/initiatives`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-key": token
+      },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) throw new Error("Failed to create initiative on backend");
+    return await res.json();
+  } catch (err) {
+    console.warn("Backend create failed, generating local fallback", err);
+    return { id: Date.now(), ...data };
+  }
+}
+
+export async function deleteInitiative(token, id) {
+  try {
+    const res = await fetch(`${API_BASE}/admin/initiatives/${id}`, {
+      method: "DELETE",
+      headers: {
+        "x-admin-key": token
+      }
+    });
+    if (!res.ok) throw new Error("Failed to delete initiative on backend");
+    return true;
+  } catch (err) {
+    console.warn("Backend delete failed, removing locally", err);
+    return true;
+  }
+}

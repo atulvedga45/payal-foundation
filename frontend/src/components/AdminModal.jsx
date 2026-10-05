@@ -1,12 +1,45 @@
-import React, { useState, useEffect } from 'react';
-import { X, ShieldCheck, DollarSign, Users, MessageSquare, LogOut, CheckCircle, RefreshCw, SlidersHorizontal, Save, Heart, HandHeart, RotateCcw } from 'lucide-react';
-import { adminLogin, fetchDashboardStats, fetchAllDonations, fetchAllVolunteers, fetchAllMessages, updateHomeStats } from '../api';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  X, ShieldCheck, DollarSign, Users, MessageSquare, LogOut,
+  CheckCircle, RefreshCw, SlidersHorizontal, Save, Heart, HandHeart,
+  RotateCcw, Target, Edit3, Trash2, Plus, Image as ImageIcon,
+  Upload, ArrowLeft, AlertCircle
+} from 'lucide-react';
+import {
+  adminLogin,
+  fetchDashboardStats,
+  fetchAllDonations,
+  fetchAllVolunteers,
+  fetchAllMessages,
+  updateHomeStats,
+  updateInitiative,
+  createInitiative,
+  deleteInitiative,
+  uploadInitiativeImage
+} from '../api';
 
-export default function AdminModal({ isOpen, onClose, homeStats, onUpdateHomeStats }) {
+const PRESET_IMAGES = [
+  { label: 'अन्नदान व रेशन वाटप', path: '/food_distribution.jpg' },
+  { label: 'आरोग्य व वैद्यकीय शिबिर', path: '/healthcare_camp.jpg' },
+  { label: 'महिला सबलीकरण', path: '/women_empowerment.jpg' },
+  { label: 'युवा शिक्षण व कौशल्य', path: '/img1.jpeg' },
+  { label: 'बाल संगोपन व रुग्णालय', path: '/child_healthcare_hospital.jpg' },
+  { label: 'समाजकार्य व मदत', path: '/community_outreach.jpg' },
+  { label: 'आपत्ती निवारण व नियोजन', path: '/relief_planning.jpeg' }
+];
+
+export default function AdminModal({
+  isOpen,
+  onClose,
+  homeStats,
+  onUpdateHomeStats,
+  initiatives = [],
+  onUpdateInitiatives
+}) {
   const [token, setToken] = useState(localStorage.getItem('admin_token') || '');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
-  const [activeTab, setActiveTab] = useState('homestats');
+  const [activeTab, setActiveTab] = useState('initiatives');
   const [loading, setLoading] = useState(false);
 
   const [stats, setStats] = useState({
@@ -18,6 +51,20 @@ export default function AdminModal({ isOpen, onClose, homeStats, onUpdateHomeSta
   const [donations, setDonations] = useState([]);
   const [volunteers, setVolunteers] = useState([]);
   const [messages, setMessages] = useState([]);
+
+  // Initiatives State
+  const [localInitiatives, setLocalInitiatives] = useState(initiatives);
+  const [editingInit, setEditingInit] = useState(null);
+  const [initSaving, setInitSaving] = useState(false);
+  const [initUploading, setInitUploading] = useState(false);
+  const [initMsg, setInitMsg] = useState({ type: '', text: '' });
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    if (initiatives && initiatives.length > 0) {
+      setLocalInitiatives(initiatives);
+    }
+  }, [initiatives]);
 
   // Home Stats Form State (Editable Community Dedicated, Active Social Workers, Families Impacted)
   const [statsForm, setStatsForm] = useState({
@@ -86,6 +133,106 @@ export default function AdminModal({ isOpen, onClose, homeStats, onUpdateHomeSta
       stat3_label_mr: 'मदत पोहचलेली कुटुंबे'
     };
     setStatsForm(defaults);
+  };
+
+  // Initiative Management Handlers
+  const handleEditInitiative = (item) => {
+    setEditingInit({ ...item });
+    setInitMsg({ type: '', text: '' });
+  };
+
+  const handleAddNewInitiative = () => {
+    setEditingInit({
+      id: 'new',
+      title: '',
+      title_mr: '',
+      description: '',
+      description_mr: '',
+      category: 'Social Welfare',
+      icon: 'Heart',
+      image_url: '/food_distribution.jpg',
+      target_amount: 100000,
+      raised_amount: 0
+    });
+    setInitMsg({ type: '', text: '' });
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setInitUploading(true);
+    setInitMsg({ type: '', text: '' });
+    try {
+      const url = await uploadInitiativeImage(token, file);
+      if (url) {
+        setEditingInit((prev) => ({ ...prev, image_url: url }));
+        setInitMsg({ type: 'success', text: 'फोटो यशस्वीरीत्या अपलोड झाला! (Image uploaded successfully!)' });
+      }
+    } catch (err) {
+      console.error(err);
+      setInitMsg({ type: 'error', text: 'फोटो अपलोड करताना अडचण आली.' });
+    } finally {
+      setInitUploading(false);
+    }
+  };
+
+  const handleSaveInitiative = async (e) => {
+    e.preventDefault();
+    if (!editingInit.title.trim()) {
+      setInitMsg({ type: 'error', text: 'कृपया उपक्रमाचे नाव (Title) प्रविष्ट करा.' });
+      return;
+    }
+    setInitSaving(true);
+    setInitMsg({ type: '', text: '' });
+    try {
+      let updatedList = [];
+      if (editingInit.id === 'new') {
+        const payload = {
+          ...editingInit,
+          title_mr: editingInit.title_mr || editingInit.title,
+          description_mr: editingInit.description_mr || editingInit.description,
+          target_amount: Number(editingInit.target_amount) || 0,
+          raised_amount: Number(editingInit.raised_amount) || 0
+        };
+        const created = await createInitiative(token, payload);
+        updatedList = [...localInitiatives, created];
+      } else {
+        const payload = {
+          ...editingInit,
+          target_amount: Number(editingInit.target_amount) || 0,
+          raised_amount: Number(editingInit.raised_amount) || 0
+        };
+        const saved = await updateInitiative(token, editingInit.id, payload);
+        updatedList = localInitiatives.map((item) => item.id === editingInit.id ? (saved || payload) : item);
+      }
+      setLocalInitiatives(updatedList);
+      if (onUpdateInitiatives) onUpdateInitiatives(updatedList);
+      setEditingInit(null);
+      setInitMsg({ type: 'success', text: 'उपक्रम यशस्वीरीत्या सेव्ह झाला! (Initiative saved successfully!)' });
+      setTimeout(() => setInitMsg({ type: '', text: '' }), 4000);
+    } catch (err) {
+      console.error(err);
+      setInitMsg({ type: 'error', text: 'उपक्रम सेव्ह करताना त्रुटी आली.' });
+    } finally {
+      setInitSaving(false);
+    }
+  };
+
+  const handleDeleteInitiative = async (id) => {
+    if (!window.confirm('हा उपक्रम खरोखर हटवायचा आहे का? (Are you sure you want to delete this initiative?)')) {
+      return;
+    }
+    try {
+      await deleteInitiative(token, id);
+      const updatedList = localInitiatives.filter((item) => item.id !== id);
+      setLocalInitiatives(updatedList);
+      if (onUpdateInitiatives) onUpdateInitiatives(updatedList);
+      setInitMsg({ type: 'success', text: 'उपक्रम यशस्वीरीत्या हटवला गेला! (Initiative deleted!)' });
+      setTimeout(() => setInitMsg({ type: '', text: '' }), 4000);
+    } catch (err) {
+      console.error(err);
+      setInitMsg({ type: 'error', text: 'उपक्रम हटवताना त्रुटी आली.' });
+    }
   };
 
   const handleLogin = async (e) => {
@@ -283,6 +430,26 @@ export default function AdminModal({ isOpen, onClose, homeStats, onUpdateHomeSta
                 >
                   <SlidersHorizontal size={15} />
                   <span>Home Stats (आकडेवारी)</span>
+                </button>
+
+                <button
+                  onClick={() => { setActiveTab('initiatives'); setEditingInit(null); }}
+                  style={{
+                    padding: '0.45rem 1rem',
+                    borderRadius: 'var(--radius-full)',
+                    border: 'none',
+                    background: activeTab === 'initiatives' ? 'var(--primary)' : 'rgba(0,0,0,0.05)',
+                    color: activeTab === 'initiatives' ? '#ffffff' : 'var(--text-main)',
+                    fontWeight: 600,
+                    fontSize: '0.85rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem'
+                  }}
+                >
+                  <Target size={15} />
+                  <span>Initiatives (उपक्रम - {localInitiatives.length})</span>
                 </button>
 
                 <button
@@ -781,6 +948,480 @@ export default function AdminModal({ isOpen, onClose, homeStats, onUpdateHomeSta
                       </button>
                     </div>
                   </form>
+                </div>
+              )}
+
+              {activeTab === 'initiatives' && (
+                <div>
+                  {initMsg.text && (
+                    <div style={{
+                      backgroundColor: initMsg.type === 'error' ? '#fee2e2' : '#dcfce7',
+                      border: `1px solid ${initMsg.type === 'error' ? '#fca5a5' : '#86efac'}`,
+                      color: initMsg.type === 'error' ? '#b91c1c' : '#15803d',
+                      padding: '0.85rem 1.25rem',
+                      borderRadius: 'var(--radius-sm)',
+                      marginBottom: '1.25rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      fontWeight: 600,
+                      fontSize: '0.9rem'
+                    }}>
+                      {initMsg.type === 'error' ? <AlertCircle size={18} /> : <CheckCircle size={18} />}
+                      <span>{initMsg.text}</span>
+                    </div>
+                  )}
+
+                  {editingInit ? (
+                    /* Edit / Add Initiative Form */
+                    <div style={{
+                      backgroundColor: '#ffffff',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: 'var(--radius-md)',
+                      padding: '1.5rem',
+                      boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--border-color)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                          <button
+                            type="button"
+                            onClick={() => setEditingInit(null)}
+                            style={{
+                              background: '#f1f5f9',
+                              border: 'none',
+                              borderRadius: 'var(--radius-full)',
+                              width: '32px',
+                              height: '32px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              color: 'var(--text-main)'
+                            }}
+                          >
+                            <ArrowLeft size={16} />
+                          </button>
+                          <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)' }}>
+                            {editingInit.id === 'new' ? 'नवीन उपक्रम जोडा (Add New Initiative)' : `उपक्रम संपादित करा: ${editingInit.title_mr || editingInit.title}`}
+                          </h4>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setEditingInit(null)}
+                          style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.85rem' }}
+                        >
+                          रद्द करा (Cancel)
+                        </button>
+                      </div>
+
+                      <form onSubmit={handleSaveInitiative}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                          
+                          {/* Left Column: Text & Details */}
+                          <div>
+                            <div style={{ marginBottom: '1rem' }}>
+                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
+                                Initiative Title (English) *
+                              </label>
+                              <input
+                                type="text"
+                                value={editingInit.title}
+                                onChange={(e) => setEditingInit({ ...editingInit, title: e.target.value })}
+                                placeholder="e.g. Community Food & Ration Distribution"
+                                required
+                                style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
+                              />
+                            </div>
+
+                            <div style={{ marginBottom: '1rem' }}>
+                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
+                                उपक्रमाचे नाव (मराठी)
+                              </label>
+                              <input
+                                type="text"
+                                value={editingInit.title_mr || ''}
+                                onChange={(e) => setEditingInit({ ...editingInit, title_mr: e.target.value })}
+                                placeholder="उदा. अन्नदान व अन्नधान्य वाटप मोहीम"
+                                style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
+                              />
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                              <div>
+                                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
+                                  Category (श्रेणी)
+                                </label>
+                                <input
+                                  type="text"
+                                  value={editingInit.category || ''}
+                                  onChange={(e) => setEditingInit({ ...editingInit, category: e.target.value })}
+                                  placeholder="e.g. Hunger Relief, Healthcare"
+                                  style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
+                                />
+                              </div>
+                              <div>
+                                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
+                                  Target Amount (₹ लक्ष)
+                                </label>
+                                <input
+                                  type="number"
+                                  value={editingInit.target_amount || ''}
+                                  onChange={(e) => setEditingInit({ ...editingInit, target_amount: e.target.value })}
+                                  placeholder="200000"
+                                  style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
+                                />
+                              </div>
+                            </div>
+
+                            <div style={{ marginBottom: '1rem' }}>
+                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
+                                Raised Amount (₹ जमा झालेला निधी)
+                              </label>
+                              <input
+                                type="number"
+                                value={editingInit.raised_amount || ''}
+                                onChange={(e) => setEditingInit({ ...editingInit, raised_amount: e.target.value })}
+                                placeholder="140000"
+                                style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
+                              />
+                            </div>
+
+                            <div style={{ marginBottom: '1rem' }}>
+                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
+                                Description (English)
+                              </label>
+                              <textarea
+                                rows={3}
+                                value={editingInit.description || ''}
+                                onChange={(e) => setEditingInit({ ...editingInit, description: e.target.value })}
+                                placeholder="Providing nutritious meals and monthly ration kits..."
+                                style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.88rem', resize: 'vertical' }}
+                              />
+                            </div>
+
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
+                                वर्णन (मराठी)
+                              </label>
+                              <textarea
+                                rows={3}
+                                value={editingInit.description_mr || ''}
+                                onChange={(e) => setEditingInit({ ...editingInit, description_mr: e.target.value })}
+                                placeholder="गरीब व गरजू कुटुंबांना दरमहा पोषण आहार व रेशन किट वाटप करणे..."
+                                style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.88rem', resize: 'vertical' }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Right Column: Image Selection & Upload */}
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--text-main)' }}>
+                              🖼️ उपक्रमाचा फोटो (Initiative Image)
+                            </label>
+                            
+                            {/* Live Image Preview Card */}
+                            <div style={{
+                              width: '100%',
+                              height: '200px',
+                              borderRadius: '10px',
+                              overflow: 'hidden',
+                              backgroundColor: '#f1f5f9',
+                              border: '2px dashed var(--border-color)',
+                              position: 'relative',
+                              marginBottom: '1rem',
+                              boxShadow: '0 4px 6px rgba(0,0,0,0.06)'
+                            }}>
+                              <img
+                                src={editingInit.image_url || '/food_distribution.jpg'}
+                                alt="Preview"
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                onError={(e) => { e.target.src = '/food_distribution.jpg'; }}
+                              />
+                              <div style={{
+                                position: 'absolute',
+                                bottom: '8px',
+                                right: '8px',
+                                background: 'rgba(0,0,0,0.7)',
+                                color: '#ffffff',
+                                padding: '0.2rem 0.6rem',
+                                borderRadius: '4px',
+                                fontSize: '0.72rem',
+                                fontWeight: 600
+                              }}>
+                                Current Image Preview
+                              </div>
+                            </div>
+
+                            {/* Hidden file input */}
+                            <input
+                              type="file"
+                              ref={fileInputRef}
+                              accept="image/*"
+                              onChange={handleImageUpload}
+                              style={{ display: 'none' }}
+                            />
+
+                            {/* Upload Button */}
+                            <div style={{ marginBottom: '1.25rem' }}>
+                              <button
+                                type="button"
+                                disabled={initUploading}
+                                onClick={() => fileInputRef.current?.click()}
+                                style={{
+                                  width: '100%',
+                                  padding: '0.65rem 1rem',
+                                  borderRadius: '6px',
+                                  border: '1.5px solid var(--primary)',
+                                  background: 'var(--primary-light)',
+                                  color: 'var(--primary)',
+                                  fontWeight: 700,
+                                  fontSize: '0.88rem',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  gap: '0.5rem',
+                                  cursor: initUploading ? 'not-allowed' : 'pointer'
+                                }}
+                              >
+                                <Upload size={16} />
+                                <span>{initUploading ? 'फोटो अपलोड होत आहे...' : '📁 डिव्हाइसवरून नवीन फोटो निवडा (Upload Image)'}</span>
+                              </button>
+                            </div>
+
+                            {/* Preset Images Gallery */}
+                            <div style={{ marginBottom: '1.25rem' }}>
+                              <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+                                किंवा खालील उपलब्ध फोटोंमधून निवडा (Choose Preset):
+                              </div>
+                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
+                                {PRESET_IMAGES.map((p, idx) => {
+                                  const isSelected = editingInit.image_url === p.path;
+                                  return (
+                                    <div
+                                      key={idx}
+                                      onClick={() => setEditingInit({ ...editingInit, image_url: p.path })}
+                                      title={p.label}
+                                      style={{
+                                        cursor: 'pointer',
+                                        borderRadius: '6px',
+                                        overflow: 'hidden',
+                                        height: '56px',
+                                        border: isSelected ? '2.5px solid var(--primary)' : '1px solid var(--border-color)',
+                                        opacity: isSelected ? 1 : 0.75,
+                                        transform: isSelected ? 'scale(1.04)' : 'none',
+                                        transition: 'all 0.15s ease',
+                                        boxShadow: isSelected ? '0 0 0 2px var(--primary-light)' : 'none'
+                                      }}
+                                    >
+                                      <img src={p.path} alt={p.label} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+
+                            {/* Direct URL input */}
+                            <div>
+                              <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
+                                Image Path / URL:
+                              </div>
+                              <input
+                                type="text"
+                                value={editingInit.image_url || ''}
+                                onChange={(e) => setEditingInit({ ...editingInit, image_url: e.target.value })}
+                                placeholder="/food_distribution.jpg"
+                                style={{ width: '100%', padding: '0.55rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.85rem', fontFamily: 'monospace' }}
+                              />
+                            </div>
+
+                          </div>
+                        </div>
+
+                        {/* Save / Cancel buttons */}
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.85rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)' }}>
+                          <button
+                            type="button"
+                            onClick={() => setEditingInit(null)}
+                            style={{
+                              padding: '0.65rem 1.25rem',
+                              borderRadius: '6px',
+                              border: '1px solid var(--border-color)',
+                              background: '#f8fafc',
+                              color: 'var(--text-main)',
+                              fontWeight: 600,
+                              cursor: 'pointer'
+                            }}
+                          >
+                            रद्द करा (Cancel)
+                          </button>
+                          <button
+                            type="submit"
+                            disabled={initSaving}
+                            className="btn btn-primary"
+                            style={{
+                              padding: '0.65rem 1.5rem',
+                              fontWeight: 700,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.45rem',
+                              cursor: initSaving ? 'not-allowed' : 'pointer'
+                            }}
+                          >
+                            <Save size={16} />
+                            <span>{initSaving ? 'सेव्ह होत आहे...' : 'उपक्रम सेव्ह करा (Save Changes)'}</span>
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  ) : (
+                    /* Initiatives List View */
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+                        <div>
+                          <h4 style={{ fontSize: '1.2rem', fontWeight: 800, margin: '0 0 0.25rem 0', color: 'var(--text-main)' }}>
+                            Initiatives & Projects Management (उपक्रम व्यवस्थापन)
+                          </h4>
+                          <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                            येथून तुम्ही उपक्रमांची नावे, माहिती, निधीचे आकडे आणि फोटो सहज बदलू शकता.
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleAddNewInitiative}
+                          className="btn btn-primary"
+                          style={{
+                            padding: '0.55rem 1.15rem',
+                            fontSize: '0.85rem',
+                            fontWeight: 700,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.4rem'
+                          }}
+                        >
+                          <Plus size={16} />
+                          <span>नवीन उपक्रम जोडा (Add Initiative)</span>
+                        </button>
+                      </div>
+
+                      {localInitiatives.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
+                          कोणताही उपक्रम आढळला नाही. नवीन उपक्रम जोडण्यासाठी वरील बटणावर क्लिक करा.
+                        </div>
+                      ) : (
+                        <div style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                          gap: '1.25rem'
+                        }}>
+                          {localInitiatives.map((item) => (
+                            <div
+                              key={item.id}
+                              style={{
+                                border: '1px solid var(--border-color)',
+                                borderRadius: 'var(--radius-md)',
+                                overflow: 'hidden',
+                                backgroundColor: '#ffffff',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                boxShadow: '0 2px 4px rgba(0,0,0,0.03)',
+                                transition: 'transform 0.2s, box-shadow 0.2s'
+                              }}
+                            >
+                              {/* Card Image */}
+                              <div style={{ height: '140px', position: 'relative', backgroundColor: '#f1f5f9' }}>
+                                <img
+                                  src={item.image_url || '/food_distribution.jpg'}
+                                  alt={item.title}
+                                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                  onError={(e) => { e.target.src = '/food_distribution.jpg'; }}
+                                />
+                                <div style={{
+                                  position: 'absolute',
+                                  top: '8px',
+                                  left: '8px',
+                                  background: 'rgba(255,255,255,0.95)',
+                                  color: 'var(--primary)',
+                                  padding: '0.2rem 0.6rem',
+                                  borderRadius: '9999px',
+                                  fontSize: '0.72rem',
+                                  fontWeight: 700
+                                }}>
+                                  {item.category}
+                                </div>
+                              </div>
+
+                              {/* Card Info */}
+                              <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                                <div style={{ fontWeight: 800, fontSize: '0.98rem', color: 'var(--text-main)', marginBottom: '0.25rem' }}>
+                                  {item.title_mr || item.title}
+                                </div>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.65rem' }}>
+                                  {item.title}
+                                </div>
+
+                                <div style={{
+                                  background: '#f8fafc',
+                                  padding: '0.6rem 0.85rem',
+                                  borderRadius: '6px',
+                                  fontSize: '0.8rem',
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  marginBottom: '0.85rem'
+                                }}>
+                                  <span>गोळा: <strong style={{ color: 'var(--primary)' }}>₹{item.raised_amount?.toLocaleString('en-IN') || 0}</strong></span>
+                                  <span>लक्ष्य: <strong>₹{item.target_amount?.toLocaleString('en-IN') || 0}</strong></span>
+                                </div>
+
+                                {/* Buttons */}
+                                <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }}>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleEditInitiative(item)}
+                                    style={{
+                                      flex: 1,
+                                      padding: '0.5rem 0.75rem',
+                                      borderRadius: '6px',
+                                      border: '1px solid var(--primary)',
+                                      background: 'var(--primary-light)',
+                                      color: 'var(--primary)',
+                                      fontWeight: 700,
+                                      fontSize: '0.82rem',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      gap: '0.35rem',
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    <Edit3 size={14} />
+                                    <span>माहिती व फोटो बदला (Edit)</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteInitiative(item.id)}
+                                    style={{
+                                      padding: '0.5rem 0.75rem',
+                                      borderRadius: '6px',
+                                      border: '1px solid #fecaca',
+                                      background: '#fee2e2',
+                                      color: '#b91c1c',
+                                      cursor: 'pointer',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center'
+                                    }}
+                                    title="उपक्रम हटवा (Delete)"
+                                  >
+                                    <Trash2 size={15} />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 

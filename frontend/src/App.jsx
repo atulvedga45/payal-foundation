@@ -79,7 +79,14 @@ export default function App() {
   const [lang, setLang] = useState('mr');
   const [trustInfo, setTrustInfo] = useState(null);
   const [trustees, setTrustees] = useState(DEFAULT_TRUSTEES);
-  const [initiatives, setInitiatives] = useState(DEFAULT_INITIATIVES);
+  const [initiatives, setInitiatives] = useState(() => {
+    try {
+      const cached = localStorage.getItem('payal_initiatives');
+      return cached ? JSON.parse(cached) : DEFAULT_INITIATIVES;
+    } catch {
+      return DEFAULT_INITIATIVES;
+    }
+  });
   const [homeStats, setHomeStats] = useState(() => {
     try {
       const cached = localStorage.getItem('payal_home_stats');
@@ -125,6 +132,7 @@ export default function App() {
       }
       if (initData.status === 'fulfilled' && initData.value && initData.value.length > 0) {
         setInitiatives(initData.value);
+        localStorage.setItem('payal_initiatives', JSON.stringify(initData.value));
       }
       if (statsData.status === 'fulfilled' && statsData.value) {
         setHomeStats(statsData.value);
@@ -247,6 +255,11 @@ export default function App() {
         onClose={() => setAdminOpen(false)}
         homeStats={homeStats}
         onUpdateHomeStats={(newStats) => setHomeStats(newStats)}
+        initiatives={initiatives}
+        onUpdateInitiatives={(newInits) => {
+          setInitiatives(newInits);
+          localStorage.setItem('payal_initiatives', JSON.stringify(newInits));
+        }}
       />
       </div>{/* end main site wrapper */}
     </div>
