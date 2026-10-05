@@ -1,7 +1,16 @@
 import React from 'react';
 import { Heart, Users, HandHeart, Sparkles, ArrowRight } from 'lucide-react';
 
-export default function Hero({ t }) {
+export default function Hero({ t, lang = 'mr', homeStats = null }) {
+  const stat1Number = homeStats?.stat1_number || t.hero.stat1Number;
+  const stat1Label = (lang === 'mr' ? homeStats?.stat1_label_mr : homeStats?.stat1_label) || homeStats?.stat1_label || t.hero.stat1Label;
+
+  const stat2Number = homeStats?.stat2_number || t.hero.stat2Number;
+  const stat2Label = (lang === 'mr' ? homeStats?.stat2_label_mr : homeStats?.stat2_label) || homeStats?.stat2_label || t.hero.stat2Label;
+
+  const stat3Number = homeStats?.stat3_number || t.hero.stat3Number;
+  const stat3Label = (lang === 'mr' ? homeStats?.stat3_label_mr : homeStats?.stat3_label) || homeStats?.stat3_label || t.hero.stat3Label;
+
   return (
     <section id="home" style={{
       position: 'relative',
@@ -275,10 +284,10 @@ export default function Hero({ t }) {
               </div>
               <div>
                 <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--primary)', lineHeight: 1.1 }}>
-                  {t.hero.stat1Number}
+                  {stat1Number}
                 </div>
                 <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-                  {t.hero.stat1Label}
+                  {stat1Label}
                 </div>
               </div>
             </div>
@@ -306,10 +315,10 @@ export default function Hero({ t }) {
               </div>
               <div>
                 <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#b45309', lineHeight: 1.1 }}>
-                  {t.hero.stat2Number}
+                  {stat2Number}
                 </div>
                 <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-                  {t.hero.stat2Label}
+                  {stat2Label}
                 </div>
               </div>
             </div>
@@ -337,10 +346,10 @@ export default function Hero({ t }) {
               </div>
               <div>
                 <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#15803d', lineHeight: 1.1 }}>
-                  {t.hero.stat3Number}
+                  {stat3Number}
                 </div>
                 <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-                  {t.hero.stat3Label}
+                  {stat3Label}
                 </div>
               </div>
             </div>

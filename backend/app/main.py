@@ -106,3 +106,15 @@ def admin_login(data: schemas.AdminLoginRequest):
 @app.get("/api/admin/dashboard")
 def admin_dashboard(db: Session = Depends(get_db)):
     return crud.get_dashboard_stats(db)
+
+@app.get("/api/home-stats", response_model=schemas.HomeStatsSchema)
+def get_home_stats_endpoint(db: Session = Depends(get_db)):
+    return crud.get_home_stats(db)
+
+@app.put("/api/admin/home-stats", response_model=schemas.HomeStatsSchema)
+def update_home_stats_endpoint(
+    stats_update: schemas.HomeStatsUpdateSchema,
+    db: Session = Depends(get_db),
+    authorized: bool = Depends(verify_admin)
+):
+    return crud.update_home_stats(db, stats_update)

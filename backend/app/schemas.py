@@ -124,3 +124,34 @@ class DonationResponse(BaseModel):
 # Admin Login
 class AdminLoginRequest(BaseModel):
     password: str
+
+# Home Stats
+class HomeStatsSchema(BaseModel):
+    id: Optional[int] = 1
+    stat1_number: str = "100%"
+    stat1_label: str = "Community Dedicated"
+    stat1_label_mr: Optional[str] = "समाजास समर्पित"
+
+    stat2_number: str = "50+"
+    stat2_label: str = "Active Social Workers"
+    stat2_label_mr: Optional[str] = "सक्रिय समाजसेवक"
+
+    stat3_number: str = "10,000+"
+    stat3_label: str = "Families Impacted"
+    stat3_label_mr: Optional[str] = "मदत पोहचलेली कुटुंबे"
+
+    class Config:
+        from_attributes = True
+
+class HomeStatsUpdateSchema(BaseModel):
+    stat1_number: Optional[str] = None
+    stat1_label: Optional[str] = None
+    stat1_label_mr: Optional[str] = None
+
+    stat2_number: Optional[str] = None
+    stat2_label: Optional[str] = None
+    stat2_label_mr: Optional[str] = None
+
+    stat3_number: Optional[str] = None
+    stat3_label: Optional[str] = None
+    stat3_label_mr: Optional[str] = None

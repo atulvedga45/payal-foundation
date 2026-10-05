@@ -85,3 +85,20 @@ class Donation(Base):
     cause = Column(String(100), default="General Community Fund")
     is_verified = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+class HomeStat(Base):
+    __tablename__ = "home_stats"
+
+    id = Column(Integer, primary_key=True, index=True)
+    stat1_number = Column(String(50), default="100%")
+    stat1_label = Column(String(100), default="Community Dedicated")
+    stat1_label_mr = Column(String(100), default="समाजास समर्पित")
+
+    stat2_number = Column(String(50), default="50+")
+    stat2_label = Column(String(100), default="Active Social Workers")
+    stat2_label_mr = Column(String(100), default="सक्रिय समाजसेवक")
+
+    stat3_number = Column(String(50), default="10,000+")
+    stat3_label = Column(String(100), default="Families Impacted")
+    stat3_label_mr = Column(String(100), default="मदत पोहचलेली कुटुंबे")
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

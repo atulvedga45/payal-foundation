@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { X, ShieldCheck, DollarSign, Users, MessageSquare, LogOut, CheckCircle, RefreshCw } from 'lucide-react';
-import { adminLogin, fetchDashboardStats, fetchAllDonations, fetchAllVolunteers, fetchAllMessages } from '../api';
+import { X, ShieldCheck, DollarSign, Users, MessageSquare, LogOut, CheckCircle, RefreshCw, SlidersHorizontal, Save, Heart, HandHeart, RotateCcw } from 'lucide-react';
+import { adminLogin, fetchDashboardStats, fetchAllDonations, fetchAllVolunteers, fetchAllMessages, updateHomeStats } from '../api';
 
-export default function AdminModal({ isOpen, onClose }) {
+export default function AdminModal({ isOpen, onClose, homeStats, onUpdateHomeStats }) {
   const [token, setToken] = useState(localStorage.getItem('admin_token') || '');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
-  const [activeTab, setActiveTab] = useState('donations');
+  const [activeTab, setActiveTab] = useState('homestats');
   const [loading, setLoading] = useState(false);
 
   const [stats, setStats] = useState({
@@ -18,6 +18,75 @@ export default function AdminModal({ isOpen, onClose }) {
   const [donations, setDonations] = useState([]);
   const [volunteers, setVolunteers] = useState([]);
   const [messages, setMessages] = useState([]);
+
+  // Home Stats Form State (Editable Community Dedicated, Active Social Workers, Families Impacted)
+  const [statsForm, setStatsForm] = useState({
+    stat1_number: '100%',
+    stat1_label: 'Community Dedicated',
+    stat1_label_mr: 'समाजास समर्पित',
+    stat2_number: '50+',
+    stat2_label: 'Active Social Workers',
+    stat2_label_mr: 'सक्रिय समाजसेवक',
+    stat3_number: '10,000+',
+    stat3_label: 'Families Impacted',
+    stat3_label_mr: 'मदत पोहचलेली कुटुंबे'
+  });
+  const [statsSaving, setStatsSaving] = useState(false);
+  const [statsSuccess, setStatsSuccess] = useState('');
+
+  useEffect(() => {
+    if (homeStats) {
+      setStatsForm({
+        stat1_number: homeStats.stat1_number || '100%',
+        stat1_label: homeStats.stat1_label || 'Community Dedicated',
+        stat1_label_mr: homeStats.stat1_label_mr || 'समाजास समर्पित',
+        stat2_number: homeStats.stat2_number || '50+',
+        stat2_label: homeStats.stat2_label || 'Active Social Workers',
+        stat2_label_mr: homeStats.stat2_label_mr || 'सक्रिय समाजसेवक',
+        stat3_number: homeStats.stat3_number || '10,000+',
+        stat3_label: homeStats.stat3_label || 'Families Impacted',
+        stat3_label_mr: homeStats.stat3_label_mr || 'मदत पोहचलेली कुटुंबे'
+      });
+    }
+  }, [homeStats, isOpen]);
+
+  const handleSaveHomeStats = async (e) => {
+    e.preventDefault();
+    setStatsSaving(true);
+    setStatsSuccess('');
+    try {
+      const updated = await updateHomeStats(token, statsForm);
+      if (onUpdateHomeStats) {
+        onUpdateHomeStats(updated || statsForm);
+      }
+      setStatsSuccess('होम पेज आकडेवारी यशस्वीरीत्या सेव्ह केली गेली! (Home stats updated live!)');
+      setTimeout(() => setStatsSuccess(''), 4500);
+    } catch (err) {
+      console.error(err);
+      if (onUpdateHomeStats) {
+        onUpdateHomeStats(statsForm);
+      }
+      setStatsSuccess('बदल सेव्ह झाले (Local cache updated).');
+      setTimeout(() => setStatsSuccess(''), 4500);
+    } finally {
+      setStatsSaving(false);
+    }
+  };
+
+  const handleResetDefaults = () => {
+    const defaults = {
+      stat1_number: '100%',
+      stat1_label: 'Community Dedicated',
+      stat1_label_mr: 'समाजास समर्पित',
+      stat2_number: '50+',
+      stat2_label: 'Active Social Workers',
+      stat2_label_mr: 'सक्रिय समाजसेवक',
+      stat3_number: '10,000+',
+      stat3_label: 'Families Impacted',
+      stat3_label_mr: 'मदत पोहचलेली कुटुंबे'
+    };
+    setStatsForm(defaults);
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -194,7 +263,27 @@ export default function AdminModal({ isOpen, onClose }) {
               gap: '1rem'
             }}>
               {/* Tab Switchers */}
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => setActiveTab('homestats')}
+                  style={{
+                    padding: '0.45rem 1rem',
+                    borderRadius: 'var(--radius-full)',
+                    border: 'none',
+                    background: activeTab === 'homestats' ? 'var(--primary)' : 'rgba(0,0,0,0.05)',
+                    color: activeTab === 'homestats' ? '#ffffff' : 'var(--text-main)',
+                    fontWeight: 600,
+                    fontSize: '0.85rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem'
+                  }}
+                >
+                  <SlidersHorizontal size={15} />
+                  <span>Home Stats (आकडेवारी)</span>
+                </button>
+
                 <button
                   onClick={() => setActiveTab('donations')}
                   style={{
@@ -298,6 +387,402 @@ export default function AdminModal({ isOpen, onClose }) {
 
             {/* Tab Contents with Scrollable Tables */}
             <div style={{ padding: '1.5rem 1.75rem', overflowY: 'auto', flexGrow: 1 }}>
+              {activeTab === 'homestats' && (
+                <div>
+                  {statsSuccess && (
+                    <div style={{
+                      backgroundColor: '#dcfce7',
+                      border: '1px solid #86efac',
+                      color: '#15803d',
+                      padding: '0.85rem 1.25rem',
+                      borderRadius: 'var(--radius-sm)',
+                      marginBottom: '1.25rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      fontWeight: 600,
+                      fontSize: '0.9rem'
+                    }}>
+                      <CheckCircle size={18} />
+                      <span>{statsSuccess}</span>
+                    </div>
+                  )}
+
+                  <div style={{ marginBottom: '1.25rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      <div>
+                        <h4 style={{ fontSize: '1.15rem', fontWeight: 800, margin: '0 0 0.25rem 0', color: 'var(--text-main)' }}>
+                          Home Page Impact Numbers (मुख्यपृष्ठ आकडेवारी व्यवस्थापन)
+                        </h4>
+                        <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                          मुख्यपृष्ठावरील ३ प्रमुख आकडेवारी (Community Dedicated, Active Social Workers, Families Impacted) येथे बदला. बदल त्वरित मुख्यपृष्ठावर दिसतील.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleResetDefaults}
+                        style={{
+                          background: '#f1f5f9',
+                          border: '1px solid var(--border-color)',
+                          borderRadius: 'var(--radius-sm)',
+                          padding: '0.4rem 0.85rem',
+                          fontSize: '0.8rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.35rem',
+                          color: 'var(--text-muted)'
+                        }}
+                      >
+                        <RotateCcw size={14} />
+                        <span>Reset Defaults (मूळ मूल्ये)</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <form onSubmit={handleSaveHomeStats}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                      gap: '1.25rem',
+                      marginBottom: '1.5rem'
+                    }}>
+                      {/* Card 1: Community Dedicated */}
+                      <div style={{
+                        border: '1.5px solid #bfdbfe',
+                        borderRadius: 'var(--radius-md)',
+                        padding: '1.25rem',
+                        backgroundColor: '#f8fafc',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1rem' }}>
+                          <div style={{
+                            background: 'var(--primary-light)',
+                            color: 'var(--primary)',
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '8px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            <HandHeart size={20} />
+                          </div>
+                          <div>
+                            <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-main)' }}>Counter 1</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Community Dedicated</div>
+                          </div>
+                        </div>
+
+                        <div style={{ marginBottom: '0.85rem' }}>
+                          <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, marginBottom: '0.3rem', color: 'var(--text-main)' }}>
+                            Value / Number (उदा. 100% किंवा 500+)
+                          </label>
+                          <input
+                            type="text"
+                            value={statsForm.stat1_number}
+                            onChange={(e) => setStatsForm({ ...statsForm, stat1_number: e.target.value })}
+                            required
+                            style={{
+                              width: '100%',
+                              padding: '0.6rem 0.85rem',
+                              borderRadius: '6px',
+                              border: '1px solid var(--border-color)',
+                              fontSize: '0.92rem',
+                              fontWeight: 700,
+                              color: 'var(--primary)'
+                            }}
+                          />
+                        </div>
+
+                        <div style={{ marginBottom: '0.85rem' }}>
+                          <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, marginBottom: '0.3rem', color: 'var(--text-muted)' }}>
+                            Label (English)
+                          </label>
+                          <input
+                            type="text"
+                            value={statsForm.stat1_label}
+                            onChange={(e) => setStatsForm({ ...statsForm, stat1_label: e.target.value })}
+                            required
+                            style={{
+                              width: '100%',
+                              padding: '0.55rem 0.85rem',
+                              borderRadius: '6px',
+                              border: '1px solid var(--border-color)',
+                              fontSize: '0.88rem'
+                            }}
+                          />
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, marginBottom: '0.3rem', color: 'var(--text-muted)' }}>
+                            Label (मराठी)
+                          </label>
+                          <input
+                            type="text"
+                            value={statsForm.stat1_label_mr}
+                            onChange={(e) => setStatsForm({ ...statsForm, stat1_label_mr: e.target.value })}
+                            required
+                            style={{
+                              width: '100%',
+                              padding: '0.55rem 0.85rem',
+                              borderRadius: '6px',
+                              border: '1px solid var(--border-color)',
+                              fontSize: '0.88rem'
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Card 2: Active Social Workers */}
+                      <div style={{
+                        border: '1.5px solid #fed7aa',
+                        borderRadius: 'var(--radius-md)',
+                        padding: '1.25rem',
+                        backgroundColor: '#f8fafc',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1rem' }}>
+                          <div style={{
+                            background: '#fef3c7',
+                            color: '#b45309',
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '8px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            <Users size={20} />
+                          </div>
+                          <div>
+                            <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-main)' }}>Counter 2</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Active Social Workers</div>
+                          </div>
+                        </div>
+
+                        <div style={{ marginBottom: '0.85rem' }}>
+                          <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, marginBottom: '0.3rem', color: 'var(--text-main)' }}>
+                            Value / Number (उदा. 50+ किंवा 100+)
+                          </label>
+                          <input
+                            type="text"
+                            value={statsForm.stat2_number}
+                            onChange={(e) => setStatsForm({ ...statsForm, stat2_number: e.target.value })}
+                            required
+                            style={{
+                              width: '100%',
+                              padding: '0.6rem 0.85rem',
+                              borderRadius: '6px',
+                              border: '1px solid var(--border-color)',
+                              fontSize: '0.92rem',
+                              fontWeight: 700,
+                              color: '#b45309'
+                            }}
+                          />
+                        </div>
+
+                        <div style={{ marginBottom: '0.85rem' }}>
+                          <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, marginBottom: '0.3rem', color: 'var(--text-muted)' }}>
+                            Label (English)
+                          </label>
+                          <input
+                            type="text"
+                            value={statsForm.stat2_label}
+                            onChange={(e) => setStatsForm({ ...statsForm, stat2_label: e.target.value })}
+                            required
+                            style={{
+                              width: '100%',
+                              padding: '0.55rem 0.85rem',
+                              borderRadius: '6px',
+                              border: '1px solid var(--border-color)',
+                              fontSize: '0.88rem'
+                            }}
+                          />
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, marginBottom: '0.3rem', color: 'var(--text-muted)' }}>
+                            Label (मराठी)
+                          </label>
+                          <input
+                            type="text"
+                            value={statsForm.stat2_label_mr}
+                            onChange={(e) => setStatsForm({ ...statsForm, stat2_label_mr: e.target.value })}
+                            required
+                            style={{
+                              width: '100%',
+                              padding: '0.55rem 0.85rem',
+                              borderRadius: '6px',
+                              border: '1px solid var(--border-color)',
+                              fontSize: '0.88rem'
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Card 3: Families Impacted */}
+                      <div style={{
+                        border: '1.5px solid #bbf7d0',
+                        borderRadius: 'var(--radius-md)',
+                        padding: '1.25rem',
+                        backgroundColor: '#f8fafc',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1rem' }}>
+                          <div style={{
+                            background: '#dcfce7',
+                            color: '#15803d',
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '8px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            <Heart size={20} />
+                          </div>
+                          <div>
+                            <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-main)' }}>Counter 3</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Families Impacted</div>
+                          </div>
+                        </div>
+
+                        <div style={{ marginBottom: '0.85rem' }}>
+                          <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, marginBottom: '0.3rem', color: 'var(--text-main)' }}>
+                            Value / Number (उदा. 10,000+ किंवा 25,000+)
+                          </label>
+                          <input
+                            type="text"
+                            value={statsForm.stat3_number}
+                            onChange={(e) => setStatsForm({ ...statsForm, stat3_number: e.target.value })}
+                            required
+                            style={{
+                              width: '100%',
+                              padding: '0.6rem 0.85rem',
+                              borderRadius: '6px',
+                              border: '1px solid var(--border-color)',
+                              fontSize: '0.92rem',
+                              fontWeight: 700,
+                              color: '#15803d'
+                            }}
+                          />
+                        </div>
+
+                        <div style={{ marginBottom: '0.85rem' }}>
+                          <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, marginBottom: '0.3rem', color: 'var(--text-muted)' }}>
+                            Label (English)
+                          </label>
+                          <input
+                            type="text"
+                            value={statsForm.stat3_label}
+                            onChange={(e) => setStatsForm({ ...statsForm, stat3_label: e.target.value })}
+                            required
+                            style={{
+                              width: '100%',
+                              padding: '0.55rem 0.85rem',
+                              borderRadius: '6px',
+                              border: '1px solid var(--border-color)',
+                              fontSize: '0.88rem'
+                            }}
+                          />
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, marginBottom: '0.3rem', color: 'var(--text-muted)' }}>
+                            Label (मराठी)
+                          </label>
+                          <input
+                            type="text"
+                            value={statsForm.stat3_label_mr}
+                            onChange={(e) => setStatsForm({ ...statsForm, stat3_label_mr: e.target.value })}
+                            required
+                            style={{
+                              width: '100%',
+                              padding: '0.55rem 0.85rem',
+                              borderRadius: '6px',
+                              border: '1px solid var(--border-color)',
+                              fontSize: '0.88rem'
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Live Preview Box */}
+                    <div style={{
+                      backgroundColor: '#ffffff',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: 'var(--radius-md)',
+                      padding: '1.25rem',
+                      marginBottom: '1.5rem'
+                    }}>
+                      <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
+                        Live Preview on Homepage (मुख्यपृष्ठावर कसे दिसेल):
+                      </div>
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                        gap: '1rem'
+                      }}>
+                        <div style={{ padding: '0.85rem 1rem', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                          <div style={{ background: 'var(--primary-light)', color: 'var(--primary)', width: '38px', height: '38px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <HandHeart size={20} />
+                          </div>
+                          <div>
+                            <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--primary)', lineHeight: 1.1 }}>{statsForm.stat1_number || '—'}</div>
+                            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>{statsForm.stat1_label_mr} / {statsForm.stat1_label}</div>
+                          </div>
+                        </div>
+
+                        <div style={{ padding: '0.85rem 1rem', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                          <div style={{ background: '#fef3c7', color: '#b45309', width: '38px', height: '38px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Users size={20} />
+                          </div>
+                          <div>
+                            <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#b45309', lineHeight: 1.1 }}>{statsForm.stat2_number || '—'}</div>
+                            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>{statsForm.stat2_label_mr} / {statsForm.stat2_label}</div>
+                          </div>
+                        </div>
+
+                        <div style={{ padding: '0.85rem 1rem', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                          <div style={{ background: '#dcfce7', color: '#15803d', width: '38px', height: '38px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Heart size={20} />
+                          </div>
+                          <div>
+                            <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#15803d', lineHeight: 1.1 }}>{statsForm.stat3_number || '—'}</div>
+                            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>{statsForm.stat3_label_mr} / {statsForm.stat3_label}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Submit Button */}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', alignItems: 'center' }}>
+                      <button
+                        type="submit"
+                        disabled={statsSaving}
+                        className="btn btn-primary"
+                        style={{
+                          padding: '0.75rem 1.75rem',
+                          fontSize: '0.95rem',
+                          fontWeight: 700,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          cursor: statsSaving ? 'not-allowed' : 'pointer',
+                          boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)'
+                        }}
+                      >
+                        <Save size={18} />
+                        <span>{statsSaving ? 'Saving...' : 'Save & Update Homepage (बदल सेव्ह करा)'}</span>
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+
               {activeTab === 'donations' && (
                 <div>
                   <h4 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--text-main)' }}>

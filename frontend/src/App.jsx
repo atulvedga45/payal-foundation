@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { translations } from './translations';
-import { fetchTrustInfo, fetchTrustees, fetchInitiatives } from './api';
+import { fetchTrustInfo, fetchTrustees, fetchInitiatives, fetchHomeStats } from './api';
 
 import TopBar from './components/TopBar';
 import Navbar from './components/Navbar';
@@ -80,6 +80,14 @@ export default function App() {
   const [trustInfo, setTrustInfo] = useState(null);
   const [trustees, setTrustees] = useState(DEFAULT_TRUSTEES);
   const [initiatives, setInitiatives] = useState(DEFAULT_INITIATIVES);
+  const [homeStats, setHomeStats] = useState(() => {
+    try {
+      const cached = localStorage.getItem('payal_home_stats');
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
   const [selectedCause, setSelectedCause] = useState('');
   const [adminOpen, setAdminOpen] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
@@ -102,10 +110,11 @@ export default function App() {
 
   useEffect(() => {
     async function loadData() {
-      const [infoData, trusteesData, initData] = await Promise.allSettled([
+      const [infoData, trusteesData, initData, statsData] = await Promise.allSettled([
         fetchTrustInfo(),
         fetchTrustees(),
-        fetchInitiatives()
+        fetchInitiatives(),
+        fetchHomeStats()
       ]);
 
       if (infoData.status === 'fulfilled' && infoData.value) {
@@ -116,6 +125,9 @@ export default function App() {
       }
       if (initData.status === 'fulfilled' && initData.value && initData.value.length > 0) {
         setInitiatives(initData.value);
+      }
+      if (statsData.status === 'fulfilled' && statsData.value) {
+        setHomeStats(statsData.value);
       }
     }
     loadData();
@@ -189,7 +201,7 @@ export default function App() {
       {/* Main Content Sections */}
       <main>
         {/* Hero Section */}
-        <Hero t={t} />
+        <Hero t={t} lang={lang} homeStats={homeStats} />
 
         {/* About Section */}
         <AboutSection t={t} />
@@ -233,6 +245,8 @@ export default function App() {
       <AdminModal
         isOpen={adminOpen}
         onClose={() => setAdminOpen(false)}
+        homeStats={homeStats}
+        onUpdateHomeStats={(newStats) => setHomeStats(newStats)}
       />
       </div>{/* end main site wrapper */}
     </div>

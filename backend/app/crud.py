@@ -74,3 +74,33 @@ def get_dashboard_stats(db: Session):
         "total_volunteers_count": total_volunteers,
         "total_messages_count": total_messages
     }
+
+def get_home_stats(db: Session):
+    stats = db.query(models.HomeStat).first()
+    if not stats:
+        stats = models.HomeStat(
+            stat1_number="100%",
+            stat1_label="Community Dedicated",
+            stat1_label_mr="समाजास समर्पित",
+            stat2_number="50+",
+            stat2_label="Active Social Workers",
+            stat2_label_mr="सक्रिय समाजसेवक",
+            stat3_number="10,000+",
+            stat3_label="Families Impacted",
+            stat3_label_mr="मदत पोहचलेली कुटुंबे"
+        )
+        db.add(stats)
+        db.commit()
+        db.refresh(stats)
+    return stats
+
+def update_home_stats(db: Session, update_data: schemas.HomeStatsUpdateSchema):
+    stats = get_home_stats(db)
+    # Support pydantic v1 or v2 (dict or model_dump)
+    data = update_data.model_dump(exclude_unset=True) if hasattr(update_data, "model_dump") else update_data.dict(exclude_unset=True)
+    for field, val in data.items():
+        if val is not None:
+            setattr(stats, field, val)
+    db.commit()
+    db.refresh(stats)
+    return stats

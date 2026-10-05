@@ -104,3 +104,18 @@ def seed_initial_data(db: Session):
             is_verified=True
         ))
         db.commit()
+
+    # Seed HomeStat if none exists
+    if db.query(models.HomeStat).count() == 0:
+        db.add(models.HomeStat(
+            stat1_number="100%",
+            stat1_label="Community Dedicated",
+            stat1_label_mr="समाजास समर्पित",
+            stat2_number="50+",
+            stat2_label="Active Social Workers",
+            stat2_label_mr="सक्रिय समाजसेवक",
+            stat3_number="10,000+",
+            stat3_label="Families Impacted",
+            stat3_label_mr="मदत पोहचलेली कुटुंबे"
+        ))
+        db.commit()
