@@ -5,6 +5,11 @@ export default function AboutSection({ t }) {
   return (
     <section id="about" className="section section-bg-alt">
       <div className="container">
+        {/* Section Header */}
+        <div className="section-header reveal" style={{ marginBottom: '3rem' }}>
+          <h2 className="section-title">{t.about.title}</h2>
+        </div>
+
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
@@ -81,10 +86,6 @@ export default function AboutSection({ t }) {
 
           {/* Right Column: Narrative & Pillars */}
           <div className="reveal-right">
-            <h2 className="section-title" style={{ textAlign: 'left', marginBottom: '1.25rem' }}>
-              {t.about.title}
-            </h2>
-
             <p style={{ color: 'var(--text-muted)', fontSize: '1.05rem', lineHeight: 1.7, marginBottom: '1rem' }}>
               {t.about.p1}
             </p>
@@ -93,69 +94,93 @@ export default function AboutSection({ t }) {
               {t.about.p2}
             </p>
 
-            {/* Core Pillars */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div className="reveal-right stagger-1" style={{
+            {/* Core Pillars with Glassmorphic Tilt Cards */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
+              <div className="glass-panel tilt-card reveal-right stagger-1" style={{
                 display: 'flex',
                 alignItems: 'flex-start',
-                gap: '1rem',
-                background: 'var(--light-surface)',
-                padding: '1rem 1.25rem',
-                borderRadius: 'var(--radius-sm)',
-                border: '1px solid var(--border-color)',
-                boxShadow: 'var(--shadow-sm)',
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease'
+                gap: '1.15rem',
+                padding: '1.25rem 1.5rem',
+                borderRadius: 'var(--radius-md)',
+                borderLeft: '4px solid var(--primary)',
               }}>
-                <CheckCircle size={22} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: '2px' }} />
+                <div style={{
+                  background: 'var(--primary-light)',
+                  color: 'var(--primary)',
+                  padding: '0.6rem',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  <CheckCircle size={22} />
+                </div>
                 <div>
-                  <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.2rem' }}>
+                  <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.25rem' }}>
                     {t.about.value1Title}
                   </h4>
-                  <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', margin: 0 }}>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.55 }}>
                     {t.about.value1Desc}
                   </p>
                 </div>
               </div>
 
-              <div className="reveal-right stagger-2" style={{
+              <div className="glass-panel tilt-card reveal-right stagger-2" style={{
                 display: 'flex',
                 alignItems: 'flex-start',
-                gap: '1rem',
-                background: 'var(--light-surface)',
-                padding: '1rem 1.25rem',
-                borderRadius: 'var(--radius-sm)',
-                border: '1px solid var(--border-color)',
-                boxShadow: 'var(--shadow-sm)',
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease'
+                gap: '1.15rem',
+                padding: '1.25rem 1.5rem',
+                borderRadius: 'var(--radius-md)',
+                borderLeft: '4px solid var(--accent-saffron)',
               }}>
-                <CheckCircle size={22} style={{ color: 'var(--accent-saffron)', flexShrink: 0, marginTop: '2px' }} />
+                <div style={{
+                  background: '#fef3c7',
+                  color: '#b45309',
+                  padding: '0.6rem',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  <CheckCircle size={22} />
+                </div>
                 <div>
-                  <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.2rem' }}>
+                  <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.25rem' }}>
                     {t.about.value2Title}
                   </h4>
-                  <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', margin: 0 }}>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.55 }}>
                     {t.about.value2Desc}
                   </p>
                 </div>
               </div>
 
-              <div className="reveal-right stagger-3" style={{
+              <div className="glass-panel tilt-card reveal-right stagger-3" style={{
                 display: 'flex',
                 alignItems: 'flex-start',
-                gap: '1rem',
-                background: 'var(--light-surface)',
-                padding: '1rem 1.25rem',
-                borderRadius: 'var(--radius-sm)',
-                border: '1px solid var(--border-color)',
-                boxShadow: 'var(--shadow-sm)',
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease'
+                gap: '1.15rem',
+                padding: '1.25rem 1.5rem',
+                borderRadius: 'var(--radius-md)',
+                borderLeft: '4px solid var(--accent-green)',
               }}>
-                <CheckCircle size={22} style={{ color: 'var(--accent-green)', flexShrink: 0, marginTop: '2px' }} />
+                <div style={{
+                  background: '#dcfce7',
+                  color: '#15803d',
+                  padding: '0.6rem',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  <CheckCircle size={22} />
+                </div>
                 <div>
-                  <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.2rem' }}>
+                  <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.25rem' }}>
                     {t.about.value3Title}
                   </h4>
-                  <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', margin: 0 }}>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.55 }}>
                     {t.about.value3Desc}
                   </p>
                 </div>

@@ -1,9 +1,9 @@
 export const translations = {
   en: {
     regNo: "Social Service",
-    phone: "+91 77768 76121",
+    phone: "+91 92252 43552",
     email: "contact@payalfoundation.org",
-    address: "Gala No D 1, Aana Sagar Scrap Market, Kurla-Andheri Road, Near Naaz Hotel, Jarimari, Sakinaka, Mumbai - 400072",
+    address: "Palghar",
     nav: {
       home: "Home",
       about: "About Us",
@@ -11,7 +11,7 @@ export const translations = {
       team: "Trustees",
       gallery: "Gallery",
       donate: "Donate",
-      volunteer: "Volunteer",
+      social: "Social Media",
       contact: "Contact",
       admin: "Admin Portal"
     },
@@ -80,18 +80,43 @@ export const translations = {
       trustTag: "Verified Charitable Trust Account",
       note: "No minimum limit — every single rupee brings hope and saves lives."
     },
-    volunteer: {
-      badge: "Join Hands",
-      title: "Become a Volunteer",
-      subtitle: "Lend your time, skills, and empathy. Be the driving force of change in your community.",
-      namePlaceholder: "Your Full Name",
-      phonePlaceholder: "Phone Number",
-      emailPlaceholder: "Email Address",
-      areaPlaceholder: "Area of Interest (e.g., Youth Mentorship, Food Drive, Health Camp)",
-      skillsPlaceholder: "Your Skills / Profession",
-      messagePlaceholder: "Why would you like to join Payal Foundation and Social Service?",
-      submitBtn: "Submit Volunteer Application",
-      successMsg: "Thank you! Your volunteer application has been received. Our team will contact you shortly."
+    social: {
+      badge: "Official Social Media",
+      title: "Connect with Us Online",
+      subtitle: "Stay updated with our humanitarian drives, daily field stories, and community activities across Palghar.",
+      verified: "Official Channel",
+      followNow: "Connect Now",
+      subscribers: "Community Members",
+      platforms: {
+        instagram: {
+          name: "Instagram",
+          handle: "@its_sonyaa1113",
+          desc: "Watch daily video stories, ground relief reels, and photo highlights of our field missions.",
+          btnText: "Follow on Instagram",
+          url: "https://www.instagram.com/its_sonyaa1113/?hl=en"
+        },
+        facebook: {
+          name: "Facebook",
+          handle: "Payal Foundation and Social Service",
+          desc: "Join our official Facebook page for live updates, community announcements, and social discussions.",
+          btnText: "Connect on Facebook",
+          url: "https://www.facebook.com/share/1BttVwMWrV/"
+        },
+        whatsapp: {
+          name: "WhatsApp",
+          handle: "+91 92252 43552",
+          desc: "Reach out directly for assistance, immediate help, or joining our official seva broadcasts.",
+          btnText: "Chat on WhatsApp",
+          url: "https://wa.me/919225243552"
+        },
+        youtube: {
+          name: "YouTube",
+          handle: "@its_sonyaa1113-t8b",
+          desc: "Watch inspiring patient recovery stories, on-ground rescue documentaries, and community events.",
+          btnText: "Subscribe on YouTube",
+          url: "https://www.youtube.com/@its_sonyaa1113-t8b"
+        }
+      }
     },
     contact: {
       badge: "Get in Touch",
@@ -104,7 +129,8 @@ export const translations = {
       formTitle: "Send Us a Message",
       name: "Your Name",
       phone: "Your Phone Number",
-      email: "Your Email",
+      address: "Address",
+      addressPlaceholder: "Your Address / City",
       message: "How can we help you?",
       sendBtn: "Send Message",
       success: "Thank you! Your message has been sent successfully. We will get back to you soon."
@@ -119,9 +145,9 @@ export const translations = {
   },
   mr: {
     regNo: "समाजसेवा",
-    phone: "+91 77768 76121",
+    phone: "+91 92252 43552",
     email: "contact@payalfoundation.org",
-    address: "गाळा क्र. D 1, आना सागर स्क्रॅप मार्केट, कुर्ला-अंधेरी रोड, नाझ हॉटेल जवळ, जरीमरी, साकीनाका, मुंबई - ४०००७२",
+    address: "पालघर (Palghar)",
     nav: {
       home: "मुख्यपृष्ठ",
       about: "आमच्याबद्दल",
@@ -129,7 +155,7 @@ export const translations = {
       team: "विश्वस्त मंडळ",
       gallery: "छायाचित्रे",
       donate: "देणगी द्या",
-      volunteer: "स्वयंसेवक व्हा",
+      social: "सोशल मीडिया",
       contact: "संपर्क",
       admin: "प्रशासन (Admin)"
     },
@@ -198,18 +224,43 @@ export const translations = {
       trustTag: "अधिकृत धर्मादाय ट्रस्ट नोंदणीकृत UPI",
       note: "कोणतीही किमान मर्यादा नाही — १ रुपयाची छोटी मदत सुद्धा लाख मोलाची ठरेल!"
     },
-    volunteer: {
-      badge: "सहभागी व्हा",
-      title: "समाजसेवेसाठी स्वयंसेवक बना",
-      subtitle: "आपला वेळ, ज्ञान आणि ऊर्जा समाजाच्या भल्यासाठी द्या. परिवर्तनाचे भागीदार व्हा.",
-      namePlaceholder: "आपले पूर्ण नाव",
-      phonePlaceholder: "मोबाईल नंबर",
-      emailPlaceholder: "ईमेल आयडी",
-      areaPlaceholder: "कामाचे क्षेत्र (उदा. युवा मार्गदर्शन, अन्नदान, आरोग्य शिबिर)",
-      skillsPlaceholder: "आपले कौशल्य / व्यवसाय",
-      messagePlaceholder: "आपण या संस्थेशी का जोडू इच्छिता?",
-      submitBtn: "अर्ज पाठवा",
-      successMsg: "धन्यवाद! आपला स्वयंसेवक अर्ज यशस्वीरीत्या नोंदवला गेला आहे. आमचे पदाधिकारी आपल्याशी लवकरच संपर्क साधतील."
+    social: {
+      badge: "अधिकृत सोशल मीडिया",
+      title: "सोशल मीडियावर आमच्याशी कनेक्ट व्हा",
+      subtitle: "आमच्या समाजोपयोगी कार्याचे ताजे अपडेट्स, छायाचित्रे, व्हिडिओ आणि थेट माहिती मिळवण्यासाठी सर्व अधिकृत सोशल मीडिया प्लॅटफॉर्मवर आम्हाला नक्की फॉलो करा.",
+      verified: "अधिकृत चॅनेल",
+      followNow: "आताच जोडा",
+      subscribers: "फॉलोअर्स व सदस्य",
+      platforms: {
+        instagram: {
+          name: "Instagram",
+          handle: "@its_sonyaa1113",
+          desc: "आमच्या मदतकार्याचे दैनंदिन फोटो, रील्स आणि ग्राउंड स्टोरी पाहण्यासाठी इन्स्टाग्रामवर नक्की फॉलो करा.",
+          btnText: "Instagram वर फॉलो करा",
+          url: "https://www.instagram.com/its_sonyaa1113/?hl=en"
+        },
+        facebook: {
+          name: "Facebook",
+          handle: "Payal Foundation and Social Service",
+          desc: "फेसबुक पेजवर लाईव्ह उपक्रम, मदत मोहिमांचे अपडेट्स आणि जनकल्याणकारी पोस्ट्स मिळवा.",
+          btnText: "Facebook वर कनेक्ट व्हा",
+          url: "https://www.facebook.com/share/1BttVwMWrV/"
+        },
+        whatsapp: {
+          name: "WhatsApp",
+          handle: "+91 92252 43552",
+          desc: "थेट मदत मागण्यासाठी, विचारपूस करण्यासाठी किंवा अधिकृत ग्रुपमध्ये सहभागी होण्यासाठी व्हॉट्सॲपवर संपर्क करा.",
+          btnText: "WhatsApp वर चॅट करा",
+          url: "https://wa.me/919225243552"
+        },
+        youtube: {
+          name: "YouTube",
+          handle: "@its_sonyaa1113-t8b",
+          desc: "गरजूंचे उपचार, माणुसकीचे अनुभव, सेवाकार्याची दृश्ये आणि प्रेरणादायी व्हिडिओ पाहण्यासाठी सबस्क्राईब करा.",
+          btnText: "YouTube वर सबस्क्राईब करा",
+          url: "https://www.youtube.com/@its_sonyaa1113-t8b"
+        }
+      }
     },
     contact: {
       badge: "संपर्क साधा",
@@ -222,7 +273,8 @@ export const translations = {
       formTitle: "आम्हाला संदेश पाठवा",
       name: "आपले नाव",
       phone: "फोन नंबर",
-      email: "ईमेल",
+      address: "पत्ता",
+      addressPlaceholder: "आपला पत्ता / शहर लिहा...",
       message: "आपला संदेश लिहा...",
       sendBtn: "संदेश पाठवा",
       success: "धन्यवाद! आपला संदेश यशस्वीरीत्या पोहोचला आहे. आम्ही लवकरच आपल्याशी संपर्क करू."

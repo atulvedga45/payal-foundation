@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { UserPlus, CheckCircle2, Send, Sparkles } from 'lucide-react';
 import { submitVolunteer } from '../api';
+import confetti from 'canvas-confetti';
 
 export default function VolunteerSection({ t }) {
   const [formData, setFormData] = useState({
@@ -26,6 +27,13 @@ export default function VolunteerSection({ t }) {
     try {
       await submitVolunteer(formData);
       setSubmitted(true);
+      try {
+        confetti({
+          particleCount: 90,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+      } catch (_) {}
       setFormData({
         full_name: '',
         phone: '',
@@ -38,6 +46,13 @@ export default function VolunteerSection({ t }) {
     } catch (err) {
       console.warn("Backend unavailable, submitting locally", err);
       setSubmitted(true);
+      try {
+        confetti({
+          particleCount: 90,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+      } catch (_) {}
     } finally {
       setSubmitting(false);
     }
@@ -59,7 +74,7 @@ export default function VolunteerSection({ t }) {
 
         {/* Volunteer Form Card */}
         <div style={{ maxWidth: '780px', margin: '0 auto' }}>
-          <div className="card" style={{ padding: '2.5rem', background: '#ffffff' }}>
+          <div className="card glass-panel tilt-card reveal-scale" style={{ padding: '2.5rem' }}>
             
             {submitted ? (
               <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
@@ -222,14 +237,16 @@ export default function VolunteerSection({ t }) {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="btn btn-primary"
+                  className="btn btn-primary btn-glow-pulse btn-shine"
                   style={{
                     width: '100%',
-                    padding: '0.85rem',
-                    fontSize: '1rem'
+                    padding: '0.92rem',
+                    fontSize: '1.02rem',
+                    fontWeight: 800,
+                    borderRadius: 'var(--radius-full)'
                   }}
                 >
-                  <Send size={16} />
+                  <Send size={18} />
                   <span>{submitting ? 'Submitting Application...' : t.volunteer.submitBtn}</span>
                 </button>
               </form>

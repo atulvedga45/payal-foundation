@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, Users, HandHeart, Sparkles, ArrowRight } from 'lucide-react';
+import { Heart, Users, HandHeart, ArrowRight } from 'lucide-react';
 
 export default function Hero({ t, lang = 'mr', homeStats = null }) {
   const stat1Number = homeStats?.stat1_number || t.hero.stat1Number;
@@ -195,160 +195,182 @@ export default function Hero({ t, lang = 'mr', homeStats = null }) {
       }} />
 
       <div className="container" style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
-        <div style={{ maxWidth: '840px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '880px', margin: '0 auto' }}>
+
           {/* Heading */}
-          <h1 className="reveal" style={{
-            fontSize: 'clamp(2.3rem, 5vw, 3.6rem)',
+          <h1 className="reveal stagger-1" style={{
+            fontSize: 'clamp(2.3rem, 5.2vw, 3.8rem)',
             fontWeight: 800,
             color: 'var(--dark-bg)',
-            lineHeight: 1.35,
-            letterSpacing: 'normal',
+            lineHeight: 1.3,
+            letterSpacing: '-0.02em',
             marginBottom: '1.5rem',
             overflow: 'visible'
           }}>
-            <span style={{ display: 'inline-block', paddingBottom: '0.15em', overflow: 'visible' }}>
+            <span style={{ display: 'inline-block', paddingBottom: '0.1em' }}>
               {t.hero.titleStart}
             </span>
             <br />
             <span style={{
-              background: 'linear-gradient(135deg, #0b62a4 0%, #2563eb 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
               display: 'inline-block',
-              paddingBottom: '0.25em',
-              marginBottom: '-0.15em',
-              overflow: 'visible'
+              paddingBottom: '0.15em',
+              color: 'var(--primary, #0b62a4)'
             }}>
               {t.hero.titleHighlight}
             </span>
           </h1>
 
           {/* Subtitle */}
-          <p className="reveal stagger-1" style={{
-            fontSize: 'clamp(1rem, 2vw, 1.2rem)',
+          <p className="reveal stagger-2" style={{
+            fontSize: 'clamp(1.05rem, 2vw, 1.22rem)',
             color: 'var(--text-muted)',
-            lineHeight: 1.65,
+            lineHeight: 1.7,
             marginBottom: '2.5rem',
-            maxWidth: '740px',
+            maxWidth: '760px',
             margin: '0 auto 2.5rem auto'
           }}>
             {t.hero.subtitle}
           </p>
 
-          {/* Action Buttons */}
-          <div className="reveal stagger-2" style={{
+          {/* Action Buttons with Glowing Pulse & Shine */}
+          <div className="reveal stagger-3" style={{
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            gap: '1rem',
+            gap: '1.15rem',
             flexWrap: 'wrap',
-            marginBottom: '3.5rem'
+            marginBottom: '3rem'
           }}>
-            <a href="#donate" className="btn btn-accent shimmer-btn" style={{ fontSize: '1.05rem', padding: '0.85rem 2rem' }}>
-              <Heart size={18} />
+            <a
+              href="#donate"
+              className="btn btn-accent btn-glow-pulse btn-shine"
+              style={{
+                fontSize: '1.08rem',
+                padding: '0.9rem 2.25rem',
+                fontWeight: 800,
+                borderRadius: '9999px',
+                border: '1px solid rgba(255, 255, 255, 0.4)'
+              }}
+            >
+              <Heart size={20} />
               <span>{t.hero.btnDonateNow}</span>
             </a>
-            <a href="#initiatives" className="btn btn-outline" style={{ fontSize: '1.05rem', padding: '0.85rem 2rem' }}>
+            <a
+              href="#initiatives"
+              className="btn btn-outline tilt-card"
+              style={{
+                fontSize: '1.08rem',
+                padding: '0.9rem 2.25rem',
+                fontWeight: 700,
+                borderRadius: '9999px',
+                background: 'rgba(255, 255, 255, 0.85)',
+                backdropFilter: 'blur(10px)',
+                borderColor: 'rgba(11, 98, 164, 0.3)'
+              }}
+            >
               <span>{t.hero.btnGetInvolved}</span>
               <ArrowRight size={18} />
             </a>
           </div>
 
-          {/* Metric Stats Banner */}
-          <div className="reveal stagger-3" style={{
+          {/* Metric Stats Banner with Glassmorphic Tilt Cards */}
+          <div className="reveal stagger-5" style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '1.25rem',
-            marginTop: '2rem'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '1.35rem',
+            marginTop: '1.5rem'
           }}>
             {/* Stat 1 */}
-            <div className="card" style={{
-              padding: '1.5rem',
+            <div className="glass-panel tilt-card" style={{
+              padding: '1.65rem',
               display: 'flex',
               alignItems: 'center',
-              gap: '1rem',
+              gap: '1.15rem',
               textAlign: 'left'
             }}>
               <div className="micro-float" style={{
-                background: 'var(--primary-light)',
+                background: 'linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%)',
                 color: 'var(--primary)',
-                width: '50px',
-                height: '50px',
-                borderRadius: '12px',
+                width: '54px',
+                height: '54px',
+                borderRadius: '14px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                flexShrink: 0
+                flexShrink: 0,
+                boxShadow: '0 4px 12px rgba(11, 98, 164, 0.18)'
               }}>
-                <HandHeart size={26} />
+                <HandHeart size={28} />
               </div>
               <div>
-                <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--primary)', lineHeight: 1.1 }}>
+                <div style={{ fontSize: '1.85rem', fontWeight: 800, color: 'var(--primary)', lineHeight: 1.1 }}>
                   {stat1Number}
                 </div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>
+                <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-muted)', marginTop: '2px' }}>
                   {stat1Label}
                 </div>
               </div>
             </div>
 
             {/* Stat 2 */}
-            <div className="card" style={{
-              padding: '1.5rem',
+            <div className="glass-panel tilt-card" style={{
+              padding: '1.65rem',
               display: 'flex',
               alignItems: 'center',
-              gap: '1rem',
+              gap: '1.15rem',
               textAlign: 'left'
             }}>
               <div className="micro-float" style={{
-                background: '#fef3c7',
+                background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
                 color: '#b45309',
-                width: '50px',
-                height: '50px',
-                borderRadius: '12px',
+                width: '54px',
+                height: '54px',
+                borderRadius: '14px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                flexShrink: 0
+                flexShrink: 0,
+                boxShadow: '0 4px 12px rgba(245, 158, 11, 0.2)'
               }}>
-                <Users size={26} />
+                <Users size={28} />
               </div>
               <div>
-                <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#b45309', lineHeight: 1.1 }}>
+                <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#b45309', lineHeight: 1.1 }}>
                   {stat2Number}
                 </div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>
+                <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-muted)', marginTop: '2px' }}>
                   {stat2Label}
                 </div>
               </div>
             </div>
 
             {/* Stat 3 */}
-            <div className="card" style={{
-              padding: '1.5rem',
+            <div className="glass-panel tilt-card" style={{
+              padding: '1.65rem',
               display: 'flex',
               alignItems: 'center',
-              gap: '1rem',
+              gap: '1.15rem',
               textAlign: 'left'
             }}>
               <div className="micro-float" style={{
-                background: '#dcfce7',
+                background: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)',
                 color: '#15803d',
-                width: '50px',
-                height: '50px',
-                borderRadius: '12px',
+                width: '54px',
+                height: '54px',
+                borderRadius: '14px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                flexShrink: 0
+                flexShrink: 0,
+                boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)'
               }}>
-                <Heart size={26} />
+                <Heart size={28} />
               </div>
               <div>
-                <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#15803d', lineHeight: 1.1 }}>
+                <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#15803d', lineHeight: 1.1 }}>
                   {stat3Number}
                 </div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>
+                <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-muted)', marginTop: '2px' }}>
                   {stat3Label}
                 </div>
               </div>

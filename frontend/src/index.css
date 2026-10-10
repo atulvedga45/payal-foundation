@@ -51,9 +51,32 @@ body {
   z-index: 1;
 }
 
-main, header, footer, nav {
+main, header, footer {
   position: relative;
-  z-index: 1;
+}
+
+nav {
+  position: relative;
+}
+
+/* Modal Active State: Completely hide navbar, topbar and floating buttons when image/card is opened */
+body.modal-open {
+  overflow: hidden !important;
+}
+
+body.modal-open nav,
+body.modal-open .main-navbar,
+body.modal-open .top-bar,
+body.modal-open .scroll-to-top-btn {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: translateY(-100%) !important;
+  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+}
+
+body.modal-open .scroll-to-top-btn {
+  transform: translateY(100%) !important;
 }
 
 .container {
@@ -224,11 +247,11 @@ main, header, footer, nav {
    SCROLL REVEAL & ENTRANCE ANIMATIONS (SLOW MOTION & SILKY SMOOTH)
    ========================================================= */
 
-/* Reveal base: fade up slowly and gently */
+/* Reveal base: fade up smoothly and gracefully */
 .reveal {
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 1.35s cubic-bezier(0.22, 1, 0.36, 1), transform 1.35s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateY(28px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
@@ -237,11 +260,11 @@ main, header, footer, nav {
   transform: translateY(0);
 }
 
-/* Reveal from left slowly */
+/* Reveal from left smoothly */
 .reveal-left {
   opacity: 0;
-  transform: translateX(-30px);
-  transition: opacity 1.4s cubic-bezier(0.22, 1, 0.36, 1), transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateX(-35px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
@@ -250,11 +273,11 @@ main, header, footer, nav {
   transform: translateX(0);
 }
 
-/* Reveal from right slowly */
+/* Reveal from right smoothly */
 .reveal-right {
   opacity: 0;
-  transform: translateX(30px);
-  transition: opacity 1.4s cubic-bezier(0.22, 1, 0.36, 1), transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateX(35px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
@@ -263,11 +286,11 @@ main, header, footer, nav {
   transform: translateX(0);
 }
 
-/* Reveal scale up slowly */
+/* Reveal scale up smoothly */
 .reveal-scale {
   opacity: 0;
-  transform: scale(0.94);
-  transition: opacity 1.4s cubic-bezier(0.22, 1, 0.36, 1), transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: scale(0.92);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
@@ -276,13 +299,13 @@ main, header, footer, nav {
   transform: scale(1);
 }
 
-/* Relaxed, cinematic Stagger Delay Utilities */
-.stagger-1 { transition-delay: 0.15s; }
-.stagger-2 { transition-delay: 0.30s; }
-.stagger-3 { transition-delay: 0.45s; }
-.stagger-4 { transition-delay: 0.60s; }
-.stagger-5 { transition-delay: 0.75s; }
-.stagger-6 { transition-delay: 0.90s; }
+/* Snappy Stagger Delays */
+.stagger-1 { transition-delay: 0.08s; }
+.stagger-2 { transition-delay: 0.16s; }
+.stagger-3 { transition-delay: 0.24s; }
+.stagger-4 { transition-delay: 0.32s; }
+.stagger-5 { transition-delay: 0.40s; }
+.stagger-6 { transition-delay: 0.48s; }
 
 /* =========================================================
    SLOW MOTION AMBIENT MOVEMENTS ("HALU HALU HALCHAL")
@@ -649,5 +672,398 @@ main, header, footer, nav {
     font-size: 0.88rem;
     padding: 0.65rem 1.25rem;
   }
+}
+
+/* =========================================================
+   LUXURY INTERACTIVE CUSTOM CURSOR
+   ========================================================= */
+.custom-cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(135deg, #f59e0b 0%, #0b62a4 100%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+  transform: translate3d(-100px, -100px, 0);
+  margin-top: -4px;
+  margin-left: -4px;
+  transition: width 0.2s cubic-bezier(0.2, 0, 0, 1),
+              height 0.2s cubic-bezier(0.2, 0, 0, 1),
+              opacity 0.2s ease,
+              background 0.3s ease;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.8), 0 0 20px rgba(11, 98, 164, 0.5);
+}
+
+.custom-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid rgba(11, 98, 164, 0.55);
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.08) 0%, rgba(11, 98, 164, 0.04) 70%, transparent 100%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99998;
+  transform: translate3d(-100px, -100px, 0);
+  margin-top: -18px;
+  margin-left: -18px;
+  transition: width 0.3s cubic-bezier(0.2, 0.9, 0.3, 1),
+              height 0.3s cubic-bezier(0.2, 0.9, 0.3, 1),
+              border-color 0.25s ease,
+              background-color 0.25s ease,
+              box-shadow 0.25s ease,
+              opacity 0.25s ease;
+  box-shadow: 0 0 14px rgba(11, 98, 164, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-theme="dark"] .custom-cursor-ring {
+  border-color: rgba(56, 189, 248, 0.65);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
+}
+
+/* Hovering interactive target */
+.custom-cursor-ring.hovered {
+  width: 58px;
+  height: 58px;
+  margin-top: -29px;
+  margin-left: -29px;
+  border-color: #f59e0b;
+  border-width: 2px;
+  background: rgba(245, 158, 11, 0.14);
+  backdrop-filter: blur(2px);
+  box-shadow: 0 0 24px rgba(245, 158, 11, 0.55), 0 0 40px rgba(11, 98, 164, 0.25);
+}
+
+.custom-cursor-dot.hovered {
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  margin-left: -3px;
+  background: #f59e0b;
+  box-shadow: 0 0 12px #f59e0b;
+}
+
+/* Clicking / Mousedown */
+.custom-cursor-ring.clicked {
+  width: 26px;
+  height: 26px;
+  margin-top: -13px;
+  margin-left: -13px;
+  border-color: #f43f5e;
+  background: rgba(244, 63, 94, 0.25);
+  box-shadow: 0 0 30px rgba(244, 63, 94, 0.7);
+}
+
+.custom-cursor-dot.clicked {
+  transform: scale(1.6);
+  background: #f43f5e;
+}
+
+.custom-cursor-dot.hidden,
+.custom-cursor-ring.hidden {
+  opacity: 0;
+}
+
+.cursor-badge-text {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #f59e0b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  pointer-events: none;
+  animation: fadeInText 0.2s ease;
+}
+
+@keyframes fadeInText {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Hide custom cursor on touch devices */
+@media (pointer: coarse), (hover: none) {
+  .custom-cursor-dot,
+  .custom-cursor-ring {
+    display: none !important;
+  }
+}
+
+/* =========================================================
+   SCROLL TO TOP BUTTON (WITH CIRCULAR PROGRESS)
+   ========================================================= */
+.scroll-to-top-btn {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(11, 98, 164, 0.2);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 999;
+  box-shadow: 0 10px 25px -4px rgba(11, 98, 164, 0.25), 0 4px 10px rgba(0, 0, 0, 0.06);
+  transition: all 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+  animation: slideUpFloat 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="dark"] .scroll-to-top-btn {
+  background: rgba(15, 23, 42, 0.92);
+  border-color: rgba(56, 189, 248, 0.3);
+  color: #38bdf8;
+  box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.5), 0 0 15px rgba(56, 189, 248, 0.2);
+}
+
+.scroll-to-top-btn:hover {
+  transform: translateY(-5px) scale(1.08);
+  box-shadow: 0 18px 32px -4px rgba(11, 98, 164, 0.35), 0 0 20px rgba(245, 158, 11, 0.3);
+  color: #f59e0b;
+}
+
+.scroll-progress-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+
+.scroll-progress-svg .progress-bg {
+  fill: none;
+  stroke: rgba(0, 0, 0, 0.06);
+  stroke-width: 2.5;
+}
+
+[data-theme="dark"] .scroll-progress-svg .progress-bg {
+  stroke: rgba(255, 255, 255, 0.08);
+}
+
+.scroll-progress-svg .progress-bar {
+  fill: none;
+  stroke: #f59e0b;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.15s ease-out;
+}
+
+.scroll-arrow-icon {
+  position: relative;
+  z-index: 2;
+  transition: transform 0.3s ease;
+}
+
+.scroll-to-top-btn:hover .scroll-arrow-icon {
+  transform: translateY(-2px);
+}
+
+@keyframes slideUpFloat {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* =========================================================
+   RICH PROFESSIONAL ANIMATIONS & MICRO-INTERACTIONS
+   ========================================================= */
+
+/* 1. Pulsing Beacon Dot */
+.pulsing-beacon {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: #10b981;
+  border-radius: 50%;
+  position: relative;
+  margin-right: 6px;
+}
+
+.pulsing-beacon::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid #10b981;
+  animation: beaconWave 2s infinite ease-out;
+}
+
+@keyframes beaconWave {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+/* 2. Gradient Flow Shimmer for Text */
+.text-shimmer {
+  background: linear-gradient(90deg, #0b62a4 0%, #f59e0b 50%, #0b62a4 100%);
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: textShimmerMove 6s linear infinite;
+}
+
+@keyframes textShimmerMove {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+/* 3. Section Title Decorative Accent Line (Removed per user request) */
+.section-accent-line {
+  display: none !important;
+}
+
+.section-accent-line::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 40px;
+  background: rgba(255, 255, 255, 0.7);
+  animation: lineGlint 3.5s ease-in-out infinite;
+}
+
+@keyframes lineGlint {
+  0% { transform: translateX(-50px); }
+  50%, 100% { transform: translateX(100px); }
+}
+
+/* 4. Luxury 3D Card Hover Elevate */
+.card,
+.initiative-card,
+.trustee-card {
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.35s ease;
+  will-change: transform, box-shadow;
+}
+
+.card:hover,
+.initiative-card:hover,
+.trustee-card:hover {
+  transform: translateY(-8px) scale(1.012);
+  box-shadow: 0 22px 40px -10px rgba(11, 98, 164, 0.16),
+              0 0 0 1px rgba(11, 98, 164, 0.12);
+}
+
+[data-theme="dark"] .card:hover,
+[data-theme="dark"] .initiative-card:hover,
+[data-theme="dark"] .trustee-card:hover {
+  box-shadow: 0 22px 40px -10px rgba(0, 0, 0, 0.6),
+              0 0 25px rgba(56, 189, 248, 0.18),
+              0 0 0 1px rgba(56, 189, 248, 0.25);
+}
+
+/* 5. Button Magnetic Springs & Ripple Waves */
+.btn {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1),
+              box-shadow 0.25s cubic-bezier(0.2, 0.9, 0.3, 1),
+              background 0.3s ease;
+}
+
+.btn:active {
+  transform: scale(0.96) !important;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 8px 25px rgba(11, 98, 164, 0.45), 0 0 15px rgba(245, 158, 11, 0.25);
+}
+
+.btn-accent:hover {
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.5), 0 0 15px rgba(245, 158, 11, 0.3);
+}
+
+/* 6. Laser Scanner Line for QR Code */
+.qr-scanner-box {
+  position: relative;
+  overflow: hidden;
+}
+
+.qr-scanner-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent 0%, #10b981 50%, transparent 100%);
+  box-shadow: 0 0 12px #10b981, 0 0 24px #10b981;
+  border-radius: 9999px;
+  animation: laserScan 3.2s ease-in-out infinite alternate;
+  z-index: 5;
+  pointer-events: none;
+}
+
+@keyframes laserScan {
+  0% { top: 4%; opacity: 0.3; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { top: 96%; opacity: 0.3; }
+}
+
+/* 7. Animated Striped Progress Bar for Initiatives */
+.progress-bar-animated {
+  background-image: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.18) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.18) 50%,
+    rgba(255, 255, 255, 0.18) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 28px 28px;
+  animation: progressStripes 2s linear infinite;
+}
+
+@keyframes progressStripes {
+  0% { background-position: 0 0; }
+  100% { background-position: 28px 0; }
+}
+
+/* 8. Floating Trust Badge Glow */
+.trust-badge-glow {
+  animation: badgeGlow 4.5s ease-in-out infinite alternate;
+}
+
+@keyframes badgeGlow {
+  0% {
+    box-shadow: 0 4px 15px rgba(11, 98, 164, 0.15);
+  }
+  100% {
+    box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3), 0 0 10px rgba(11, 98, 164, 0.2);
+  }
+}
+
+/* 9. Glassmorphic Glow Card */
+.glass-glow-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="dark"] .glass-glow-card {
+  background: rgba(30, 41, 59, 0.85);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 

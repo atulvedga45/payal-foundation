@@ -228,3 +228,120 @@ export async function deleteInitiative(token, id) {
     return true;
   }
 }
+
+export async function updateTrustee(token, id, data) {
+  try {
+    const res = await fetch(`${API_BASE}/admin/trustees/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-key": token
+      },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) throw new Error("Failed to update trustee on backend");
+    return await res.json();
+  } catch (err) {
+    console.warn("Backend update failed, using local fallback", err);
+    return { id, ...data };
+  }
+}
+
+export async function createTrustee(token, data) {
+  try {
+    const res = await fetch(`${API_BASE}/admin/trustees`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-key": token
+      },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) throw new Error("Failed to create trustee on backend");
+    return await res.json();
+  } catch (err) {
+    console.warn("Backend create failed, generating local fallback", err);
+    return { id: Date.now(), ...data };
+  }
+}
+
+export async function deleteTrustee(token, id) {
+  try {
+    const res = await fetch(`${API_BASE}/admin/trustees/${id}`, {
+      method: "DELETE",
+      headers: {
+        "x-admin-key": token
+      }
+    });
+    if (!res.ok) throw new Error("Failed to delete trustee on backend");
+    return true;
+  } catch (err) {
+    console.warn("Backend delete failed, removing locally", err);
+    return true;
+  }
+}
+
+// Gallery API
+export async function fetchGallery() {
+  try {
+    const res = await fetch(`${API_BASE}/gallery`);
+    if (!res.ok) throw new Error("Failed to fetch gallery");
+    return await res.json();
+  } catch (err) {
+    console.warn("Backend not reached for gallery, using local fallback", err);
+    return null;
+  }
+}
+
+export async function createGalleryItem(token, data) {
+  try {
+    const res = await fetch(`${API_BASE}/admin/gallery`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-key": token
+      },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) throw new Error("Failed to create gallery item on backend");
+    return await res.json();
+  } catch (err) {
+    console.warn("Backend create failed, generating local fallback", err);
+    return { id: Date.now(), ...data };
+  }
+}
+
+export async function updateGalleryItem(token, id, data) {
+  try {
+    const res = await fetch(`${API_BASE}/admin/gallery/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-key": token
+      },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) throw new Error("Failed to update gallery item on backend");
+    return await res.json();
+  } catch (err) {
+    console.warn("Backend update failed, using local fallback", err);
+    return { id, ...data };
+  }
+}
+
+export async function deleteGalleryItem(token, id) {
+  try {
+    const res = await fetch(`${API_BASE}/admin/gallery/${id}`, {
+      method: "DELETE",
+      headers: {
+        "x-admin-key": token
+      }
+    });
+    if (!res.ok) throw new Error("Failed to delete gallery item on backend");
+    return true;
+  } catch (err) {
+    console.warn("Backend delete failed, removing locally", err);
+    return true;
+  }
+}
+

@@ -1,23 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { Copy, Check, Sparkles, Smartphone, Download } from 'lucide-react';
 import QRCode from 'qrcode';
+import confetti from 'canvas-confetti';
 
 export default function DonateSection({ t, trustInfo }) {
   const [copiedField, setCopiedField] = useState(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState('');
-
-  const upiId = trustInfo?.upi_id || '7776876121@ybl';
+  const upiId = trustInfo?.upi_id || '9225243552@ybl';
   const orgName = trustInfo?.name || 'Payal Foundation and Social Service';
 
   const copyToClipboard = (text, fieldName) => {
     navigator.clipboard.writeText(text);
     setCopiedField(fieldName);
+    try {
+      confetti({
+        particleCount: 70,
+        spread: 60,
+        origin: { y: 0.7 }
+      });
+    } catch (_) {}
     setTimeout(() => setCopiedField(null), 2500);
   };
 
-  // UPI QR String (Open amount so donors can send ₹1 or any amount directly)
+  // Official UPI QR Deep Link
   const upiDeepLink = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(orgName)}&cu=INR`;
 
   // Generate QR code locally and instantly (no external API dependence)
@@ -146,6 +153,13 @@ export default function DonateSection({ t, trustInfo }) {
       document.body.removeChild(downloadLink);
 
       setDownloadSuccess(true);
+      try {
+        confetti({
+          particleCount: 80,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+      } catch (_) {}
       setTimeout(() => setDownloadSuccess(false), 3000);
     } catch (err) {
       console.error('Instant download error:', err);
@@ -224,8 +238,8 @@ export default function DonateSection({ t, trustInfo }) {
           {/* Card Body */}
           <div style={{ padding: 'clamp(1.25rem, 4vw, 2rem) clamp(0.85rem, 3.5vw, 1.75rem)', textAlign: 'center' }}>
 
-            {/* QR Code Container with Stylized Camera Scan Frame */}
-            <div style={{
+            {/* QR Code Container with Stylized Camera Scan Frame & Animated Laser */}
+            <div className="qr-scanner-box" style={{
               position: 'relative',
               display: 'inline-block',
               padding: 'clamp(0.75rem, 3vw, 1.25rem)',

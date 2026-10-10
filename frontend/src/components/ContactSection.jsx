@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { MapPin, Phone, Mail, FileText, Send, CheckCircle2 } from 'lucide-react';
+import { Phone, Mail, MapPin, Send, CheckCircle2 } from 'lucide-react';
 import { submitContact } from '../api';
+import confetti from 'canvas-confetti';
 
 export default function ContactSection({ t }) {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
-    email: '',
+    address: '',
     message: ''
   });
   const [sending, setSending] = useState(false);
@@ -21,12 +22,32 @@ export default function ContactSection({ t }) {
 
     setSending(true);
     try {
-      await submitContact(formData);
+      const payload = {
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.address || '',
+        message: formData.address ? `[पत्ता: ${formData.address}]\n${formData.message}` : formData.message
+      };
+      await submitContact(payload);
       setSentSuccess(true);
-      setFormData({ name: '', phone: '', email: '', message: '' });
+      try {
+        confetti({
+          particleCount: 85,
+          spread: 75,
+          origin: { y: 0.6 }
+        });
+      } catch (_) {}
+      setFormData({ name: '', phone: '', address: '', message: '' });
     } catch (err) {
       console.warn("Backend not reachable, setting sent locally", err);
       setSentSuccess(true);
+      try {
+        confetti({
+          particleCount: 85,
+          spread: 75,
+          origin: { y: 0.6 }
+        });
+      } catch (_) {}
     } finally {
       setSending(false);
     }
@@ -47,87 +68,66 @@ export default function ContactSection({ t }) {
         </div>
 
         {/* Content Box */}
-        <div className="card reveal-scale" style={{ padding: '0', overflow: 'hidden' }}>
+        <div 
+          className="card reveal-scale" 
+          style={{ 
+            padding: '0', 
+            overflow: 'hidden', 
+            maxWidth: '880px', 
+            margin: '0 auto',
+            borderRadius: 'var(--radius-lg, 16px)'
+          }}
+        >
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))',
           }}>
 
             {/* Left: Contact Info */}
             <div style={{
               background: 'var(--primary-gradient)',
               color: '#ffffff',
-              padding: '3rem 2.5rem',
+              padding: '2.25rem 2rem',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between'
             }}>
               <div>
-                <h3 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: '0.75rem' }}>
+                <h3 style={{ fontSize: '1.35rem', fontWeight: 800, marginBottom: '0.65rem' }}>
                   Payal Foundation and Social Service
                 </h3>
-                <p style={{ opacity: 0.85, fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '2rem' }}>
+                <p style={{ opacity: 0.85, fontSize: '0.9rem', lineHeight: 1.55, marginBottom: '1.65rem' }}>
                   Reach out to us directly or visit our registered office. We are always ready to serve and collaborate for social welfare.
                 </p>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
                   
-                  {/* Address */}
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-                    <div style={{ background: 'rgba(255, 255, 255, 0.15)', padding: '0.6rem', borderRadius: '10px' }}>
-                      <MapPin size={22} style={{ color: 'var(--accent-saffron)' }} />
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.8 }}>
-                        {t.contact.addressLabel}
-                      </div>
-                      <div style={{ fontSize: '0.95rem', fontWeight: 600, marginTop: '2px', lineHeight: 1.5 }}>
-                        {t.address}
-                      </div>
-                    </div>
-                  </div>
-
                   {/* Phone */}
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-                    <div style={{ background: 'rgba(255, 255, 255, 0.15)', padding: '0.6rem', borderRadius: '10px' }}>
-                      <Phone size={22} style={{ color: 'var(--accent-green)' }} />
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem' }}>
+                    <div style={{ background: 'rgba(255, 255, 255, 0.15)', padding: '0.5rem', borderRadius: '8px' }}>
+                      <Phone size={20} style={{ color: 'var(--accent-green)' }} />
                     </div>
                     <div>
-                      <div style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.8 }}>
+                      <div style={{ fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.8 }}>
                         {t.contact.phoneLabel}
                       </div>
-                      <a href={`tel:${t.phone.replace(/\s+/g, '')}`} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '1.05rem', fontWeight: 700, display: 'block', marginTop: '2px' }}>
+                      <a href={`tel:${t.phone.replace(/\s+/g, '')}`} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '1rem', fontWeight: 700, display: 'block', marginTop: '2px' }}>
                         {t.phone}
                       </a>
                     </div>
                   </div>
 
-                  {/* Email */}
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-                    <div style={{ background: 'rgba(255, 255, 255, 0.15)', padding: '0.6rem', borderRadius: '10px' }}>
-                      <Mail size={22} />
+                  {/* Address */}
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem' }}>
+                    <div style={{ background: 'rgba(255, 255, 255, 0.15)', padding: '0.5rem', borderRadius: '8px' }}>
+                      <MapPin size={20} style={{ color: '#fef08a' }} />
                     </div>
                     <div>
-                      <div style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.8 }}>
-                        Email Contact
+                      <div style={{ fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.8 }}>
+                        {t.contact.addressLabel || 'पत्ता'}
                       </div>
-                      <a href={`mailto:${t.email}`} style={{ color: '#ffffff', textDecoration: 'none', fontSize: '0.95rem', fontWeight: 600, display: 'block', marginTop: '2px' }}>
-                        {t.email}
-                      </a>
-                    </div>
-                  </div>
-
-                  {/* Registration Certificate */}
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-                    <div style={{ background: 'rgba(255, 255, 255, 0.15)', padding: '0.6rem', borderRadius: '10px' }}>
-                      <FileText size={22} style={{ color: 'var(--accent-saffron)' }} />
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.8 }}>
-                        {t.contact.regDetails}
-                      </div>
-                      <div style={{ fontSize: '0.9rem', fontWeight: 600, marginTop: '2px' }}>
-                        {t.contact.regDetailsDesc}
+                      <div style={{ color: '#ffffff', fontSize: '0.95rem', fontWeight: 600, marginTop: '2px' }}>
+                        {t.address}
                       </div>
                     </div>
                   </div>
@@ -135,36 +135,41 @@ export default function ContactSection({ t }) {
                 </div>
               </div>
 
-              <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255, 255, 255, 0.15)', fontSize: '0.8rem', opacity: 0.75 }}>
-                Office Hours: Monday - Saturday: 10:00 AM - 7:00 PM
+              <div style={{
+                marginTop: '1.75rem',
+                paddingTop: '1.25rem',
+                borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+                fontSize: '1rem',
+                fontWeight: 700,
+                color: '#fef08a',
+                letterSpacing: '0.02em'
+              }}>
+                सोन्या भाऊ तुमच्या सेवेसाठी हजर.
               </div>
             </div>
 
             {/* Right: Interactive Contact Form */}
-            <div style={{ padding: '3rem 2.5rem', background: '#ffffff' }}>
-              <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '1.5rem' }}>
-                {t.contact.formTitle}
-              </h3>
+            <div style={{ padding: '2.25rem 2rem', background: '#ffffff' }}>
 
               {sentSuccess ? (
-                <div style={{ textAlign: 'center', padding: '2.5rem 1rem' }}>
+                <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
                   <div style={{
-                    width: '60px',
-                    height: '60px',
+                    width: '54px',
+                    height: '54px',
                     borderRadius: '50%',
                     background: '#dcfce7',
                     color: '#15803d',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    margin: '0 auto 1.25rem auto'
+                    margin: '0 auto 1rem auto'
                   }}>
-                    <CheckCircle2 size={34} />
+                    <CheckCircle2 size={30} />
                   </div>
-                  <h4 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.5rem' }}>
+                  <h4 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.4rem' }}>
                     Message Sent!
                   </h4>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginBottom: '1.5rem' }}>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
                     {t.contact.success}
                   </p>
                   <button
@@ -177,9 +182,9 @@ export default function ContactSection({ t }) {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit}>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
                         {t.contact.name} *
                       </label>
                       <input
@@ -190,70 +195,70 @@ export default function ContactSection({ t }) {
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         style={{
                           width: '100%',
-                          padding: '0.75rem 1rem',
+                          padding: '0.62rem 0.85rem',
                           borderRadius: 'var(--radius-sm)',
                           border: '1px solid var(--border-color)',
-                          fontSize: '0.95rem'
+                          fontSize: '0.9rem'
                         }}
                       />
                     </div>
 
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
                         {t.contact.phone} *
                       </label>
                       <input
                         type="tel"
                         required
-                        placeholder="+91 77768 76121"
+                        placeholder="+91 92252 43552"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         style={{
                           width: '100%',
-                          padding: '0.75rem 1rem',
+                          padding: '0.62rem 0.85rem',
                           borderRadius: 'var(--radius-sm)',
                           border: '1px solid var(--border-color)',
-                          fontSize: '0.95rem'
+                          fontSize: '0.9rem'
                         }}
                       />
                     </div>
                   </div>
 
-                  <div style={{ marginBottom: '1.25rem' }}>
-                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
-                      {t.contact.email}
+                  <div style={{ marginBottom: '1rem' }}>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
+                      {t.contact.address || 'पत्ता'}
                     </label>
                     <input
-                      type="email"
-                      placeholder="your.email@example.com"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      type="text"
+                      placeholder={t.contact.addressPlaceholder || "आपला पत्ता / शहर लिहा..."}
+                      value={formData.address}
+                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                       style={{
                         width: '100%',
-                        padding: '0.75rem 1rem',
+                        padding: '0.62rem 0.85rem',
                         borderRadius: 'var(--radius-sm)',
                         border: '1px solid var(--border-color)',
-                        fontSize: '0.95rem'
+                        fontSize: '0.9rem'
                       }}
                     />
                   </div>
 
-                  <div style={{ marginBottom: '1.5rem' }}>
-                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
+                  <div style={{ marginBottom: '1.25rem' }}>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
                       {t.contact.message} *
                     </label>
                     <textarea
                       required
-                      rows={4}
+                      rows={3}
                       placeholder="Type your question or query here..."
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                       style={{
                         width: '100%',
-                        padding: '0.75rem 1rem',
+                        padding: '0.62rem 0.85rem',
                         borderRadius: 'var(--radius-sm)',
                         border: '1px solid var(--border-color)',
-                        fontSize: '0.95rem',
+                        fontSize: '0.9rem',
                         fontFamily: 'inherit',
                         resize: 'vertical'
                       }}
@@ -263,11 +268,13 @@ export default function ContactSection({ t }) {
                   <button
                     type="submit"
                     disabled={sending}
-                    className="btn btn-primary shimmer-btn"
+                    className="btn btn-primary btn-glow-pulse btn-shine"
                     style={{
                       width: '100%',
-                      padding: '0.85rem',
-                      fontSize: '1rem'
+                      padding: '0.78rem',
+                      fontSize: '0.95rem',
+                      fontWeight: 800,
+                      borderRadius: 'var(--radius-full)'
                     }}
                   >
                     <Send size={16} />

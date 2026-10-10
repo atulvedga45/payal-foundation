@@ -14,16 +14,19 @@ export default function Navbar({ t }) {
   ];
 
   return (
-    <nav style={{
-      position: 'sticky',
-      top: 0,
-      zIndex: 100,
-      backgroundColor: 'var(--navbar-bg)',
-      backdropFilter: 'blur(10px)',
-      boxShadow: '0 2px 15px rgba(0, 0, 0, 0.06)',
-      borderBottom: '1px solid var(--border-color)',
-      transition: 'all 0.3s ease'
-    }}>
+    <nav 
+      className="main-navbar"
+      style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+        backgroundColor: 'var(--navbar-bg)',
+        backdropFilter: 'blur(10px)',
+        boxShadow: '0 2px 15px rgba(0, 0, 0, 0.06)',
+        borderBottom: '1px solid var(--border-color)',
+        transition: 'all 0.3s ease'
+      }}
+    >
       <div className="container" style={{
         paddingTop: '0.75rem',
         paddingBottom: '0.75rem',
@@ -75,18 +78,21 @@ export default function Navbar({ t }) {
         </a>
 
         {/* Desktop Nav Items */}
-        <div style={{ display: 'none', alignItems: 'center', gap: '1.65rem' }} className="desktop-nav">
+        <div style={{ display: 'none', alignItems: 'center', gap: '1.4rem' }} className="desktop-nav">
           {navLinks.map((link, idx) => (
             <a
               key={idx}
               href={link.href}
+              className="nav-link-animated"
               style={{
                 textDecoration: 'none',
                 color: 'var(--text-main)',
                 fontWeight: 700,
-                fontSize: '1.08rem',
+                fontSize: '0.98rem',
                 letterSpacing: '0.01em',
-                transition: 'color 0.2s',
+                padding: '0.4rem 0.2rem',
+                position: 'relative',
+                transition: 'color 0.2s ease',
               }}
               onMouseEnter={(e) => e.target.style.color = 'var(--primary)'}
               onMouseLeave={(e) => e.target.style.color = 'var(--text-main)'}
@@ -95,9 +101,22 @@ export default function Navbar({ t }) {
             </a>
           ))}
 
-          {/* Donate CTA button */}
-          <a href="#donate" className="btn btn-accent btn-sm shimmer-btn" style={{ padding: '0.6rem 1.45rem', fontSize: '0.98rem', fontWeight: 700 }}>
-            <HeartHandshake size={17} />
+          {/* Donate CTA button with Glow Pulse & Shine */}
+          <a
+            href="#donate"
+            className="btn btn-accent btn-sm btn-glow-pulse btn-shine"
+            style={{
+              padding: '0.62rem 1.4rem',
+              fontSize: '0.95rem',
+              fontWeight: 800,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              borderRadius: '9999px',
+              border: '1px solid rgba(255, 255, 255, 0.4)'
+            }}
+          >
+            <HeartHandshake size={18} />
             <span>{t.nav.donate}</span>
           </a>
         </div>
@@ -107,16 +126,18 @@ export default function Navbar({ t }) {
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="mobile-toggle"
           style={{
-            background: 'none',
-            border: 'none',
+            background: 'rgba(11, 98, 164, 0.08)',
+            border: '1px solid rgba(11, 98, 164, 0.15)',
+            borderRadius: '10px',
             cursor: 'pointer',
-            padding: '0.4rem',
-            color: 'var(--text-main)',
-            display: 'block'
+            padding: '0.45rem',
+            color: 'var(--primary)',
+            display: 'block',
+            transition: 'all 0.2s ease'
           }}
           aria-label="Toggle Navigation Menu"
         >
-          {mobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
+          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
@@ -124,12 +145,13 @@ export default function Navbar({ t }) {
       {mobileMenuOpen && (
         <div style={{
           backgroundColor: 'var(--light-surface)',
-          borderBottom: '1px solid var(--border-color)',
-          padding: '1rem 1.5rem',
+          borderBottom: '2px solid rgba(11, 98, 164, 0.15)',
+          padding: '1.25rem 1.5rem',
           display: 'flex',
           flexDirection: 'column',
-          gap: '1rem',
-          boxShadow: 'var(--shadow-md)'
+          gap: '0.65rem',
+          boxShadow: '0 15px 30px rgba(0, 0, 0, 0.1)',
+          animation: 'slideDownNav 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
         }}>
           {navLinks.map((link, idx) => (
             <a
@@ -139,9 +161,19 @@ export default function Navbar({ t }) {
               style={{
                 textDecoration: 'none',
                 color: 'var(--text-main)',
-                fontWeight: 600,
-                fontSize: '1rem',
-                padding: '0.35rem 0'
+                fontWeight: 700,
+                fontSize: '1.02rem',
+                padding: '0.45rem 0.6rem',
+                borderRadius: '8px',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--primary-light)';
+                e.currentTarget.style.color = 'var(--primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = 'var(--text-main)';
               }}
             >
               {link.label}
@@ -150,8 +182,8 @@ export default function Navbar({ t }) {
           <a
             href="#donate"
             onClick={() => setMobileMenuOpen(false)}
-            className="btn btn-accent"
-            style={{ width: '100%', marginTop: '0.5rem' }}
+            className="btn btn-accent btn-glow-pulse btn-shine"
+            style={{ width: '100%', marginTop: '0.5rem', padding: '0.75rem', justifyContent: 'center' }}
           >
             <HeartHandshake size={18} />
             <span>{t.nav.donate}</span>
@@ -159,8 +191,30 @@ export default function Navbar({ t }) {
         </div>
       )}
 
-      {/* Inline styles for media query */}
+      {/* Scoped CSS for Navbar animations & responsiveness */}
       <style>{`
+        @keyframes slideDownNav {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .nav-link-animated::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 50%;
+          width: 0;
+          height: 2.5px;
+          background: var(--primary-gradient);
+          border-radius: 9999px;
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+          transform: translateX(-50%);
+        }
+
+        .nav-link-animated:hover::after {
+          width: 85%;
+        }
+
         @media (min-width: 992px) {
           .desktop-nav {
             display: flex !important;

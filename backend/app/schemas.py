@@ -29,10 +29,33 @@ class TrusteeSchema(BaseModel):
     role: str
     role_mr: Optional[str] = None
     photo_url: Optional[str] = None
+    phone: Optional[str] = "1234567890"
+    upi_id: Optional[str] = "payalfoundation@ybl"
+    upi_qr_url: Optional[str] = None
     order: int
 
     class Config:
         from_attributes = True
+
+class TrusteeCreate(BaseModel):
+    name: str
+    role: str
+    role_mr: Optional[str] = None
+    photo_url: Optional[str] = None
+    phone: Optional[str] = "1234567890"
+    upi_id: Optional[str] = "payalfoundation@ybl"
+    upi_qr_url: Optional[str] = None
+    order: Optional[int] = 0
+
+class TrusteeUpdate(BaseModel):
+    name: Optional[str] = None
+    role: Optional[str] = None
+    role_mr: Optional[str] = None
+    photo_url: Optional[str] = None
+    phone: Optional[str] = None
+    upi_id: Optional[str] = None
+    upi_qr_url: Optional[str] = None
+    order: Optional[int] = None
 
 # Initiative
 class InitiativeSchema(BaseModel):
@@ -177,3 +200,32 @@ class HomeStatsUpdateSchema(BaseModel):
     stat3_number: Optional[str] = None
     stat3_label: Optional[str] = None
     stat3_label_mr: Optional[str] = None
+
+# Gallery Item
+class GalleryItemSchema(BaseModel):
+    id: int
+    image_url: str
+    title: str
+    title_mr: Optional[str] = None
+    category: str = "Social Service"
+    category_mr: Optional[str] = None
+    order: int = 0
+
+    class Config:
+        from_attributes = True
+
+class GalleryItemCreate(BaseModel):
+    image_url: str
+    title: Optional[str] = "Gallery Photo"
+    title_mr: Optional[str] = None
+    category: Optional[str] = "Social Service"
+    category_mr: Optional[str] = None
+    order: Optional[int] = 0
+
+class GalleryItemUpdate(BaseModel):
+    image_url: Optional[str] = None
+    title: Optional[str] = None
+    title_mr: Optional[str] = None
+    category: Optional[str] = None
+    category_mr: Optional[str] = None
+    order: Optional[int] = None

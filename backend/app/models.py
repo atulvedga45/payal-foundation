@@ -30,6 +30,9 @@ class Trustee(Base):
     role = Column(String(100), nullable=False)
     role_mr = Column(String(100), nullable=True)
     photo_url = Column(String(500), nullable=True)
+    phone = Column(String(50), default="1234567890", nullable=True)
+    upi_id = Column(String(100), default="payalfoundation@ybl", nullable=True)
+    upi_qr_url = Column(String(500), nullable=True)
     order = Column(Integer, default=0)
 
 class Initiative(Base):
@@ -102,3 +105,14 @@ class HomeStat(Base):
     stat3_label = Column(String(100), default="Families Impacted")
     stat3_label_mr = Column(String(100), default="मदत पोहचलेली कुटुंबे")
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class GalleryItem(Base):
+    __tablename__ = "gallery_items"
+
+    id = Column(Integer, primary_key=True, index=True)
+    image_url = Column(String(500), nullable=False)
+    title = Column(String(255), nullable=False)
+    title_mr = Column(String(255), nullable=True)
+    category = Column(String(100), default="Social Service")
+    category_mr = Column(String(100), nullable=True)
+    order = Column(Integer, default=0)

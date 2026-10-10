@@ -13,7 +13,7 @@ def seed_initial_data(db: Session):
             act_name="Public Trust Act, Govt. of Maharashtra",
             president="Zakir Hussain",
             secretary="Mohd Rahim Abdul Kalam Khan",
-            phone="+91 77768 76121",
+            phone="+91 92252 43552",
             email="contact@payalfoundation.org",
             address="Gala No D 1, Aana Sagar Scrap Market, Kurla-Andheri Road, Near Naaz Hotel, Jarimari, Sakinaka, Mumbai - 400072",
             bank_name="State Bank of India (SBI)",
@@ -27,14 +27,14 @@ def seed_initial_data(db: Session):
     # Check if Trustees exist
     if db.query(models.Trustee).count() == 0:
         trustees = [
-            models.Trustee(name="Sonya Oghe", role="President", role_mr="अध्यक्ष (President)", photo_url="/sonya.jpg", order=1),
-            models.Trustee(name="Sonya Oghe", role="Secretary", role_mr="सचिव (Secretary)", photo_url="/sonya.jpg", order=2),
-            models.Trustee(name="Sonya Oghe", role="Trust Member", role_mr="विश्वस्त सदस्य (Trust Member)", photo_url="/sonya.jpg", order=3),
-            models.Trustee(name="Sonya Oghe", role="Trust Member", role_mr="विश्वस्त सदस्य (Trust Member)", photo_url="/sonya.jpg", order=4),
-            models.Trustee(name="Sonya Oghe", role="Trust Member", role_mr="विश्वस्त सदस्य (Trust Member)", photo_url="/sonya.jpg", order=5),
-            models.Trustee(name="Sonya Oghe", role="Trust Member", role_mr="विश्वस्त सदस्य (Trust Member)", photo_url="/sonya.jpg", order=6),
-            models.Trustee(name="Sonya Oghe", role="Trust Member", role_mr="विश्वस्त सदस्य (Trust Member)", photo_url="/sonya.jpg", order=7),
-            models.Trustee(name="Sonya Oghe", role="Trust Member", role_mr="विश्वस्त सदस्य (Trust Member)", photo_url="/sonya.jpg", order=8)
+            models.Trustee(name="Sonya Oghe", role="President", role_mr="अध्यक्ष (President)", photo_url="/sonya.jpg", phone="1234567890", upi_id="payalfoundation@ybl", order=1),
+            models.Trustee(name="Sonya Oghe", role="Secretary", role_mr="सचिव (Secretary)", photo_url="/sonya.jpg", phone="1234567890", upi_id="payalfoundation@ybl", order=2),
+            models.Trustee(name="Sonya Oghe", role="Trust Member", role_mr="विश्वस्त सदस्य (Trust Member)", photo_url="/sonya.jpg", phone="1234567890", upi_id="payalfoundation@ybl", order=3),
+            models.Trustee(name="Sonya Oghe", role="Trust Member", role_mr="विश्वस्त सदस्य (Trust Member)", photo_url="/sonya.jpg", phone="1234567890", upi_id="payalfoundation@ybl", order=4),
+            models.Trustee(name="Sonya Oghe", role="Trust Member", role_mr="विश्वस्त सदस्य (Trust Member)", photo_url="/sonya.jpg", phone="1234567890", upi_id="payalfoundation@ybl", order=5),
+            models.Trustee(name="Sonya Oghe", role="Trust Member", role_mr="विश्वस्त सदस्य (Trust Member)", photo_url="/sonya.jpg", phone="1234567890", upi_id="payalfoundation@ybl", order=6),
+            models.Trustee(name="Sonya Oghe", role="Trust Member", role_mr="विश्वस्त सदस्य (Trust Member)", photo_url="/sonya.jpg", phone="1234567890", upi_id="payalfoundation@ybl", order=7),
+            models.Trustee(name="Sonya Oghe", role="Trust Member", role_mr="विश्वस्त सदस्य (Trust Member)", photo_url="/sonya.jpg", phone="1234567890", upi_id="payalfoundation@ybl", order=8)
         ]
         db.add_all(trustees)
         db.commit()
@@ -118,4 +118,43 @@ def seed_initial_data(db: Session):
             stat3_label="Families Impacted",
             stat3_label_mr="मदत पोहचलेली कुटुंबे"
         ))
+        db.commit()
+
+    # Seed GalleryItems if none exists
+    if db.query(models.GalleryItem).count() == 0:
+        gallery_items = [
+            models.GalleryItem(
+                image_url="/about_initiative.jpg",
+                title="Emergency Medical & Hospital Assistance in Palghar",
+                title_mr="माणुसकीची साथ: गरजू बाबांना रुग्णालयात नेऊन उपचारासाठी मदत",
+                category="Healthcare & Compassion",
+                category_mr="आरोग्य व मदत",
+                order=1
+            ),
+            models.GalleryItem(
+                image_url="/community_outreach.jpg",
+                title="Field Social Work & Community Outreach",
+                title_mr="विश्वस्त व स्वयंसेवकांचा प्रत्यक्ष सेवा उपक्रम",
+                category="Social Service",
+                category_mr="समाजकार्य",
+                order=2
+            ),
+            models.GalleryItem(
+                image_url="/child_healthcare_hospital.jpg",
+                title="Child Healthcare & Patient Care Support in Hospital",
+                title_mr="रुग्णालय सहाय्य: बालकांवर उपचार व माणुसकीचा आधार",
+                category="Healthcare Support",
+                category_mr="आरोग्य सहाय्य",
+                order=3
+            ),
+            models.GalleryItem(
+                image_url="/women_empowerment.jpg",
+                title="Women Support & Community Assistance",
+                title_mr="महिला सबलीकरण व प्रत्यक्ष मदत उपक्रम",
+                category="Women Welfare",
+                category_mr="महिला सबलीकरण",
+                order=4
+            )
+        ]
+        db.add_all(gallery_items)
         db.commit()

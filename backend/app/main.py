@@ -83,6 +83,10 @@ def get_trustees_endpoint(db: Session = Depends(get_db)):
 def get_initiatives_endpoint(db: Session = Depends(get_db)):
     return crud.get_initiatives(db)
 
+@app.get("/api/gallery", response_model=List[schemas.GalleryItemSchema])
+def get_gallery_endpoint(db: Session = Depends(get_db)):
+    return crud.get_gallery_items(db)
+
 @app.post("/api/contact", response_model=schemas.ContactResponse)
 def submit_contact_form(contact: schemas.ContactCreate, db: Session = Depends(get_db)):
     return crud.create_contact_message(db, contact)
@@ -160,6 +164,70 @@ def delete_initiative_endpoint(
     if not success:
         raise HTTPException(status_code=404, detail="Initiative not found")
     return {"success": True, "message": "Initiative deleted successfully"}
+
+# Trustee Admin Endpoints
+@app.post("/api/admin/trustees", response_model=schemas.TrusteeSchema)
+def add_trustee_endpoint(
+    trustee: schemas.TrusteeCreate,
+    db: Session = Depends(get_db),
+    authorized: bool = Depends(verify_admin)
+):
+    return crud.create_trustee(db, trustee)
+
+@app.put("/api/admin/trustees/{trustee_id}", response_model=schemas.TrusteeSchema)
+def update_trustee_endpoint(
+    trustee_id: int,
+    trustee: schemas.TrusteeUpdate,
+    db: Session = Depends(get_db),
+    authorized: bool = Depends(verify_admin)
+):
+    updated = crud.update_trustee(db, trustee_id, trustee)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Trustee not found")
+    return updated
+
+@app.delete("/api/admin/trustees/{trustee_id}")
+def delete_trustee_endpoint(
+    trustee_id: int,
+    db: Session = Depends(get_db),
+    authorized: bool = Depends(verify_admin)
+):
+    success = crud.delete_trustee(db, trustee_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Trustee not found")
+    return {"success": True, "message": "Trustee deleted successfully"}
+
+# Gallery Admin Endpoints
+@app.post("/api/admin/gallery", response_model=schemas.GalleryItemSchema)
+def add_gallery_item_endpoint(
+    item: schemas.GalleryItemCreate,
+    db: Session = Depends(get_db),
+    authorized: bool = Depends(verify_admin)
+):
+    return crud.create_gallery_item(db, item)
+
+@app.put("/api/admin/gallery/{item_id}", response_model=schemas.GalleryItemSchema)
+def update_gallery_item_endpoint(
+    item_id: int,
+    item: schemas.GalleryItemUpdate,
+    db: Session = Depends(get_db),
+    authorized: bool = Depends(verify_admin)
+):
+    updated = crud.update_gallery_item(db, item_id, item)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Gallery item not found")
+    return updated
+
+@app.delete("/api/admin/gallery/{item_id}")
+def delete_gallery_item_endpoint(
+    item_id: int,
+    db: Session = Depends(get_db),
+    authorized: bool = Depends(verify_admin)
+):
+    success = crud.delete_gallery_item(db, item_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Gallery item not found")
+    return {"success": True, "message": "Gallery item deleted successfully"}
 
 # Image Upload Endpoint
 @app.post("/api/admin/upload-image")
