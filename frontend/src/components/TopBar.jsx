@@ -1,6 +1,27 @@
-import { Phone, Globe, ShieldCheck } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Phone, Globe, ShieldCheck, ChevronDown } from 'lucide-react';
 
 export default function TopBar({ lang, setLang, t, onOpenAdmin, theme, toggleTheme }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [isOpen]);
+
   return (
     <div 
       className="top-bar"
@@ -11,18 +32,22 @@ export default function TopBar({ lang, setLang, t, onOpenAdmin, theme, toggleThe
         padding: '0.35rem 0',
         borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
         boxShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
-        transition: 'all 0.3s ease'
+        transition: 'all 0.3s ease',
+        position: 'relative',
+        zIndex: 105
       }}
     >
-      <div className="container" style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: '0.5rem'
-      }}>
+      <div 
+        className="container topbar-container" 
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '0.5rem'
+        }}
+      >
         {/* Social Media Quick Icons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
           {[
             {
               name: 'Instagram (@its_sonyaa1113)',
@@ -115,9 +140,8 @@ export default function TopBar({ lang, setLang, t, onOpenAdmin, theme, toggleThe
           ))}
         </div>
 
-        {/* Right side: Phone, Language Toggle, Admin & Theme Toggle */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
-          
+        {/* Desktop Right Side: Phone, Language Toggle, Admin */}
+        <div className="topbar-desktop-items">
           {/* Contact Number */}
           <a 
             href={`tel:${t.phone.replace(/\s+/g, '')}`} 
@@ -147,7 +171,7 @@ export default function TopBar({ lang, setLang, t, onOpenAdmin, theme, toggleThe
             <span>{t.phone}</span>
           </a>
 
-          {/* Language Toggle Button with Selected Green Background */}
+          {/* Language Toggle Button */}
           <div style={{ 
             display: 'inline-flex', 
             alignItems: 'center', 
@@ -232,9 +256,177 @@ export default function TopBar({ lang, setLang, t, onOpenAdmin, theme, toggleThe
             <ShieldCheck size={14} style={{ color: '#fbbf24' }} />
             <span>{t.nav.admin}</span>
           </button>
+        </div>
 
+        {/* Mobile Right Side: Dropdown Toggle Button & Menu */}
+        <div className="topbar-mobile-actions" ref={dropdownRef}>
+          <button
+            type="button"
+            onClick={() => setIsOpen((prev) => !prev)}
+            aria-label="Toggle options"
+            aria-expanded={isOpen}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.2rem',
+              background: isOpen ? 'rgba(255, 255, 255, 0.25)' : 'rgba(255, 255, 255, 0.12)',
+              border: '1px solid rgba(255, 255, 255, 0.24)',
+              color: '#ffffff',
+              padding: '0.24rem 0.5rem',
+              borderRadius: '9999px',
+              cursor: 'pointer',
+              fontSize: '0.74rem',
+              fontWeight: 600,
+              transition: 'all 0.2s ease',
+              flexShrink: 0
+            }}
+          >
+            <Globe size={13} style={{ color: '#4ade80' }} />
+            <span style={{ fontSize: '0.7rem', textTransform: 'uppercase' }}>{lang}</span>
+            <ChevronDown
+              size={14}
+              style={{
+                transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                transition: 'transform 0.25s ease'
+              }}
+            />
+          </button>
 
+          {/* Mobile Dropdown Popup */}
+          {isOpen && (
+            <div
+              className="topbar-mobile-dropdown"
+              style={{
+                position: 'absolute',
+                top: 'calc(100% + 8px)',
+                right: 0,
+                backgroundColor: 'var(--primary-dark)',
+                backgroundImage: 'linear-gradient(160deg, #074779 0%, #063860 100%)',
+                border: '1px solid rgba(255, 255, 255, 0.22)',
+                borderRadius: '14px',
+                padding: '0.75rem',
+                minWidth: '220px',
+                boxShadow: '0 12px 28px rgba(0, 0, 0, 0.45), 0 4px 10px rgba(0, 0, 0, 0.25)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.6rem',
+                zIndex: 1100,
+                animation: 'topbarDropdownSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
+              }}
+            >
+              {/* Contact Number */}
+              <a 
+                href={`tel:${t.phone.replace(/\s+/g, '')}`} 
+                onClick={() => setIsOpen(false)}
+                style={{ 
+                  color: '#ffffff', 
+                  textDecoration: 'none', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  gap: '0.45rem',
+                  fontWeight: 600,
+                  fontSize: '0.82rem',
+                  padding: '0.45rem 0.75rem',
+                  borderRadius: '9999px',
+                  background: 'rgba(255, 255, 255, 0.12)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  transition: 'all 0.2s ease'
+                }}
+                title="Call Us"
+              >
+                <Phone size={14} style={{ color: '#22c55e' }} />
+                <span>{t.phone}</span>
+              </a>
 
+              {/* Language Switcher */}
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'space-between', 
+                background: 'rgba(0, 0, 0, 0.32)', 
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '9999px',
+                padding: '3px 4px',
+                gap: '4px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', paddingLeft: '8px' }}>
+                  <Globe size={13} style={{ color: '#4ade80' }} />
+                  <span style={{ fontSize: '0.75rem', opacity: 0.85, fontWeight: 500 }}>
+                    {lang === 'mr' ? 'भाषा' : 'Lang'}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', gap: '3px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setLang('en')}
+                    style={{
+                      background: lang === 'en' ? 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)' : 'transparent',
+                      color: '#ffffff',
+                      border: 'none',
+                      borderRadius: '9999px',
+                      padding: '3px 10px',
+                      fontSize: '0.74rem',
+                      fontWeight: lang === 'en' ? 700 : 500,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      boxShadow: lang === 'en' ? '0 2px 6px rgba(22, 163, 74, 0.5)' : 'none'
+                    }}
+                  >
+                    EN
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLang('mr')}
+                    style={{
+                      background: lang === 'mr' ? 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)' : 'transparent',
+                      color: '#ffffff',
+                      border: 'none',
+                      borderRadius: '9999px',
+                      padding: '3px 10px',
+                      fontSize: '0.74rem',
+                      fontWeight: lang === 'mr' ? 700 : 500,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      boxShadow: lang === 'mr' ? '0 2px 6px rgba(22, 163, 74, 0.5)' : 'none'
+                    }}
+                  >
+                    मराठी
+                  </button>
+                </div>
+              </div>
+
+              {/* Admin Portal Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false);
+                  onOpenAdmin();
+                }}
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.08) 100%)',
+                  border: '1px solid rgba(255, 255, 255, 0.25)',
+                  color: '#ffffff',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.45rem',
+                  padding: '0.45rem 0.75rem',
+                  borderRadius: '9999px',
+                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
+                  transition: 'all 0.2s ease'
+                }}
+                title="Admin Portal Login"
+              >
+                <ShieldCheck size={14} style={{ color: '#fbbf24' }} />
+                <span>{t.nav.admin}</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

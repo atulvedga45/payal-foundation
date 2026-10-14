@@ -278,6 +278,14 @@
   animation-play-state: paused;
 }
 
+.gallery-marquee-inner.marquee-reverse {
+  animation: galleryContinuousLoopReverse 38s linear infinite;
+}
+
+.gallery-marquee-inner.marquee-reverse:hover {
+  animation-play-state: paused;
+}
+
 .gallery-marquee-group {
   display: flex;
   gap: 20px;
@@ -291,6 +299,15 @@
   }
   100% {
     transform: translateX(-50%);
+  }
+}
+
+@keyframes galleryContinuousLoopReverse {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
   }
 }
 

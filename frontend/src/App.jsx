@@ -250,23 +250,41 @@ export default function App() {
     };
   }, [trustees, initiatives, lang]);
 
-  // Hide WhatsApp floating button when footer is visible in viewport
-  const [isFooterVisible, setIsFooterVisible] = useState(false);
+  // WhatsApp floating button: hidden on Home page, visible on other sections, hidden at footer
+  const [showWhatsApp, setShowWhatsApp] = useState(false);
 
   useEffect(() => {
-    const checkFooter = () => {
+    const handleScroll = () => {
+      const homeEl = document.getElementById('home');
       const footerEl = document.querySelector('footer');
-      if (footerEl) {
-        const rect = footerEl.getBoundingClientRect();
-        setIsFooterVisible(rect.top < window.innerHeight - 30);
+
+      // Check if user has scrolled past home section
+      let pastHome = false;
+      if (homeEl) {
+        const homeRect = homeEl.getBoundingClientRect();
+        // Hidden when viewing home section; visible once home section scrolls past top
+        pastHome = homeRect.bottom < 150;
+      } else {
+        pastHome = window.scrollY > 350;
       }
+
+      // Hide when footer is visible
+      let footerVisible = false;
+      if (footerEl) {
+        const footerRect = footerEl.getBoundingClientRect();
+        footerVisible = footerRect.top < window.innerHeight - 30;
+      }
+
+      setShowWhatsApp(pastHome && !footerVisible);
     };
-    window.addEventListener('scroll', checkFooter, { passive: true });
-    window.addEventListener('resize', checkFooter);
-    checkFooter();
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
+    handleScroll();
+
     return () => {
-      window.removeEventListener('scroll', checkFooter);
-      window.removeEventListener('resize', checkFooter);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
     };
   }, []);
 
@@ -300,7 +318,7 @@ export default function App() {
       <div className="live-ticker-bar">
         <div className="ticker-track">
           <div className="ticker-item">
-            <span>✨ {lang === 'mr' ? 'माणुसकीची साथ, मदतीचा हात — पालघर जिल्हा समाजसेवा' : 'Hand of Humanity, Support in Need — Palghar Community Aid'}</span>
+            <span>✨ {lang === 'mr' ? 'माणुसकीची साथ, मदतीचा हात' : 'Hand of Humanity, Support in Need'}</span>
           </div>
           <div className="ticker-item">
             <span>📍 {lang === 'mr' ? 'पालघर व ग्रामीण भागातील गरजू रुग्णांसाठी मोफत रुग्णवाहिका व उपचार साहाय्य' : 'Free Emergency Hospital & Medical Care for Rural Palghar'}</span>
@@ -309,11 +327,11 @@ export default function App() {
             <span>🤝 {lang === 'mr' ? 'पायल फाउंडेशन - समाज सेवा' : 'Payal Foundation - Social Service'}</span>
           </div>
           <div className="ticker-item">
-            <span>📞 {lang === 'mr' ? 'तात्काळ मदतीसाठी थेट संपर्क: +९१ ७७७६८ ७६१२१' : 'Immediate Assistance Helpline: +91 77768 76121'}</span>
+            <span>📞 {lang === 'mr' ? 'तात्काळ मदतीसाठी थेट संपर्क: +९१ ९२२५२ ४३५५२' : 'Immediate Assistance Helpline: +91 92252 43552'}</span>
           </div>
           {/* Duplicate track for seamless infinite marquee loop */}
           <div className="ticker-item">
-            <span>✨ {lang === 'mr' ? 'माणुसकीची साथ, मदतीचा हात — पालघर जिल्हा समाजसेवा' : 'Hand of Humanity, Support in Need — Palghar Community Aid'}</span>
+            <span>✨ {lang === 'mr' ? 'माणुसकीची साथ, मदतीचा हात' : 'Hand of Humanity, Support in Need'}</span>
           </div>
           <div className="ticker-item">
             <span>📍 {lang === 'mr' ? 'पालघर व ग्रामीण भागातील गरजू रुग्णांसाठी मोफत रुग्णवाहिका व उपचार साहाय्य' : 'Free Emergency Hospital & Medical Care for Rural Palghar'}</span>
@@ -322,7 +340,7 @@ export default function App() {
             <span>🤝 {lang === 'mr' ? 'पायल फाउंडेशन - समाज सेवा' : 'Payal Foundation - Social Service'}</span>
           </div>
           <div className="ticker-item">
-            <span>📞 {lang === 'mr' ? 'तात्काळ मदतीसाठी थेट संपर्क: +९१ ७७७६८ ७६१२१' : 'Immediate Assistance Helpline: +91 77768 76121'}</span>
+            <span>📞 {lang === 'mr' ? 'तात्काळ मदतीसाठी थेट संपर्क: +९१ ९२२५२ ४३५५२' : 'Immediate Assistance Helpline: +91 92252 43552'}</span>
           </div>
         </div>
       </div>
@@ -410,7 +428,7 @@ export default function App() {
         href="https://wa.me/919225243552?text=Namaskar%20Payal%20Foundation%2C%20I%20would%20like%20to%20help%20or%20need%20assistance"
         target="_blank"
         rel="noopener noreferrer"
-        className={`whatsapp-float-btn ${isFooterVisible ? 'footer-hidden' : ''}`}
+        className={`whatsapp-float-btn ${!showWhatsApp ? 'footer-hidden' : ''}`}
         title={lang === 'mr' ? 'WhatsApp वर संपर्क करा' : 'Chat on WhatsApp'}
         aria-label="WhatsApp Chat"
       >

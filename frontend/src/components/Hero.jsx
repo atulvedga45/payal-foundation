@@ -245,31 +245,49 @@ export default function Hero({ t, lang = 'mr', homeStats = null }) {
               href="#donate"
               className="btn btn-accent btn-glow-pulse btn-shine"
               style={{
-                fontSize: '1.08rem',
-                padding: '0.9rem 2.25rem',
+                fontSize: '0.98rem',
+                width: 'min(265px, 86vw)',
+                height: '52px',
+                padding: '0 1rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
                 fontWeight: 800,
                 borderRadius: '9999px',
-                border: '1px solid rgba(255, 255, 255, 0.4)'
+                border: '1px solid rgba(255, 255, 255, 0.4)',
+                textAlign: 'center',
+                boxSizing: 'border-box',
+                whiteSpace: 'nowrap'
               }}
             >
-              <Heart size={20} />
+              <Heart size={18} />
               <span>{t.hero.btnDonateNow}</span>
             </a>
             <a
               href="#initiatives"
               className="btn btn-outline tilt-card"
               style={{
-                fontSize: '1.08rem',
-                padding: '0.9rem 2.25rem',
+                fontSize: '0.98rem',
+                width: 'min(265px, 86vw)',
+                height: '52px',
+                padding: '0 1rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
                 fontWeight: 700,
                 borderRadius: '9999px',
                 background: 'rgba(255, 255, 255, 0.85)',
                 backdropFilter: 'blur(10px)',
-                borderColor: 'rgba(11, 98, 164, 0.3)'
+                borderColor: 'rgba(11, 98, 164, 0.3)',
+                textAlign: 'center',
+                boxSizing: 'border-box',
+                whiteSpace: 'nowrap'
               }}
             >
               <span>{t.hero.btnGetInvolved}</span>
-              <ArrowRight size={18} />
+              <ArrowRight size={17} />
             </a>
           </div>
 

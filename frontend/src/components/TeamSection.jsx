@@ -195,8 +195,9 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
                     color: theme.tagText
                   }}
                 >
-                  <QrCode size={13} />
-                  <span>UPI QR & Info</span>
+                  <QrCode size={13} className="tag-icon" />
+                  <span className="tag-full">UPI QR & Info</span>
+                  <span className="tag-short">QR Info</span>
                 </div>
 
                 {/* Avatar Icon / Profile Photo */}
@@ -235,8 +236,9 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
 
                 {/* Open details CTA */}
                 <div className="trustee-click-hint">
-                  <span>{lang === 'mr' ? 'QR स्कॅनर व माहिती उघडा' : 'Click to Open QR & Details'}</span>
-                  <ExternalLink size={15} />
+                  <span className="hint-full">{lang === 'mr' ? 'QR स्कॅनर व माहिती उघडा' : 'Click to Open QR & Details'}</span>
+                  <span className="hint-short">{lang === 'mr' ? 'QR व माहिती' : 'QR & Details'}</span>
+                  <ExternalLink size={14} className="hint-icon" />
                 </div>
 
                 {/* Organization Label */}
@@ -418,14 +420,20 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
         @media (max-width: 980px) {
           .trustees-grid {
             grid-template-columns: repeat(2, 1fr);
-            gap: 1.4rem;
+            gap: 1.25rem;
           }
         }
 
         @media (max-width: 620px) {
           .trustees-grid {
-            grid-template-columns: 1fr;
-            gap: 1.25rem;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+          }
+        }
+
+        @media (max-width: 380px) {
+          .trustees-grid {
+            gap: 0.5rem;
           }
         }
 
@@ -465,6 +473,14 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
           align-items: center;
           gap: 0.25rem;
           transition: all 0.25s ease;
+        }
+
+        .card-top-tag .tag-short {
+          display: none;
+        }
+
+        .trustee-click-hint .hint-short {
+          display: none;
         }
 
         /* Hover Effect: Elevation, border glow and smooth scale */
@@ -574,6 +590,154 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
           color: var(--text-muted);
           margin-top: 0.85rem;
           font-weight: 500;
+        }
+
+        /* Mobile 2-Columns Responsive Enhancements */
+        @media (max-width: 620px) {
+          .trustee-card {
+            padding: 1.45rem 0.55rem 0.85rem 0.55rem;
+            border-radius: 14px;
+            border-top-width: 3px !important;
+          }
+
+          .trustee-card:active {
+            transform: scale(0.97);
+          }
+
+          .card-top-tag {
+            top: 0.4rem;
+            right: 0.4rem;
+            padding: 0.16rem 0.38rem;
+            font-size: 0.62rem;
+            gap: 0.2rem;
+          }
+
+          .card-top-tag .tag-full {
+            display: none;
+          }
+
+          .card-top-tag .tag-short {
+            display: inline;
+          }
+
+          .card-top-tag svg,
+          .card-top-tag .tag-icon {
+            width: 10px;
+            height: 10px;
+          }
+
+          .trustee-avatar {
+            width: 72px;
+            height: 72px;
+            margin-top: 0.35rem;
+            margin-bottom: 0.55rem;
+            border-width: 3px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+          }
+
+          .trustee-avatar .trustee-fallback-icon {
+            width: 34px !important;
+            height: 34px !important;
+          }
+
+          .trustee-name {
+            font-size: 0.94rem;
+            margin-bottom: 0.3rem;
+            line-height: 1.22;
+            word-break: break-word;
+          }
+
+          .trustee-phone-pill {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            margin-bottom: 0.45rem;
+            gap: 0.25rem;
+            max-width: 100%;
+          }
+
+          .trustee-phone-pill svg {
+            width: 11px;
+            height: 11px;
+            flex-shrink: 0;
+          }
+
+          .trustee-click-hint {
+            font-size: 0.7rem;
+            padding: 0.32rem 0.45rem;
+            gap: 0.25rem;
+            margin-top: 0.15rem;
+            width: 100%;
+            justify-content: center;
+          }
+
+          .trustee-click-hint .hint-full {
+            display: none;
+          }
+
+          .trustee-click-hint .hint-short {
+            display: inline;
+            white-space: nowrap;
+          }
+
+          .trustee-click-hint svg,
+          .trustee-click-hint .hint-icon {
+            width: 11px;
+            height: 11px;
+            flex-shrink: 0;
+          }
+
+          .trustee-org {
+            font-size: 0.62rem;
+            line-height: 1.2;
+            margin-top: auto;
+            padding-top: 0.35rem;
+            text-align: center;
+            opacity: 0.85;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+          }
+        }
+
+        @media (max-width: 380px) {
+          .trustee-card {
+            padding: 1.25rem 0.4rem 0.75rem 0.4rem;
+            border-radius: 12px;
+          }
+
+          .trustee-avatar {
+            width: 62px;
+            height: 62px;
+            margin-top: 0.25rem;
+            margin-bottom: 0.45rem;
+          }
+
+          .trustee-avatar .trustee-fallback-icon {
+            width: 28px !important;
+            height: 28px !important;
+          }
+
+          .trustee-name {
+            font-size: 0.84rem;
+            margin-bottom: 0.22rem;
+          }
+
+          .trustee-phone-pill {
+            font-size: 0.64rem;
+            padding: 0.15rem 0.38rem;
+            margin-bottom: 0.35rem;
+          }
+
+          .trustee-click-hint {
+            font-size: 0.63rem;
+            padding: 0.28rem 0.35rem;
+          }
+
+          .trustee-org {
+            font-size: 0.55rem;
+            padding-top: 0.25rem;
+          }
         }
 
         /* Modal Styles */

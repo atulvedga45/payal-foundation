@@ -92,14 +92,20 @@ export default function GallerySection({ t, gallery = [], lang = 'mr' }) {
   const rawItems = gallery && gallery.length > 0 ? gallery : fallbackItems;
   const sortedItems = [...rawItems].sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
 
-  // Ensure base set has at least 8 items for a generous, seamless continuous scroll loop
-  let baseSet = sortedItems;
-  if (baseSet.length > 0 && baseSet.length < 8) {
-    baseSet = [...baseSet, ...baseSet];
-    if (baseSet.length < 8) {
-      baseSet = [...baseSet, ...baseSet];
+  // Ensure base sets have at least 8 items for a generous, seamless continuous scroll loop
+  const makeBaseSet = (arr) => {
+    let result = [...arr];
+    if (result.length > 0 && result.length < 8) {
+      result = [...result, ...result];
+      if (result.length < 8) {
+        result = [...result, ...result];
+      }
     }
-  }
+    return result;
+  };
+
+  const row1Items = makeBaseSet(sortedItems);
+  const row2Items = makeBaseSet([...sortedItems].reverse());
 
   const renderCard = (item, uniqueKey) => {
     const imgSrc = item.image_url || item.src;
@@ -112,7 +118,7 @@ export default function GallerySection({ t, gallery = [], lang = 'mr' }) {
         className="card gallery-scroll-card"
         style={{
           width: `${cardWidth}px`,
-          height: '280px',
+          height: 'clamp(200px, 24vw, 265px)',
           flexShrink: 0,
           position: 'relative',
           cursor: 'pointer',
@@ -191,20 +197,35 @@ export default function GallerySection({ t, gallery = [], lang = 'mr' }) {
           <p className="section-subtitle">{t.gallery.subtitle}</p>
         </div>
 
-        {/* Continuous Infinite Auto-Scrolling Carousel (4 cards per view on desktop) */}
+        {/* Continuous Infinite Auto-Scrolling Carousel: 2 Rows (Row 1 Left, Row 2 Right) */}
         <div className="gallery-carousel-wrapper">
           <div className="gallery-fade-edge gallery-fade-left" />
           <div className="gallery-fade-edge gallery-fade-right" />
 
-          <div className="gallery-marquee-viewport" ref={viewportRef}>
+          {/* Row 1: Leftward Scroll (←) */}
+          <div className="gallery-marquee-viewport" ref={viewportRef} style={{ marginBottom: '1.25rem' }}>
             <div className="gallery-marquee-inner">
               {/* Group 1 */}
               <div className="gallery-marquee-group">
-                {baseSet.map((item, idx) => renderCard(item, `g1-${item.id || idx}-${idx}`))}
+                {row1Items.map((item, idx) => renderCard(item, `r1-g1-${item.id || idx}-${idx}`))}
               </div>
               {/* Group 2 (duplicate for seamless continuous loop) */}
               <div className="gallery-marquee-group" aria-hidden="true">
-                {baseSet.map((item, idx) => renderCard(item, `g2-${item.id || idx}-${idx}`))}
+                {row1Items.map((item, idx) => renderCard(item, `r1-g2-${item.id || idx}-${idx}`))}
+              </div>
+            </div>
+          </div>
+
+          {/* Row 2: Rightward Scroll (→) */}
+          <div className="gallery-marquee-viewport">
+            <div className="gallery-marquee-inner marquee-reverse">
+              {/* Group 1 */}
+              <div className="gallery-marquee-group">
+                {row2Items.map((item, idx) => renderCard(item, `r2-g1-${item.id || idx}-${idx}`))}
+              </div>
+              {/* Group 2 (duplicate for seamless continuous loop) */}
+              <div className="gallery-marquee-group" aria-hidden="true">
+                {row2Items.map((item, idx) => renderCard(item, `r2-g2-${item.id || idx}-${idx}`))}
               </div>
             </div>
           </div>
