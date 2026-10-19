@@ -471,3 +471,10 @@ body.modal-open .whatsapp-float-btn,
   100% { transform: translateY(100%) rotate(45deg); }
 }
 
+/* Hide scroll-to-top button when mobile drawer is open */
+body.drawer-open .scroll-to-top-btn,
+body.drawer-open .floating-action-btn {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}

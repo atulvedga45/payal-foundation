@@ -9,7 +9,7 @@ export default function DonateSection({ t, trustInfo }) {
   const [downloadSuccess, setDownloadSuccess] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState('');
   const upiId = trustInfo?.upi_id || '9225243552@ybl';
-  const orgName = trustInfo?.name || 'Payal Foundation and Social Service';
+  const orgName = trustInfo?.name || 'Payal Foundation';
 
   const copyToClipboard = (text, fieldName) => {
     navigator.clipboard.writeText(text);
@@ -212,14 +212,15 @@ export default function DonateSection({ t, trustInfo }) {
 
         {/* Centered Payal Foundation Scanner Card with Slow Breathing Movement */}
         <div className="reveal-scale slow-breathe" style={{
-          maxWidth: '560px',
+          maxWidth: '760px',
           margin: '0 auto',
-          background: '#ffffff',
+          background: 'linear-gradient(135deg, #eef4ff 0%, #e0eaff 50%, #f0f7ff 100%)',
           borderRadius: '24px',
-          boxShadow: '0 20px 45px -10px rgba(11, 98, 164, 0.15), 0 8px 16px -4px rgba(0, 0, 0, 0.04)',
-          border: '1px solid #e2e8f0',
+          boxShadow: '0 20px 45px -10px rgba(11, 98, 164, 0.22), 0 8px 16px -4px rgba(99, 102, 241, 0.1)',
+          border: '1.5px solid #bfcfff',
           overflow: 'hidden',
           transition: 'all 0.3s ease'
+
         }}>
           
           {/* Card Top Header Banner */}
@@ -235,56 +236,66 @@ export default function DonateSection({ t, trustInfo }) {
             </h3>
           </div>
 
-          {/* Card Body */}
-          <div style={{ padding: 'clamp(1.25rem, 4vw, 2rem) clamp(0.85rem, 3.5vw, 1.75rem)', textAlign: 'center' }}>
+          {/* Card Body - Horizontal Layout */}
+          <div className="donate-card-body" style={{
+            padding: 'clamp(1.25rem, 4vw, 2rem) clamp(0.85rem, 3.5vw, 1.75rem)',
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: '2rem',
+            flexWrap: 'wrap'
+          }}>
 
-            {/* QR Code Container with Stylized Camera Scan Frame & Animated Laser */}
-            <div className="qr-scanner-box" style={{
-              position: 'relative',
-              display: 'inline-block',
-              padding: 'clamp(0.75rem, 3vw, 1.25rem)',
-              background: '#ffffff',
-              borderRadius: '20px',
-              boxShadow: '0 8px 30px rgba(0, 0, 0, 0.08)',
-              border: '2px solid #e2e8f0',
-              marginBottom: '1.25rem',
-              maxWidth: '100%'
-            }}>
-              {/* Corner scan brackets */}
-              <div style={{ position: 'absolute', top: '6px', left: '6px', width: '20px', height: '20px', borderTop: '3.5px solid #0b62a4', borderLeft: '3.5px solid #0b62a4', borderTopLeftRadius: '6px' }} />
-              <div style={{ position: 'absolute', top: '6px', right: '6px', width: '20px', height: '20px', borderTop: '3.5px solid #0b62a4', borderRight: '3.5px solid #0b62a4', borderTopRightRadius: '6px' }} />
-              <div style={{ position: 'absolute', bottom: '6px', left: '6px', width: '20px', height: '20px', borderBottom: '3.5px solid #0b62a4', borderLeft: '3.5px solid #0b62a4', borderBottomLeftRadius: '6px' }} />
-              <div style={{ position: 'absolute', bottom: '6px', right: '6px', width: '20px', height: '20px', borderBottom: '3.5px solid #0b62a4', borderRight: '3.5px solid #0b62a4', borderBottomRightRadius: '6px' }} />
+            {/* LEFT: QR Code Container with Stylized Camera Scan Frame & Animated Laser */}
+            <div className="donate-qr-col" style={{ flex: '0 0 auto', display: 'flex', justifyContent: 'center' }}>
+              <div className="qr-scanner-box" style={{
+                position: 'relative',
+                display: 'inline-block',
+                padding: 'clamp(0.75rem, 3vw, 1.25rem)',
+                background: '#ffffff',
+                borderRadius: '20px',
+                boxShadow: '0 8px 30px rgba(0, 0, 0, 0.08)',
+                border: '2px solid #e2e8f0',
+                maxWidth: '100%'
+              }}>
+                {/* Corner scan brackets */}
+                <div style={{ position: 'absolute', top: '6px', left: '6px', width: '20px', height: '20px', borderTop: '3.5px solid #0b62a4', borderLeft: '3.5px solid #0b62a4', borderTopLeftRadius: '6px' }} />
+                <div style={{ position: 'absolute', top: '6px', right: '6px', width: '20px', height: '20px', borderTop: '3.5px solid #0b62a4', borderRight: '3.5px solid #0b62a4', borderTopRightRadius: '6px' }} />
+                <div style={{ position: 'absolute', bottom: '6px', left: '6px', width: '20px', height: '20px', borderBottom: '3.5px solid #0b62a4', borderLeft: '3.5px solid #0b62a4', borderBottomLeftRadius: '6px' }} />
+                <div style={{ position: 'absolute', bottom: '6px', right: '6px', width: '20px', height: '20px', borderBottom: '3.5px solid #0b62a4', borderRight: '3.5px solid #0b62a4', borderBottomRightRadius: '6px' }} />
 
-              {qrDataUrl ? (
-                <img
-                  src={qrDataUrl}
-                  alt="Payal Foundation Scanner QR Code"
-                  style={{
-                    width: 'clamp(180px, 55vw, 230px)',
-                    height: 'clamp(180px, 55vw, 230px)',
-                    display: 'block',
-                    borderRadius: '10px',
-                    margin: '0 auto'
-                  }}
-                />
-              ) : (
-                <div style={{
-                  width: 'clamp(180px, 55vw, 230px)',
-                  height: 'clamp(180px, 55vw, 230px)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#64748b',
-                  fontSize: '0.9rem'
-                }}>
-                  स्कॅनर लोड होत आहे...
-                </div>
-              )}
+                {qrDataUrl ? (
+                  <img
+                    src={qrDataUrl}
+                    alt="Payal Foundation Scanner QR Code"
+                    style={{
+                      width: 'clamp(160px, 40vw, 210px)',
+                      height: 'clamp(160px, 40vw, 210px)',
+                      display: 'block',
+                      borderRadius: '10px',
+                      margin: '0 auto'
+                    }}
+                  />
+                ) : (
+                  <div style={{
+                    width: 'clamp(160px, 40vw, 210px)',
+                    height: 'clamp(160px, 40vw, 210px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#64748b',
+                    fontSize: '0.9rem'
+                  }}>
+                    स्कॅनर लोड होत आहे...
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* DOWNLOAD SCANNER BUTTON */}
-            <div style={{ maxWidth: '420px', margin: '0 auto 1.5rem auto' }}>
+            {/* RIGHT: Download button + UPI bar + Direct Pay */}
+            <div style={{ flex: '1 1 220px', display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'center' }}>
+
+              {/* DOWNLOAD SCANNER BUTTON */}
               <button
                 type="button"
                 className="shimmer-btn"
@@ -334,61 +345,56 @@ export default function DonateSection({ t, trustInfo }) {
                   </>
                 )}
               </button>
-            </div>
 
-            {/* UPI ID Copy Bar */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              background: '#f8fafc',
-              padding: '0.75rem 1rem',
-              borderRadius: '14px',
-              border: '1.5px solid #cbd5e1',
-              maxWidth: '420px',
-              margin: '0 auto 1.25rem auto'
-            }}>
-              <div style={{ textAlign: 'left', overflow: 'hidden' }}>
-                <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  Official UPI ID
+              {/* UPI ID Copy Bar - hidden on mobile */}
+              <div className="donate-upi-bar" style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                background: '#f8fafc',
+                padding: '0.75rem 1rem',
+                borderRadius: '14px',
+                border: '1.5px solid #cbd5e1',
+              }}>
+                <div style={{ textAlign: 'left', overflow: 'hidden' }}>
+                  <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Official UPI ID
+                  </div>
+                  <div style={{ fontWeight: 800, fontSize: '1.02rem', color: '#0f172a', wordBreak: 'break-all' }}>
+                    {upiId}
+                  </div>
                 </div>
-                <div style={{ fontWeight: 800, fontSize: '1.02rem', color: '#0f172a', wordBreak: 'break-all' }}>
-                  {upiId}
-                </div>
+
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(upiId, 'upi')}
+                  style={{
+                    background: copiedField === 'upi' ? '#16a34a' : 'var(--primary)',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '10px',
+                    padding: '0.55rem 1.1rem',
+                    fontSize: '0.85rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    transition: 'all 0.2s ease',
+                    flexShrink: 0
+                  }}
+                >
+                  {copiedField === 'upi' ? <Check size={16} /> : <Copy size={16} />}
+                  <span>{copiedField === 'upi' ? (t.donate?.copySuccess || 'कॉपी झाले!') : (t.donate?.copyUpi || 'UPI आयडी कॉपी करा')}</span>
+                </button>
               </div>
 
-              <button
-                type="button"
-                onClick={() => copyToClipboard(upiId, 'upi')}
-                style={{
-                  background: copiedField === 'upi' ? '#16a34a' : 'var(--primary)',
-                  color: '#ffffff',
-                  border: 'none',
-                  borderRadius: '10px',
-                  padding: '0.55rem 1.1rem',
-                  fontSize: '0.85rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.4rem',
-                  transition: 'all 0.2s ease',
-                  flexShrink: 0
-                }}
-              >
-                {copiedField === 'upi' ? <Check size={16} /> : <Copy size={16} />}
-                <span>{copiedField === 'upi' ? (t.donate?.copySuccess || 'कॉपी झाले!') : (t.donate?.copyUpi || 'कॉपी करा')}</span>
-              </button>
-            </div>
-
-            {/* Mobile Direct Pay Action */}
-            <div style={{ marginTop: '0.5rem', marginBottom: '1.5rem' }}>
+              {/* Mobile Direct Pay Action */}
               <a
                 href={upiDeepLink}
                 className="btn btn-primary"
                 style={{
                   width: '100%',
-                  maxWidth: '420px',
                   padding: '0.85rem 1.25rem',
                   fontSize: '0.98rem',
                   fontWeight: 700,
@@ -402,11 +408,46 @@ export default function DonateSection({ t, trustInfo }) {
                 }}
               >
                 <Smartphone size={18} />
-                <span>{t.donate?.directUpi || 'थेट UPI ॲपद्वारे देणगी द्या (Mobile)'}</span>
+                <span>{t.donate?.directUpi || 'थेट UPI ॲपद्वारे पैसे पाठवा'}</span>
               </a>
+
             </div>
 
           </div>
+
+          {/* Responsive styles for donate card */}
+          <style>{`
+            @media (max-width: 640px) {
+              .donate-card-body {
+                flex-direction: column !important;
+                align-items: center !important;
+                gap: 1.25rem !important;
+                padding: 1.5rem 1rem !important;
+              }
+
+              .donate-qr-col {
+                width: 100% !important;
+                justify-content: center !important;
+              }
+
+              .donate-qr-col .qr-scanner-box img,
+              .donate-qr-col .qr-scanner-box > div {
+                width: clamp(200px, 70vw, 260px) !important;
+                height: clamp(200px, 70vw, 260px) !important;
+              }
+
+              /* Hide UPI ID bar on mobile */
+              .donate-upi-bar {
+                display: none !important;
+              }
+
+              /* Right column full width */
+              .donate-card-body > div:last-child {
+                width: 100% !important;
+                flex: 1 1 100% !important;
+              }
+            }
+          `}</style>
         </div>
 
         {/* Emotional Gratitude Card under Scanner */}
