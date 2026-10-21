@@ -5,6 +5,7 @@ import { fetchTrustInfo, fetchTrustees, fetchInitiatives, fetchHomeStats, fetchG
 import TopBar from './components/TopBar';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
+import ImageSliderSection from './components/ImageSliderSection';
 import AboutSection from './components/AboutSection';
 import InitiativesSection from './components/InitiativesSection';
 import TeamSection from './components/TeamSection';
@@ -352,6 +353,9 @@ export default function App() {
       <main>
         {/* Hero Section */}
         <Hero t={t} lang={lang} homeStats={homeStats} />
+
+        {/* Live Glimpses Slider Section (Auto-scrolls every 3 seconds) */}
+        <ImageSliderSection lang={lang} />
 
         {/* About Section */}
         <AboutSection t={t} />
