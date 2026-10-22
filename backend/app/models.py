@@ -56,6 +56,7 @@ class ContactMessage(Base):
     name = Column(String(255), nullable=False)
     phone = Column(String(50), nullable=False)
     email = Column(String(100), nullable=True)
+    address = Column(String(255), nullable=True)
     message = Column(Text, nullable=False)
     status = Column(String(50), default="New")
     created_at = Column(DateTime, default=datetime.utcnow)

@@ -12,6 +12,8 @@ from . import models, schemas, crud
 from .database import engine, Base, get_db, SessionLocal
 from .seed_data import seed_initial_data
 from .config import ADMIN_SECRET_KEY, CORS_ORIGINS
+from .sms import send_contact_sms_notification
+from .mailer import send_contact_email_notification
 
 UPLOADS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "public", "uploads"))
 os.makedirs(UPLOADS_DIR, exist_ok=True)
@@ -20,6 +22,16 @@ os.makedirs(UPLOADS_DIR, exist_ok=True)
 async def lifespan(app: FastAPI):
     # Create DB tables
     Base.metadata.create_all(bind=engine)
+    # Ensure 'address' column exists in contact_messages
+    try:
+        from sqlalchemy import text
+        with engine.begin() as conn:
+            try:
+                conn.execute(text("ALTER TABLE contact_messages ADD COLUMN address VARCHAR(255)"))
+            except Exception:
+                pass
+    except Exception:
+        pass
     # Seed default data
     db = SessionLocal()
     try:
@@ -89,7 +101,27 @@ def get_gallery_endpoint(db: Session = Depends(get_db)):
 
 @app.post("/api/contact", response_model=schemas.ContactResponse)
 def submit_contact_form(contact: schemas.ContactCreate, db: Session = Depends(get_db)):
-    return crud.create_contact_message(db, contact)
+    msg = crud.create_contact_message(db, contact)
+    
+    # Send Email Notification to payalfoundation212@gmail.com
+    email_res = send_contact_email_notification(
+        name=contact.name,
+        phone=contact.phone,
+        address=contact.address or "",
+        message=contact.message
+    )
+    
+    # Send SMS Notification if Fast2SMS key is active
+    sms_res = send_contact_sms_notification(
+        name=contact.name,
+        phone=contact.phone,
+        address=contact.address or "",
+        message=contact.message
+    )
+    
+    res = schemas.ContactResponse.model_validate(msg)
+    res.sms_status = email_res.get("status", sms_res.get("status", "pending"))
+    return res
 
 @app.get("/api/contact", response_model=List[schemas.ContactResponse])
 def list_contact_messages(db: Session = Depends(get_db)):

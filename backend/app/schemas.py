@@ -100,6 +100,7 @@ class ContactCreate(BaseModel):
     name: str
     phone: str
     email: Optional[str] = None
+    address: Optional[str] = None
     message: str
 
 class ContactResponse(BaseModel):
@@ -107,9 +108,11 @@ class ContactResponse(BaseModel):
     name: str
     phone: str
     email: Optional[str] = None
+    address: Optional[str] = None
     message: str
     status: str
     created_at: datetime
+    sms_status: Optional[str] = None
 
     class Config:
         from_attributes = True

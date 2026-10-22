@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone, Mail, MapPin, Send, CheckCircle2 } from 'lucide-react';
+import { Phone, Mail, MapPin, Send, CheckCircle2, MessageSquare } from 'lucide-react';
 import { submitContact } from '../api';
 import confetti from 'canvas-confetti';
 
@@ -10,23 +10,27 @@ export default function ContactSection({ t }) {
     address: '',
     message: ''
   });
+  const [lastSubmitted, setLastSubmitted] = useState(null);
   const [sending, setSending] = useState(false);
   const [sentSuccess, setSentSuccess] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name || !formData.phone || !formData.message) {
-      alert('Please fill your name, phone and message');
+      alert('कृपया नाव, फोन नंबर आणि संदेश आवश्यक भरा');
       return;
     }
 
     setSending(true);
+    const dataToSubmit = { ...formData };
+    setLastSubmitted(dataToSubmit);
+
     try {
       const payload = {
-        name: formData.name,
-        phone: formData.phone,
-        email: formData.address || '',
-        message: formData.address ? `[पत्ता: ${formData.address}]\n${formData.message}` : formData.message
+        name: dataToSubmit.name,
+        phone: dataToSubmit.phone,
+        address: dataToSubmit.address || '',
+        message: dataToSubmit.message
       };
       await submitContact(payload);
       setSentSuccess(true);
@@ -152,32 +156,98 @@ export default function ContactSection({ t }) {
             <div style={{ padding: '2.25rem 2rem', background: '#ffffff' }}>
 
               {sentSuccess ? (
-                <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
+                <div style={{ textAlign: 'center', padding: '1.25rem 0.5rem' }}>
                   <div style={{
-                    width: '54px',
-                    height: '54px',
+                    width: '56px',
+                    height: '56px',
                     borderRadius: '50%',
                     background: '#dcfce7',
                     color: '#15803d',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    margin: '0 auto 1rem auto'
+                    margin: '0 auto 0.75rem auto'
                   }}>
-                    <CheckCircle2 size={30} />
+                    <CheckCircle2 size={32} />
                   </div>
-                  <h4 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.4rem' }}>
-                    Message Sent!
+                  <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.35rem' }}>
+                    संदेश यशस्वीरीत्या पाठवला!
                   </h4>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.25rem' }}>
-                    {t.contact.success}
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: '1.2rem', lineHeight: 1.5 }}>
+                    {t.contact.success || 'आपली माहिती डेटाबेसमध्ये नोंदवली गेली आहे. खालील नंबरवर त्वरित WhatsApp संदेश पाठवा:'}
                   </p>
+
+                  {/* Direct Message Action Buttons for 9225243552 & 8766573113 */}
+                  {lastSubmitted && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', marginBottom: '1.25rem' }}>
+                      <a
+                        href={`https://wa.me/919225243552?text=${encodeURIComponent(
+                          `*नवीन संपर्क संदेश - पायल फाउंडेशन*\n` +
+                          `👤 *नाव:* ${lastSubmitted.name}\n` +
+                          `📞 *फोन:* ${lastSubmitted.phone}\n` +
+                          `📍 *पत्ता:* ${lastSubmitted.address || 'दिलेला नाही'}\n` +
+                          `📝 *संदेश:* ${lastSubmitted.message}`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.5rem',
+                          background: '#25D366',
+                          color: '#ffffff',
+                          fontWeight: 700,
+                          fontSize: '0.88rem',
+                          padding: '0.65rem 1rem',
+                          borderRadius: 'var(--radius-full)',
+                          textDecoration: 'none',
+                          boxShadow: '0 3px 10px rgba(37, 211, 102, 0.35)',
+                          transition: 'transform 0.2s ease'
+                        }}
+                      >
+                        <MessageSquare size={16} />
+                        <span>WhatsApp वर पाठवा (9225243552)</span>
+                      </a>
+
+                      <a
+                        href={`https://wa.me/918766573113?text=${encodeURIComponent(
+                          `*नवीन संपर्क संदेश - पायल फाउंडेशन*\n` +
+                          `👤 *नाव:* ${lastSubmitted.name}\n` +
+                          `📞 *फोन:* ${lastSubmitted.phone}\n` +
+                          `📍 *पत्ता:* ${lastSubmitted.address || 'दिलेला नाही'}\n` +
+                          `📝 *संदेश:* ${lastSubmitted.message}`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.5rem',
+                          background: '#128C7E',
+                          color: '#ffffff',
+                          fontWeight: 700,
+                          fontSize: '0.88rem',
+                          padding: '0.65rem 1rem',
+                          borderRadius: 'var(--radius-full)',
+                          textDecoration: 'none',
+                          boxShadow: '0 3px 10px rgba(18, 140, 126, 0.35)',
+                          transition: 'transform 0.2s ease'
+                        }}
+                      >
+                        <MessageSquare size={16} />
+                        <span>WhatsApp वर पाठवा (8766573113)</span>
+                      </a>
+                    </div>
+                  )}
+
                   <button
                     type="button"
-                    onClick={() => setSentSuccess(false)}
+                    onClick={() => { setSentSuccess(false); setLastSubmitted(null); }}
                     className="btn btn-outline btn-sm"
                   >
-                    Send Another Message
+                    दुसरा संदेश पाठवा (Send Another Message)
                   </button>
                 </div>
               ) : (

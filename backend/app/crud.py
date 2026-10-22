@@ -88,6 +88,7 @@ def create_contact_message(db: Session, contact: schemas.ContactCreate):
         name=contact.name,
         phone=contact.phone,
         email=contact.email,
+        address=contact.address,
         message=contact.message
     )
     db.add(db_obj)
