@@ -26,17 +26,23 @@ def get_engine_and_session():
 
     # Try PostgreSQL or configured URL
     if db_url and "postgres" in db_url and "localhost" not in db_url:
-        try:
-            connect_args = {"connect_timeout": 15}
-            test_engine = create_engine(db_url, pool_pre_ping=True, pool_recycle=300, connect_args=connect_args)
-            with test_engine.connect() as conn:
-                pass
-            logger.info(f"Successfully connected to PostgreSQL Database: {db_url.split('@')[-1]}")
-            engine = test_engine
-            SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-            return engine, SessionLocal
-        except Exception as e:
-            logger.warning(f"Could not connect to PostgreSQL ({e}). Falling back to SQLite.")
+        candidates = [db_url]
+        if "postgresql://" in db_url and "+" not in db_url:
+            candidates.append(db_url.replace("postgresql://", "postgresql+psycopg2://", 1))
+            candidates.append(db_url.replace("postgresql://", "postgresql+psycopg://", 1))
+
+        for candidate_url in candidates:
+            try:
+                connect_args = {"connect_timeout": 15}
+                test_engine = create_engine(candidate_url, pool_pre_ping=True, pool_recycle=300, connect_args=connect_args)
+                with test_engine.connect() as conn:
+                    pass
+                logger.info(f"Successfully connected to PostgreSQL Database: {candidate_url.split('@')[-1]}")
+                engine = test_engine
+                SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+                return engine, SessionLocal
+            except Exception as e:
+                logger.warning(f"Could not connect with {candidate_url.split('@')[-1]}: {e}")
 
     # SQLite fallback (check for persistent mounted directory if available)
     uploads_dir = os.getenv("UPLOADS_PATH", "")
