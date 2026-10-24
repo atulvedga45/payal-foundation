@@ -892,201 +892,183 @@ export default function AdminModal({
             
             {/* Admin Navbar */}
             <div style={{
-              padding: '0.85rem 1.5rem',
+              padding: '0.75rem 1.25rem',
               backgroundColor: 'var(--light-bg)',
               borderBottom: '1px solid var(--border-color)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: '0.75rem'
+              flexWrap: 'nowrap',
+              gap: '0.5rem'
             }}>
-              {/* Left Side: Edit/Add Dropdown and Current Section indicator */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-                <div ref={editDropdownRef} style={{ position: 'relative' }}>
-                  <button
-                    type="button"
-                    onClick={() => setIsEditDropdownOpen(!isEditDropdownOpen)}
+              {/* Left Side: Edit Dropdown only */}
+              <div ref={editDropdownRef} style={{ position: 'relative' }}>
+                <button
+                  type="button"
+                  onClick={() => setIsEditDropdownOpen(!isEditDropdownOpen)}
+                  style={{
+                    padding: '0.45rem 1rem',
+                    borderRadius: 'var(--radius-full)',
+                    border: '1.5px solid var(--primary)',
+                    background: 'var(--primary)',
+                    color: '#ffffff',
+                    fontWeight: 700,
+                    fontSize: '0.85rem',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    boxShadow: '0 2px 8px rgba(37, 99, 235, 0.25)',
+                    transition: 'all 0.2s ease',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  <Edit3 size={14} />
+                  <span>Edit</span>
+                  <ChevronDown
+                    size={13}
                     style={{
-                      padding: '0.52rem 1.15rem',
-                      borderRadius: 'var(--radius-full)',
-                      border: '1.5px solid var(--primary)',
-                      background: 'var(--primary)',
-                      color: '#ffffff',
-                      fontWeight: 700,
-                      fontSize: '0.88rem',
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.45rem',
-                      boxShadow: '0 3px 10px rgba(37, 99, 235, 0.28)',
-                      transition: 'all 0.2s ease'
+                      transform: isEditDropdownOpen ? 'rotate(180deg)' : 'none',
+                      transition: 'transform 0.2s'
                     }}
-                  >
-                    <Edit3 size={15} />
-                    <span>Edit / Add</span>
-                    <ChevronDown
-                      size={14}
-                      style={{
-                        transform: isEditDropdownOpen ? 'rotate(180deg)' : 'none',
-                        transition: 'transform 0.2s'
-                      }}
-                    />
-                  </button>
+                  />
+                </button>
 
-                  {/* Dropdown Menu */}
-                  {isEditDropdownOpen && (
+                {/* Dropdown Menu */}
+                {isEditDropdownOpen && (
+                  <div style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 8px)',
+                    left: 0,
+                    zIndex: 1000,
+                    backgroundColor: '#ffffff',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '14px',
+                    boxShadow: '0 12px 30px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+                    minWidth: '270px',
+                    padding: '0.5rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.3rem',
+                    animation: 'fadeIn 0.15s ease-out'
+                  }}>
                     <div style={{
-                      position: 'absolute',
-                      top: 'calc(100% + 8px)',
-                      left: 0,
-                      zIndex: 1000,
-                      backgroundColor: '#ffffff',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: '14px',
-                      boxShadow: '0 12px 30px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.05)',
-                      minWidth: '270px',
-                      padding: '0.5rem',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '0.3rem',
-                      animation: 'fadeIn 0.15s ease-out'
+                      padding: '0.4rem 0.75rem',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      color: '#64748b',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em'
                     }}>
-                      <div style={{
-                        padding: '0.4rem 0.75rem',
-                        fontSize: '0.72rem',
-                        fontWeight: 700,
-                        color: '#64748b',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em'
-                      }}>
-                        बदल करण्यासाठी निवडा (Select Option)
-                      </div>
-
-                      {/* 1. Home Stats */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setActiveTab('homestats');
-                          setIsEditDropdownOpen(false);
-                        }}
-                        style={{
-                          padding: '0.65rem 0.85rem',
-                          borderRadius: '10px',
-                          border: 'none',
-                          background: activeTab === 'homestats' ? 'rgba(37, 99, 235, 0.12)' : 'transparent',
-                          color: activeTab === 'homestats' ? 'var(--primary)' : '#1e293b',
-                          fontWeight: activeTab === 'homestats' ? 700 : 500,
-                          fontSize: '0.88rem',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '0.65rem',
-                          textAlign: 'left',
-                          transition: 'all 0.15s ease'
-                        }}
-                        onMouseEnter={(e) => {
-                          if (activeTab !== 'homestats') e.currentTarget.style.background = '#f1f5f9';
-                        }}
-                        onMouseLeave={(e) => {
-                          if (activeTab !== 'homestats') e.currentTarget.style.background = 'transparent';
-                        }}
-                      >
-                        <SlidersHorizontal size={16} style={{ color: activeTab === 'homestats' ? 'var(--primary)' : '#64748b', flexShrink: 0 }} />
-                        <span>Home Stats (आकडेवारी)</span>
-                      </button>
-
-                      {/* 2. Initiatives */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setActiveTab('initiatives');
-                          setEditingInit(null);
-                          setIsEditDropdownOpen(false);
-                        }}
-                        style={{
-                          padding: '0.65rem 0.85rem',
-                          borderRadius: '10px',
-                          border: 'none',
-                          background: activeTab === 'initiatives' ? 'rgba(37, 99, 235, 0.12)' : 'transparent',
-                          color: activeTab === 'initiatives' ? 'var(--primary)' : '#1e293b',
-                          fontWeight: activeTab === 'initiatives' ? 700 : 500,
-                          fontSize: '0.88rem',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '0.65rem',
-                          textAlign: 'left',
-                          transition: 'all 0.15s ease'
-                        }}
-                        onMouseEnter={(e) => {
-                          if (activeTab !== 'initiatives') e.currentTarget.style.background = '#f1f5f9';
-                        }}
-                        onMouseLeave={(e) => {
-                          if (activeTab !== 'initiatives') e.currentTarget.style.background = 'transparent';
-                        }}
-                      >
-                        <Target size={16} style={{ color: activeTab === 'initiatives' ? 'var(--primary)' : '#64748b', flexShrink: 0 }} />
-                        <span>Initiatives (उपक्रम - {localInitiatives.length})</span>
-                      </button>
-
-                      {/* 3. Trustees */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setActiveTab('trustees');
-                          setEditingTrustee(null);
-                          setIsEditDropdownOpen(false);
-                        }}
-                        style={{
-                          padding: '0.65rem 0.85rem',
-                          borderRadius: '10px',
-                          border: 'none',
-                          background: activeTab === 'trustees' ? 'rgba(37, 99, 235, 0.12)' : 'transparent',
-                          color: activeTab === 'trustees' ? 'var(--primary)' : '#1e293b',
-                          fontWeight: activeTab === 'trustees' ? 700 : 500,
-                          fontSize: '0.88rem',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '0.65rem',
-                          textAlign: 'left',
-                          transition: 'all 0.15s ease'
-                        }}
-                        onMouseEnter={(e) => {
-                          if (activeTab !== 'trustees') e.currentTarget.style.background = '#f1f5f9';
-                        }}
-                        onMouseLeave={(e) => {
-                          if (activeTab !== 'trustees') e.currentTarget.style.background = 'transparent';
-                        }}
-                      >
-                        <ShieldCheck size={16} style={{ color: activeTab === 'trustees' ? 'var(--primary)' : '#64748b', flexShrink: 0 }} />
-                        <span>Trustees (विश्वस्त मंडळ - {localTrustees.length})</span>
-                      </button>
+                      बदल करण्यासाठी निवडा (Select Option)
                     </div>
-                  )}
-                </div>
 
-                {/* Current Active Section Badge */}
-                <div style={{
-                  fontSize: '0.82rem',
-                  fontWeight: 600,
-                  color: 'var(--text-muted)',
-                  background: 'rgba(0, 0, 0, 0.04)',
-                  padding: '0.4rem 0.85rem',
-                  borderRadius: 'var(--radius-full)',
-                  border: '1px solid var(--border-color)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.4rem'
-                }}>
-                  <span>विभाग:</span>
-                  <strong style={{ color: 'var(--primary)' }}>{getTabLabel()}</strong>
-                </div>
+                    {/* 1. Home Stats */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTab('homestats');
+                        setIsEditDropdownOpen(false);
+                      }}
+                      style={{
+                        padding: '0.65rem 0.85rem',
+                        borderRadius: '10px',
+                        border: 'none',
+                        background: activeTab === 'homestats' ? 'rgba(37, 99, 235, 0.12)' : 'transparent',
+                        color: activeTab === 'homestats' ? 'var(--primary)' : '#1e293b',
+                        fontWeight: activeTab === 'homestats' ? 700 : 500,
+                        fontSize: '0.88rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.65rem',
+                        textAlign: 'left',
+                        transition: 'all 0.15s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (activeTab !== 'homestats') e.currentTarget.style.background = '#f1f5f9';
+                      }}
+                      onMouseLeave={(e) => {
+                        if (activeTab !== 'homestats') e.currentTarget.style.background = 'transparent';
+                      }}
+                    >
+                      <SlidersHorizontal size={16} style={{ color: activeTab === 'homestats' ? 'var(--primary)' : '#64748b', flexShrink: 0 }} />
+                      <span>Home Stats (आकडेवारी)</span>
+                    </button>
+
+                    {/* 2. Initiatives */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTab('initiatives');
+                        setEditingInit(null);
+                        setIsEditDropdownOpen(false);
+                      }}
+                      style={{
+                        padding: '0.65rem 0.85rem',
+                        borderRadius: '10px',
+                        border: 'none',
+                        background: activeTab === 'initiatives' ? 'rgba(37, 99, 235, 0.12)' : 'transparent',
+                        color: activeTab === 'initiatives' ? 'var(--primary)' : '#1e293b',
+                        fontWeight: activeTab === 'initiatives' ? 700 : 500,
+                        fontSize: '0.88rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.65rem',
+                        textAlign: 'left',
+                        transition: 'all 0.15s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (activeTab !== 'initiatives') e.currentTarget.style.background = '#f1f5f9';
+                      }}
+                      onMouseLeave={(e) => {
+                        if (activeTab !== 'initiatives') e.currentTarget.style.background = 'transparent';
+                      }}
+                    >
+                      <Target size={16} style={{ color: activeTab === 'initiatives' ? 'var(--primary)' : '#64748b', flexShrink: 0 }} />
+                      <span>Initiatives (उपक्रम - {localInitiatives.length})</span>
+                    </button>
+
+                    {/* 3. Trustees */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTab('trustees');
+                        setEditingTrustee(null);
+                        setIsEditDropdownOpen(false);
+                      }}
+                      style={{
+                        padding: '0.65rem 0.85rem',
+                        borderRadius: '10px',
+                        border: 'none',
+                        background: activeTab === 'trustees' ? 'rgba(37, 99, 235, 0.12)' : 'transparent',
+                        color: activeTab === 'trustees' ? 'var(--primary)' : '#1e293b',
+                        fontWeight: activeTab === 'trustees' ? 700 : 500,
+                        fontSize: '0.88rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.65rem',
+                        textAlign: 'left',
+                        transition: 'all 0.15s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (activeTab !== 'trustees') e.currentTarget.style.background = '#f1f5f9';
+                      }}
+                      onMouseLeave={(e) => {
+                        if (activeTab !== 'trustees') e.currentTarget.style.background = 'transparent';
+                      }}
+                    >
+                      <ShieldCheck size={16} style={{ color: activeTab === 'trustees' ? 'var(--primary)' : '#64748b', flexShrink: 0 }} />
+                      <span>Trustees (विश्वस्त मंडळ - {localTrustees.length})</span>
+                    </button>
+                  </div>
+                )}
               </div>
 
-              {/* Right Side: Refresh & Logout */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              {/* Right Side: Refresh & Logout (in the exact same row/line) */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
                 <button
                   type="button"
                   onClick={loadAllAdminData}
@@ -1094,16 +1076,17 @@ export default function AdminModal({
                     background: '#ffffff',
                     border: '1px solid var(--border-color)',
                     borderRadius: 'var(--radius-full)',
-                    padding: '0.45rem 0.9rem',
+                    padding: '0.45rem 0.8rem',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.35rem',
-                    fontSize: '0.82rem',
+                    gap: '0.3rem',
+                    fontSize: '0.8rem',
                     fontWeight: 600,
                     color: 'var(--text-main)',
                     boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-                    transition: 'all 0.2s ease'
+                    transition: 'all 0.2s ease',
+                    whiteSpace: 'nowrap'
                   }}
                   onMouseEnter={(e) => e.currentTarget.style.background = '#f8fafc'}
                   onMouseLeave={(e) => e.currentTarget.style.background = '#ffffff'}
@@ -1119,15 +1102,16 @@ export default function AdminModal({
                     background: 'rgba(239, 68, 68, 0.08)',
                     border: '1px solid rgba(239, 68, 68, 0.25)',
                     borderRadius: 'var(--radius-full)',
-                    padding: '0.45rem 0.9rem',
+                    padding: '0.45rem 0.8rem',
                     color: '#ef4444',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.35rem',
-                    fontSize: '0.82rem',
+                    gap: '0.3rem',
+                    fontSize: '0.8rem',
                     fontWeight: 700,
-                    transition: 'all 0.2s ease'
+                    transition: 'all 0.2s ease',
+                    whiteSpace: 'nowrap'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background = '#ef4444';
@@ -1138,7 +1122,7 @@ export default function AdminModal({
                     e.currentTarget.style.color = '#ef4444';
                   }}
                 >
-                  <LogOut size={14} />
+                  <LogOut size={13} />
                   <span>Logout</span>
                 </button>
               </div>
