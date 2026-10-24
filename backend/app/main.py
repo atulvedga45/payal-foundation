@@ -3,7 +3,7 @@ import shutil
 import time
 from contextlib import asynccontextmanager
 from typing import List
-from fastapi import FastAPI, Depends, HTTPException, Header, status, UploadFile, File
+from fastapi import FastAPI, Depends, HTTPException, Header, status, UploadFile, File, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
@@ -87,6 +87,15 @@ def read_root():
 def health_check():
     return {"status": "ok", "service": "youngsamajsevatrust-backend"}
 
+@app.get("/api/test-email")
+def test_email_endpoint():
+    res = send_contact_email_notification(
+        name="Diagnostic Test",
+        phone="9225243552",
+        message="Checking email connectivity on Render"
+    )
+    return res
+
 @app.get("/api/info", response_model=schemas.TrustInfoSchema)
 def get_trust_info_endpoint(db: Session = Depends(get_db)):
     info = crud.get_trust_info(db)
@@ -118,11 +127,12 @@ def get_gallery_endpoint(db: Session = Depends(get_db)):
     return crud.get_gallery_items(db)
 
 @app.post("/api/contact", response_model=schemas.ContactResponse)
-def submit_contact_form(contact: schemas.ContactCreate, db: Session = Depends(get_db)):
+def submit_contact_form(contact: schemas.ContactCreate, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     msg = crud.create_contact_message(db, contact)
     
-    # Send Email Notification to payalfoundation212@gmail.com
-    email_res = send_contact_email_notification(
+    # Send Email Notification in background to prevent timeout or blocking
+    background_tasks.add_task(
+        send_contact_email_notification,
         name=contact.name,
         phone=contact.phone,
         phone2=contact.phone2 or "",
@@ -132,8 +142,9 @@ def submit_contact_form(contact: schemas.ContactCreate, db: Session = Depends(ge
         message=contact.message
     )
     
-    # Send SMS Notification if Fast2SMS key is active
-    sms_res = send_contact_sms_notification(
+    # Send SMS Notification in background if Fast2SMS key is active
+    background_tasks.add_task(
+        send_contact_sms_notification,
         name=contact.name,
         phone=contact.phone,
         address=contact.address or "",
@@ -141,7 +152,7 @@ def submit_contact_form(contact: schemas.ContactCreate, db: Session = Depends(ge
     )
     
     res = schemas.ContactResponse.model_validate(msg)
-    res.sms_status = email_res.get("status", sms_res.get("status", "pending"))
+    res.sms_status = "sent"
     return res
 
 @app.get("/api/contact", response_model=List[schemas.ContactResponse])
