@@ -282,10 +282,10 @@ export default function TopBar({
                 e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.25)';
                 e.currentTarget.style.transform = 'none';
               }}
-              title="Develop By"
+              title="About Us"
             >
-              <Code2 size={13} style={{ color: '#38bdf8' }} />
-              <span>Develop By</span>
+              <ShieldCheck size={13} style={{ color: '#38bdf8' }} />
+              <span>About Us</span>
             </button>
           ) : (
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
@@ -509,10 +509,10 @@ export default function TopBar({
                     boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
                     transition: 'all 0.2s ease'
                   }}
-                  title="Develop By"
+                  title="About Us"
                 >
-                  <Code2 size={14} style={{ color: '#38bdf8' }} />
-                  <span>Develop By</span>
+                  <ShieldCheck size={14} style={{ color: '#38bdf8' }} />
+                  <span>About Us</span>
                 </button>
               ) : (
                 <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>

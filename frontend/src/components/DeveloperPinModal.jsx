@@ -48,8 +48,8 @@ export default function DeveloperPinModal({ isOpen, onClose, onSuccess, lang = '
     } else {
       setError(
         lang === 'mr'
-          ? 'चुकीचा पिन! कृपया बरोबर ६ अंकी किंवा सिक्रेट कोड प्रविष्ट करा.'
-          : 'Incorrect PIN! Please enter the valid developer security code.'
+          ? 'चुकीचा पिन! कृपया बरोबर पिन कोड प्रविष्ट करा.'
+          : 'Incorrect PIN! Please enter the valid PIN code.'
       );
       setPin('');
       if (inputRef.current) inputRef.current.focus();
@@ -146,7 +146,7 @@ export default function DeveloperPinModal({ isOpen, onClose, onSuccess, lang = '
             {success ? (
               <CheckCircle2 size={28} color="#ffffff" />
             ) : (
-              <Code2 size={28} color="#ffffff" />
+              <ShieldCheck size={28} color="#ffffff" />
             )}
           </div>
 
@@ -162,13 +162,13 @@ export default function DeveloperPinModal({ isOpen, onClose, onSuccess, lang = '
           >
             {success
               ? (lang === 'mr' ? 'अ‍ॅडमिन पॅनेल अनलॉक झाले!' : 'Admin Panel Unlocked!')
-              : (lang === 'mr' ? 'Develop By - सुरक्षा पिन' : 'Develop By - Verification')}
+              : 'About Us'}
           </h3>
 
           {/* Subtitle */}
           <p
             style={{
-              fontSize: '0.84rem',
+              fontSize: '0.88rem',
               color: '#94a3b8',
               margin: '0 0 1.4rem 0',
               lineHeight: 1.4
@@ -177,8 +177,8 @@ export default function DeveloperPinModal({ isOpen, onClose, onSuccess, lang = '
             {success
               ? (lang === 'mr' ? 'अ‍ॅडमिन पर्याय नेव्हिगेशन बारमध्ये उपलब्ध झाला आहे.' : 'Admin option is now available in the Navbar.')
               : (lang === 'mr'
-                  ? 'प्रशासन (Admin) पर्याय पाहण्यासाठी कृपया पिन कोड प्रविष्ट करा'
-                  : 'Enter security PIN to reveal and access Admin Panel')}
+                  ? 'कृपया पिन कोड प्रविष्ट करा'
+                  : 'Please enter PIN code')}
           </p>
 
           {!success && (
