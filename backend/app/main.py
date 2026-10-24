@@ -85,7 +85,9 @@ def read_root():
 
 @app.get("/api/health")
 def health_check():
-    return {"status": "ok", "service": "youngsamajsevatrust-backend"}
+    db_type = "sqlite" if "sqlite" in str(engine.url) else "postgresql"
+    masked = str(engine.url).split("@")[-1] if "@" in str(engine.url) else str(engine.url)
+    return {"status": "ok", "service": "youngsamajsevatrust-backend", "database": db_type, "db_target": masked}
 
 @app.get("/api/test-email")
 def test_email_endpoint():
