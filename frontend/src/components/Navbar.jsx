@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, HeartHandshake, Home, Info, Layers, Users, Image, Phone } from 'lucide-react';
+import { Menu, X, HeartHandshake, Home, Info, Layers, Users, Image, Phone, ShieldCheck } from 'lucide-react';
 
-export default function Navbar({ t }) {
+export default function Navbar({ t, isAdminUnlocked = false, onOpenAdmin }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
@@ -116,6 +116,42 @@ export default function Navbar({ t }) {
                 {link.label}
               </a>
             ))}
+
+            {/* Admin Portal Button in Navbar (Visible when unlocked via Develop By) */}
+            {isAdminUnlocked && (
+              <button
+                type="button"
+                onClick={onOpenAdmin}
+                className="btn-admin-nav"
+                style={{
+                  padding: '0.48rem 1.05rem',
+                  fontSize: '0.88rem',
+                  fontWeight: 700,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  borderRadius: '9999px',
+                  background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                  color: '#ffffff',
+                  border: '1px solid rgba(255, 255, 255, 0.4)',
+                  boxShadow: '0 3px 10px rgba(2, 132, 199, 0.35)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(2, 132, 199, 0.5)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'none';
+                  e.currentTarget.style.boxShadow = '0 3px 10px rgba(2, 132, 199, 0.35)';
+                }}
+                title="Admin Portal"
+              >
+                <ShieldCheck size={16} style={{ color: '#fbbf24' }} />
+                <span>{t.nav.admin}</span>
+              </button>
+            )}
 
             {/* Donate CTA button */}
             <a
@@ -321,6 +357,44 @@ export default function Navbar({ t }) {
                   </a>
                 );
               })}
+
+              {/* Mobile Drawer: Admin Option when unlocked via Develop By */}
+              {isAdminUnlocked && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeMenu();
+                    onOpenAdmin();
+                  }}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.85rem',
+                    padding: '0.85rem 1rem',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(2, 132, 199, 0.35)',
+                    background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.12) 0%, rgba(3, 105, 161, 0.06) 100%)',
+                    color: '#0369a1',
+                    fontWeight: 700,
+                    fontSize: '1.05rem',
+                    marginTop: '0.4rem',
+                    marginBottom: '0.25rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    textAlign: 'left'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(2, 132, 199, 0.2)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(2, 132, 199, 0.12) 0%, rgba(3, 105, 161, 0.06) 100%)';
+                  }}
+                >
+                  <ShieldCheck size={20} style={{ color: '#d97706', flexShrink: 0 }} />
+                  <span>{t.nav.admin}</span>
+                </button>
+              )}
             </nav>
 
             {/* Donate Button at Bottom */}

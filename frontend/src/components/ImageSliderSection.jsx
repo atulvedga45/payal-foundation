@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Sparkles, MapPin, HeartHandshake } from 'lucide-react';
+import { HeartHandshake } from 'lucide-react';
 
 const SLIDES = [
   {
@@ -78,15 +78,7 @@ export default function ImageSliderSection({ lang = 'mr' }) {
   const [touchStartX, setTouchStartX] = useState(null);
   const isNavigatingRef = useRef(false);
 
-  const SLIDE_DURATION = 5000; // 5 seconds per image
-
-  // Calculate active dot index (0 to SLIDES.length - 1)
-  const activeDotIndex =
-    currentIndex === 0
-      ? SLIDES.length - 1
-      : currentIndex === EXTENDED_SLIDES.length - 1
-      ? 0
-      : currentIndex - 1;
+  const SLIDE_DURATION = 4000; // 4 seconds per image
 
   // Re-enable transition after instant loop snap
   useEffect(() => {
@@ -124,13 +116,6 @@ export default function ImageSliderSection({ lang = 'mr' }) {
     setCurrentIndex((prev) => prev - 1);
   };
 
-  const goToSlide = (dotIndex) => {
-    if (isNavigatingRef.current) return;
-    isNavigatingRef.current = true;
-    setIsTransitioning(true);
-    setCurrentIndex(dotIndex + 1);
-  };
-
   const handleTransitionEnd = () => {
     isNavigatingRef.current = false;
     // When reached the clone of the first slide at the end, snap smoothly back to real first slide
@@ -162,33 +147,24 @@ export default function ImageSliderSection({ lang = 'mr' }) {
 
   return (
     <section
-      id="live-glimpses"
+      id="gallery"
       className="impact-slider-section"
       aria-label="Moments of Social Service Slider"
     >
       <div className="container">
         {/* Section Heading */}
-        <div className="slider-header-wrapper reveal">
-          <div className="slider-badge">
-            <Sparkles size={16} className="badge-sparkle-icon" />
-            <span>{lang === 'mr' ? 'प्रत्यक्ष कार्य क्षणचित्रे' : 'Live Social Service Moments'}</span>
-          </div>
-          <h2 className="slider-title">
+        <div className="slider-header-wrapper reveal" style={{ marginBottom: '1.75rem' }}>
+          <h2 className="slider-title" style={{ color: '#000000', marginBottom: 0 }}>
             {lang === 'mr' ? (
               <>
-                माणुसकीच्या सेवेतील <span className="title-gradient">प्रत्यक्ष क्षण</span>
+                माणुसकीच्या सेवेतील <span style={{ color: '#000000' }}>प्रत्यक्ष क्षण</span>
               </>
             ) : (
               <>
-                Moments of Compassion &amp; <span className="title-gradient">Direct Impact</span>
+                Moments of Compassion &amp; <span style={{ color: '#000000' }}>Direct Impact</span>
               </>
             )}
           </h2>
-          <p className="slider-subtitle">
-            {lang === 'mr'
-              ? 'पालघर जिल्ह्यातील गरजू नागरिकांसाठी रुग्णसेवा, तातडीची मदत आणि सामाजिक उपक्रमांची खास छायाचित्रे.'
-              : 'Glimpses of free ambulance rescue, patient hospital support, and community assistance in Palghar.'}
-          </p>
         </div>
 
         {/* Carousel Showcase Card */}
@@ -228,10 +204,6 @@ export default function ImageSliderSection({ lang = 'mr' }) {
                         <HeartHandshake size={14} />
                         {lang === 'mr' ? slide.tag_mr : slide.tag_en}
                       </span>
-                      <span className="slide-location">
-                        <MapPin size={13} />
-                        {lang === 'mr' ? slide.location_mr : slide.location_en}
-                      </span>
                     </div>
 
                     <h3 className="slide-heading">
@@ -246,36 +218,37 @@ export default function ImageSliderSection({ lang = 'mr' }) {
             </div>
           </div>
 
-          {/* Navigation Controls: Left / Right Floating Buttons */}
-          <button
-            onClick={handlePrev}
-            className="slider-nav-btn slider-prev-btn"
-            aria-label="Previous image"
-          >
-            <ChevronLeft size={24} />
-          </button>
-          <button
-            onClick={handleNext}
-            className="slider-nav-btn slider-next-btn"
-            aria-label="Next image"
-          >
-            <ChevronRight size={24} />
-          </button>
         </div>
 
-        {/* Dot Indicators Centered in the middle */}
-        <div className="slider-controls-footer">
-          <div className="slider-dots-container">
-            {SLIDES.map((slide, idx) => (
-              <button
-                key={slide.id}
-                onClick={() => goToSlide(idx)}
-                className={`slider-dot-btn ${idx === activeDotIndex ? 'active' : ''}`}
-                aria-label={`Go to slide ${idx + 1}`}
-              >
-                <span className="dot-visual" />
-              </button>
-            ))}
+        {/* Slider Indicator Dots (Pagination Circles) */}
+        <div className="slider-controls-footer" style={{ margin: '1.5rem auto 0 auto', display: 'flex', justifyContent: 'center' }}>
+          <div className="slider-dots-container" role="tablist" aria-label="Slider Pagination">
+            {SLIDES.map((slide, idx) => {
+              const activeDotIndex =
+                currentIndex === 0
+                  ? SLIDES.length - 1
+                  : currentIndex === EXTENDED_SLIDES.length - 1
+                  ? 0
+                  : currentIndex - 1;
+              const isActive = activeDotIndex === idx;
+
+              return (
+                <button
+                  key={`dot-${slide.id}`}
+                  className={`slider-dot-btn ${isActive ? 'active' : ''}`}
+                  onClick={() => {
+                    if (isNavigatingRef.current) return;
+                    setIsTransitioning(true);
+                    setCurrentIndex(idx + 1);
+                  }}
+                  aria-label={`Go to slide ${idx + 1}`}
+                  role="tab"
+                  aria-selected={isActive}
+                >
+                  <span className="dot-visual" />
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>

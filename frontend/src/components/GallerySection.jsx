@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { ZoomIn, X } from 'lucide-react';
+import { getImageUrl } from '../api';
 
 export default function GallerySection({ t, gallery = [], lang = 'mr' }) {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -108,7 +109,7 @@ export default function GallerySection({ t, gallery = [], lang = 'mr' }) {
   const row2Items = makeBaseSet([...sortedItems].reverse());
 
   const renderCard = (item, uniqueKey) => {
-    const imgSrc = item.image_url || item.src;
+    const imgSrc = getImageUrl(item.image_url || item.src);
     const itemTitle = (lang === 'mr' && item.title_mr) ? item.title_mr : (item.title || item.title_mr || '');
     const itemCategory = (lang === 'mr' && item.category_mr) ? item.category_mr : (item.category || item.category_mr || 'Social Service');
 
@@ -190,45 +191,11 @@ export default function GallerySection({ t, gallery = [], lang = 'mr' }) {
   return (
     <section id="gallery" className="section">
       <div className="container">
-        
-        {/* Header without badge */}
-        <div className="section-header reveal" style={{ marginBottom: '2.5rem' }}>
+
+        {/* Header */}
+        <div className="section-header reveal" style={{ marginBottom: '1rem' }}>
           <h2 className="section-title">{t.gallery.title}</h2>
           <p className="section-subtitle">{t.gallery.subtitle}</p>
-        </div>
-
-        {/* Continuous Infinite Auto-Scrolling Carousel: 2 Rows (Row 1 Left, Row 2 Right) */}
-        <div className="gallery-carousel-wrapper">
-          <div className="gallery-fade-edge gallery-fade-left" />
-          <div className="gallery-fade-edge gallery-fade-right" />
-
-          {/* Row 1: Leftward Scroll (←) */}
-          <div className="gallery-marquee-viewport" ref={viewportRef} style={{ marginBottom: '1.25rem' }}>
-            <div className="gallery-marquee-inner">
-              {/* Group 1 */}
-              <div className="gallery-marquee-group">
-                {row1Items.map((item, idx) => renderCard(item, `r1-g1-${item.id || idx}-${idx}`))}
-              </div>
-              {/* Group 2 (duplicate for seamless continuous loop) */}
-              <div className="gallery-marquee-group" aria-hidden="true">
-                {row1Items.map((item, idx) => renderCard(item, `r1-g2-${item.id || idx}-${idx}`))}
-              </div>
-            </div>
-          </div>
-
-          {/* Row 2: Rightward Scroll (→) */}
-          <div className="gallery-marquee-viewport">
-            <div className="gallery-marquee-inner marquee-reverse">
-              {/* Group 1 */}
-              <div className="gallery-marquee-group">
-                {row2Items.map((item, idx) => renderCard(item, `r2-g1-${item.id || idx}-${idx}`))}
-              </div>
-              {/* Group 2 (duplicate for seamless continuous loop) */}
-              <div className="gallery-marquee-group" aria-hidden="true">
-                {row2Items.map((item, idx) => renderCard(item, `r2-g2-${item.id || idx}-${idx}`))}
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Lightbox Modal Portaled to document.body */}

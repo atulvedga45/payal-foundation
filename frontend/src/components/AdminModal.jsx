@@ -26,7 +26,9 @@ import {
   fetchGallery,
   createGalleryItem,
   updateGalleryItem,
-  deleteGalleryItem
+  deleteGalleryItem,
+  updateTrustInfo,
+  getImageUrl
 } from '../api';
 
 const PRESET_IMAGES = [
@@ -116,7 +118,9 @@ export default function AdminModal({
   trustees = [],
   onUpdateTrustees,
   gallery = [],
-  onUpdateGallery
+  onUpdateGallery,
+  trustInfo,
+  onUpdateTrustInfo
 }) {
   const [token, setToken] = useState(localStorage.getItem('admin_token') || '');
   const [password, setPassword] = useState('');
@@ -164,6 +168,67 @@ export default function AdminModal({
       setLocalTrustees(trustees);
     }
   }, [trustees]);
+
+  // Trust Info State
+  const [trustInfoForm, setTrustInfoForm] = useState({
+    name: '', tagline: '', tagline_mr: '', reg_no: '', act_name: '',
+    president: '', secretary: '', phone: '', email: '', address: '',
+    bank_name: '', bank_account_no: '', bank_ifsc: '', upi_id: ''
+  });
+  const [trustInfoSaving, setTrustInfoSaving] = useState(false);
+  const [trustInfoMsg, setTrustInfoMsg] = useState({ type: '', text: '' });
+
+  // Load trust info from App props (passed via trustInfo prop) or fetch fresh
+  useEffect(() => {
+    async function loadTrustInfo() {
+      try {
+        const res = await fetch((import.meta.env.VITE_API_BASE || 'http://localhost:8000/api') + '/info');
+        if (res.ok) {
+          const data = await res.json();
+          setTrustInfoForm({
+            name: data.name || '',
+            tagline: data.tagline || '',
+            tagline_mr: data.tagline_mr || '',
+            reg_no: data.reg_no || '',
+            act_name: data.act_name || '',
+            president: data.president || '',
+            secretary: data.secretary || '',
+            phone: data.phone || '',
+            email: data.email || '',
+            address: data.address || '',
+            bank_name: data.bank_name || '',
+            bank_account_no: data.bank_account_no || '',
+            bank_ifsc: data.bank_ifsc || '',
+            upi_id: data.upi_id || ''
+          });
+        }
+      } catch (err) {
+        console.warn('Could not load trust info:', err);
+      }
+    }
+    if (isOpen && activeTab === 'trustinfo') {
+      loadTrustInfo();
+    }
+  }, [isOpen, activeTab]);
+
+  const handleSaveTrustInfo = async (e) => {
+    e.preventDefault();
+    setTrustInfoSaving(true);
+    setTrustInfoMsg({ type: '', text: '' });
+    try {
+      const result = await updateTrustInfo(token, trustInfoForm);
+      if (result) {
+        setTrustInfoMsg({ type: 'success', text: '✅ संस्था माहिती यशस्वीपणे सेव्ह झाली! (Trust Info saved successfully!)' });
+        if (onUpdateTrustInfo) {
+          onUpdateTrustInfo(result);
+        }
+      }
+    } catch (err) {
+      setTrustInfoMsg({ type: 'error', text: '❌ Save करताना error आली. पुन्हा प्रयत्न करा.' });
+    } finally {
+      setTrustInfoSaving(false);
+    }
+  };
 
   // Generate QR code for trustee live preview
   useEffect(() => {
@@ -859,6 +924,26 @@ export default function AdminModal({
                 >
                   <ShieldCheck size={15} />
                   <span>Trustees (विश्वस्त मंडळ - {localTrustees.length})</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('trustinfo')}
+                  style={{
+                    padding: '0.45rem 1rem',
+                    borderRadius: 'var(--radius-full)',
+                    border: 'none',
+                    background: activeTab === 'trustinfo' ? 'var(--primary)' : 'rgba(0,0,0,0.05)',
+                    color: activeTab === 'trustinfo' ? '#ffffff' : 'var(--text-main)',
+                    fontWeight: 600,
+                    fontSize: '0.85rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem'
+                  }}
+                >
+                  <SlidersHorizontal size={15} />
+                  <span>Trust Info (संस्था माहिती)</span>
                 </button>
               </div>
 
@@ -2298,6 +2383,73 @@ export default function AdminModal({
                       )}
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* ===================== TRUST INFO TAB ===================== */}
+              {activeTab === 'trustinfo' && (
+                <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '1.25rem', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <SlidersHorizontal size={18} /> संस्था माहिती (Trust Information)
+                  </h3>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-sub)', marginBottom: '1.25rem', background: 'rgba(99,102,241,0.07)', padding: '0.75rem 1rem', borderRadius: '10px', borderLeft: '3px solid var(--primary)' }}>
+                    ℹ️ इथे बदलल्यावर सर्व users ला (mobile, PC, laptop) नवीन माहिती दिसेल. Backend database मध्ये save होते.
+                  </p>
+
+                  {trustInfoMsg.text && (
+                    <div style={{ backgroundColor: trustInfoMsg.type === 'error' ? '#fee2e2' : '#dcfce7', border: `1px solid ${trustInfoMsg.type === 'error' ? '#fca5a5' : '#86efac'}`, color: trustInfoMsg.type === 'error' ? '#b91c1c' : '#15803d', borderRadius: '10px', padding: '0.75rem 1rem', marginBottom: '1rem', fontSize: '0.9rem', fontWeight: 600 }}>
+                      {trustInfoMsg.text}
+                    </div>
+                  )}
+
+                  <form onSubmit={handleSaveTrustInfo} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {[
+                      { label: 'संस्था नाव (Organization Name)', key: 'name', placeholder: 'Payal Foundation and Social Service' },
+                      { label: 'Tagline (English)', key: 'tagline', placeholder: 'Empowering Communities, Serving Humanity' },
+                      { label: 'Tagline (मराठी)', key: 'tagline_mr', placeholder: 'सक्षम समाज, समृद्ध भविष्य' },
+                      { label: 'Registration No.', key: 'reg_no', placeholder: 'G.B.B.S.D 409/2026 | F-82401 (M)' },
+                      { label: 'Act Name', key: 'act_name', placeholder: 'Public Trust Act, Govt. of Maharashtra' },
+                      { label: 'अध्यक्ष (President)', key: 'president', placeholder: 'President Name' },
+                      { label: 'सचिव (Secretary)', key: 'secretary', placeholder: 'Secretary Name' },
+                      { label: 'फोन नंबर (Phone)', key: 'phone', placeholder: '+91 77768 76121' },
+                      { label: 'ईमेल (Email)', key: 'email', placeholder: 'contact@payalfoundation.org' },
+                      { label: 'पत्ता (Address)', key: 'address', placeholder: 'Full address...', multiline: true },
+                      { label: 'Bank Name', key: 'bank_name', placeholder: 'State Bank of India' },
+                      { label: 'Account No.', key: 'bank_account_no', placeholder: '428901238910' },
+                      { label: 'IFSC Code', key: 'bank_ifsc', placeholder: 'SBIN0001234' },
+                      { label: 'UPI ID', key: 'upi_id', placeholder: 'payalfoundation@ybl' }
+                    ].map(({ label, key, placeholder, multiline }) => (
+                      <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                        <label style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-sub)' }}>{label}</label>
+                        {multiline ? (
+                          <textarea
+                            value={trustInfoForm[key] || ''}
+                            onChange={e => setTrustInfoForm(f => ({ ...f, [key]: e.target.value }))}
+                            placeholder={placeholder}
+                            rows={3}
+                            style={{ width: '100%', padding: '0.6rem 0.85rem', border: '1px solid var(--border-color)', borderRadius: '8px', fontSize: '0.9rem', background: 'var(--surface)', color: 'var(--text-main)', resize: 'vertical', boxSizing: 'border-box' }}
+                          />
+                        ) : (
+                          <input
+                            type="text"
+                            value={trustInfoForm[key] || ''}
+                            onChange={e => setTrustInfoForm(f => ({ ...f, [key]: e.target.value }))}
+                            placeholder={placeholder}
+                            style={{ width: '100%', padding: '0.6rem 0.85rem', border: '1px solid var(--border-color)', borderRadius: '8px', fontSize: '0.9rem', background: 'var(--surface)', color: 'var(--text-main)', boxSizing: 'border-box' }}
+                          />
+                        )}
+                      </div>
+                    ))}
+
+                    <button
+                      type="submit"
+                      disabled={trustInfoSaving}
+                      style={{ background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: '10px', padding: '0.75rem 1.5rem', fontWeight: 700, fontSize: '1rem', cursor: trustInfoSaving ? 'not-allowed' : 'pointer', opacity: trustInfoSaving ? 0.7 : 1, display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center', marginTop: '0.5rem' }}
+                    >
+                      <Save size={18} />
+                      {trustInfoSaving ? 'Saving...' : '💾 Save Trust Info (सेव्ह करा)'}
+                    </button>
+                  </form>
                 </div>
               )}
 

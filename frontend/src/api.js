@@ -1,4 +1,26 @@
-const API_BASE = "http://localhost:8000/api";
+// In development: reads from frontend/.env → VITE_API_BASE=http://localhost:8000/api
+// In production (Vercel): reads from frontend/.env.production → VITE_API_BASE=https://your-render-app.onrender.com/api
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000/api";
+
+// Backend root URL (without /api) — used to prefix /uploads/ image paths
+export const BACKEND_BASE = API_BASE.replace(/\/api$/, "");
+
+/**
+ * Convert a stored image path to a proper display URL.
+ * - If it starts with http/https → already absolute, return as-is
+ * - If it starts with /uploads/ → prepend BACKEND_BASE (Render served images)
+ * - Otherwise → treat as local public asset path
+ */
+export function getImageUrl(url) {
+  if (!url) return "";
+  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:")) {
+    return url;
+  }
+  if (url.startsWith("/uploads/")) {
+    return `${BACKEND_BASE}${url}`;
+  }
+  return url;
+}
 
 export async function fetchTrustInfo() {
   try {
@@ -344,4 +366,44 @@ export async function deleteGalleryItem(token, id) {
     return true;
   }
 }
+// Trust Info Admin Endpoints
+export async function updateTrustInfo(token, data) {
+  try {
+    const res = await fetch(`${API_BASE}/admin/info`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-key": token
+      },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) throw new Error("Failed to update trust info on backend");
+    return await res.json();
+  } catch (err) {
+    console.warn("Backend trust info update failed:", err);
+    return { ...data };
+  }
+}
 
+// Slug for image uploads (reusable for trustee, gallery, initiative)
+export async function uploadImage(token, file) {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch(`${API_BASE}/admin/upload-image`, {
+      method: "POST",
+      headers: { "x-admin-key": token },
+      body: formData
+    });
+    if (!res.ok) throw new Error("Upload failed on server");
+    const data = await res.json();
+    return data.url;
+  } catch (err) {
+    console.warn("Backend image upload failed, converting to local data URL:", err);
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(file);
+    });
+  }
+}

@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Heart, ArrowUpRight, ChevronLeft, ChevronRight, Calendar, X, Target, TrendingUp, Tag } from 'lucide-react';
+import { getImageUrl } from '../api';
 
 const DEFAULT_DATES_MR = [
   '१० मार्च २०२६',
@@ -56,7 +57,7 @@ function InitiativeModal({ item, idx, lang, t, onClose, onSelectCause }) {
         {/* Hero Image */}
         <div className="initiative-modal-img-wrap">
           <img
-            src={item.image_url || '/img1.jpeg'}
+            src={getImageUrl(item.image_url) || '/img1.jpeg'}
             alt={title}
             className="initiative-modal-img"
             onError={(e) => {
@@ -233,7 +234,7 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
                   {/* Image */}
                   <div className="img-zoom-container initiative-img-box">
                     <img
-                      src={item.image_url || '/img1.jpeg'}
+                      src={getImageUrl(item.image_url) || '/img1.jpeg'}
                       alt={title}
                       className="initiative-photo"
                       onError={(e) => {

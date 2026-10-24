@@ -22,6 +22,22 @@ class TrustInfoSchema(BaseModel):
     class Config:
         from_attributes = True
 
+class TrustInfoUpdateSchema(BaseModel):
+    name: Optional[str] = None
+    tagline: Optional[str] = None
+    tagline_mr: Optional[str] = None
+    reg_no: Optional[str] = None
+    act_name: Optional[str] = None
+    president: Optional[str] = None
+    secretary: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    address: Optional[str] = None
+    bank_name: Optional[str] = None
+    bank_account_no: Optional[str] = None
+    bank_ifsc: Optional[str] = None
+    upi_id: Optional[str] = None
+
 # Trustee
 class TrusteeSchema(BaseModel):
     id: int
@@ -99,16 +115,22 @@ class InitiativeUpdate(BaseModel):
 class ContactCreate(BaseModel):
     name: str
     phone: str
+    phone2: Optional[str] = None
     email: Optional[str] = None
     address: Optional[str] = None
+    taluka: Optional[str] = None
+    district: Optional[str] = None
     message: str
 
 class ContactResponse(BaseModel):
     id: int
     name: str
     phone: str
+    phone2: Optional[str] = None
     email: Optional[str] = None
     address: Optional[str] = None
+    taluka: Optional[str] = None
+    district: Optional[str] = None
     message: str
     status: str
     created_at: datetime

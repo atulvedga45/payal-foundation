@@ -8,7 +8,10 @@ export default function DonateSection({ t, trustInfo }) {
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState('');
-  const upiId = trustInfo?.upi_id || '9225243552@ybl';
+  const defaultScannerImage = '/donation_qr.jpg';
+  const upiId = (trustInfo?.upi_id && trustInfo.upi_id !== '9225243552@ybl' && trustInfo.upi_id !== 'payalfoundation@ybl')
+    ? trustInfo.upi_id
+    : 'payalghe04102004@okaxis';
   const orgName = trustInfo?.name || 'Payal Foundation';
 
   const copyToClipboard = (text, fieldName) => {
@@ -92,39 +95,51 @@ export default function DonateSection({ t, trustInfo }) {
       ctx.font = 'bold 23px system-ui, -apple-system, sans-serif';
       ctx.fillText('❝ तुमची १ रुपयाची मदत पण १ जीवन वाचवू शकते ❞', 360, 243);
 
-      // 5. Generate high-res QR code on an offscreen canvas
-      const qrCanvas = document.createElement('canvas');
-      await QRCode.toCanvas(qrCanvas, upiDeepLink, {
-        width: 380,
-        margin: 1,
-        color: {
-          dark: '#000000',
-          light: '#ffffff'
+      // 5. Draw official scanner image or fallback to vector QR code
+      try {
+        const qrImg = new Image();
+        qrImg.crossOrigin = 'anonymous';
+        qrImg.src = defaultScannerImage;
+        await new Promise((resolve) => {
+          qrImg.onload = resolve;
+          qrImg.onerror = resolve;
+        });
+
+        // QR Code container box
+        ctx.fillStyle = '#ffffff';
+        if (typeof ctx.roundRect === 'function') {
+          ctx.beginPath();
+          ctx.roundRect(155, 290, 410, 410, 20);
+          ctx.fill();
+        } else {
+          ctx.fillRect(155, 290, 410, 410);
         }
-      });
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 2;
+        ctx.stroke();
 
-      // QR Code container box
-      ctx.fillStyle = '#ffffff';
-      if (typeof ctx.roundRect === 'function') {
-        ctx.beginPath();
-        ctx.roundRect(155, 290, 410, 410, 20);
-        ctx.fill();
-      } else {
-        ctx.fillRect(155, 290, 410, 410);
+        // Corner scan accents
+        ctx.strokeStyle = '#0b62a4';
+        ctx.lineWidth = 6;
+        ctx.beginPath(); ctx.moveTo(155, 330); ctx.lineTo(155, 290); ctx.lineTo(195, 290); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(525, 290); ctx.lineTo(565, 290); ctx.lineTo(565, 330); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(155, 660); ctx.lineTo(155, 700); ctx.lineTo(195, 700); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(525, 700); ctx.lineTo(565, 700); ctx.lineTo(565, 660); ctx.stroke();
+
+        if (qrImg.complete && qrImg.naturalWidth > 0) {
+          ctx.drawImage(qrImg, 170, 305, 380, 380);
+        } else {
+          const qrCanvas = document.createElement('canvas');
+          await QRCode.toCanvas(qrCanvas, upiDeepLink, {
+            width: 380,
+            margin: 1,
+            color: { dark: '#000000', light: '#ffffff' }
+          });
+          ctx.drawImage(qrCanvas, 170, 305, 380, 380);
+        }
+      } catch (err) {
+        console.error('Error rendering scanner for download:', err);
       }
-      ctx.strokeStyle = '#e2e8f0';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      // Corner scan accents
-      ctx.strokeStyle = '#0b62a4';
-      ctx.lineWidth = 6;
-      ctx.beginPath(); ctx.moveTo(155, 330); ctx.lineTo(155, 290); ctx.lineTo(195, 290); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(525, 290); ctx.lineTo(565, 290); ctx.lineTo(565, 330); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(155, 660); ctx.lineTo(155, 700); ctx.lineTo(195, 700); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(525, 700); ctx.lineTo(565, 700); ctx.lineTo(565, 660); ctx.stroke();
-
-      ctx.drawImage(qrCanvas, 170, 305, 380, 380);
 
       // 6. UPI ID Pill Box
       ctx.fillStyle = '#f8fafc';
@@ -264,31 +279,23 @@ export default function DonateSection({ t, trustInfo }) {
                 <div style={{ position: 'absolute', bottom: '6px', left: '6px', width: '20px', height: '20px', borderBottom: '3.5px solid #0b62a4', borderLeft: '3.5px solid #0b62a4', borderBottomLeftRadius: '6px' }} />
                 <div style={{ position: 'absolute', bottom: '6px', right: '6px', width: '20px', height: '20px', borderBottom: '3.5px solid #0b62a4', borderRight: '3.5px solid #0b62a4', borderBottomRightRadius: '6px' }} />
 
-                {qrDataUrl ? (
-                  <img
-                    src={qrDataUrl}
-                    alt="Payal Foundation Scanner QR Code"
-                    style={{
-                      width: 'clamp(160px, 40vw, 210px)',
-                      height: 'clamp(160px, 40vw, 210px)',
-                      display: 'block',
-                      borderRadius: '10px',
-                      margin: '0 auto'
-                    }}
-                  />
-                ) : (
-                  <div style={{
+                <img
+                  src={defaultScannerImage}
+                  alt="Payal Foundation Scanner QR Code"
+                  style={{
                     width: 'clamp(160px, 40vw, 210px)',
                     height: 'clamp(160px, 40vw, 210px)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#64748b',
-                    fontSize: '0.9rem'
-                  }}>
-                    स्कॅनर लोड होत आहे...
-                  </div>
-                )}
+                    display: 'block',
+                    borderRadius: '10px',
+                    margin: '0 auto',
+                    objectFit: 'contain'
+                  }}
+                  onError={(e) => {
+                    if (qrDataUrl && e.target.src !== qrDataUrl) {
+                      e.target.src = qrDataUrl;
+                    }
+                  }}
+                />
               </div>
             </div>
 

@@ -118,7 +118,14 @@ const DEFAULT_INITIATIVES = [
 
 export default function App() {
   const [lang, setLang] = useState('mr');
-  const [trustInfo, setTrustInfo] = useState(null);
+  const [trustInfo, setTrustInfo] = useState(() => {
+    try {
+      const cached = localStorage.getItem('payal_trust_info');
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
   const [trustees, setTrustees] = useState(() => {
     try {
       const cached = localStorage.getItem('payal_trustees');
@@ -153,6 +160,9 @@ export default function App() {
   });
   const [selectedCause, setSelectedCause] = useState('');
   const [adminOpen, setAdminOpen] = useState(false);
+  const [isAdminUnlocked, setIsAdminUnlocked] = useState(() => {
+    return sessionStorage.getItem('admin_unlocked') === 'true';
+  });
   const [showSplash, setShowSplash] = useState(true);
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('samajseva_theme') || 'light';
@@ -183,6 +193,7 @@ export default function App() {
 
       if (infoData.status === 'fulfilled' && infoData.value) {
         setTrustInfo(infoData.value);
+        localStorage.setItem('payal_trust_info', JSON.stringify(infoData.value));
       }
       if (trusteesData.status === 'fulfilled' && trusteesData.value && trusteesData.value.length > 0) {
         setTrustees(trusteesData.value);
@@ -313,6 +324,8 @@ export default function App() {
         onOpenAdmin={() => setAdminOpen(true)}
         theme={theme}
         toggleTheme={toggleTheme}
+        isAdminUnlocked={isAdminUnlocked}
+        setIsAdminUnlocked={setIsAdminUnlocked}
       />
 
       {/* Dynamic Live Impact Announcement Ticker */}
@@ -347,15 +360,16 @@ export default function App() {
       </div>
 
       {/* Main Sticky Navbar */}
-      <Navbar t={t} />
+      <Navbar
+        t={t}
+        isAdminUnlocked={isAdminUnlocked}
+        onOpenAdmin={() => setAdminOpen(true)}
+      />
 
       {/* Main Content Sections */}
       <main>
         {/* Hero Section */}
         <Hero t={t} lang={lang} homeStats={homeStats} />
-
-        {/* Live Glimpses Slider Section (Auto-scrolls every 3 seconds) */}
-        <ImageSliderSection lang={lang} />
 
         {/* About Section */}
         <AboutSection t={t} />
@@ -376,13 +390,8 @@ export default function App() {
           trustInfo={trustInfo}
         />
 
-        {/* Photo Gallery & Work Glimpses */}
-        {/* Photo Gallery & Work Glimpses */}
-        <GallerySection
-          t={t}
-          gallery={gallery}
-          lang={lang}
-        />
+        {/* Photo Gallery & Work Moments Slider */}
+        <ImageSliderSection lang={lang} />
 
         {/* Donation Portal (Real UPI QR + Bank Transfer + Receipt) */}
         <DonateSection
@@ -392,12 +401,13 @@ export default function App() {
         />
 
         {/* Contact Form & Office Location */}
-        <ContactSection t={t} />
+        <ContactSection t={t} lang={lang} trustInfo={trustInfo} />
       </main>
 
       {/* Footer */}
       <Footer
         t={t}
+        trustInfo={trustInfo}
         onOpenAdmin={() => setAdminOpen(true)}
       />
 
@@ -421,6 +431,11 @@ export default function App() {
         onUpdateGallery={(newGallery) => {
           setGallery(newGallery);
           localStorage.setItem('payal_gallery', JSON.stringify(newGallery));
+        }}
+        trustInfo={trustInfo}
+        onUpdateTrustInfo={(newInfo) => {
+          setTrustInfo(newInfo);
+          localStorage.setItem('payal_trust_info', JSON.stringify(newInfo));
         }}
       />
 

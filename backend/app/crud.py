@@ -4,6 +4,18 @@ from . import models, schemas
 def get_trust_info(db: Session):
     return db.query(models.TrustInfo).first()
 
+def update_trust_info(db: Session, info_data: schemas.TrustInfoUpdateSchema):
+    db_obj = db.query(models.TrustInfo).first()
+    if not db_obj:
+        return None
+    data = info_data.model_dump(exclude_unset=True) if hasattr(info_data, "model_dump") else info_data.dict(exclude_unset=True)
+    for field, val in data.items():
+        if val is not None:
+            setattr(db_obj, field, val)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj
+
 def get_trustees(db: Session):
     return db.query(models.Trustee).order_by(models.Trustee.order.asc(), models.Trustee.id.asc()).all()
 
@@ -87,8 +99,11 @@ def create_contact_message(db: Session, contact: schemas.ContactCreate):
     db_obj = models.ContactMessage(
         name=contact.name,
         phone=contact.phone,
+        phone2=contact.phone2,
         email=contact.email,
         address=contact.address,
+        taluka=contact.taluka,
+        district=contact.district,
         message=contact.message
     )
     db.add(db_obj)

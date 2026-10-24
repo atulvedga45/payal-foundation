@@ -1,9 +1,39 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Phone, Globe, ShieldCheck, ChevronDown } from 'lucide-react';
+import { Phone, Globe, ShieldCheck, ChevronDown, Code2, Lock } from 'lucide-react';
+import DeveloperPinModal from './DeveloperPinModal';
 
-export default function TopBar({ lang, setLang, t, onOpenAdmin, theme, toggleTheme }) {
+export default function TopBar({
+  lang,
+  setLang,
+  t,
+  onOpenAdmin,
+  theme,
+  toggleTheme,
+  isAdminUnlocked: externalIsAdminUnlocked,
+  setIsAdminUnlocked: externalSetIsAdminUnlocked
+}) {
   const [isOpen, setIsOpen] = useState(false);
+  const [internalIsAdminUnlocked, setInternalIsAdminUnlocked] = useState(() => {
+    return sessionStorage.getItem('admin_unlocked') === 'true';
+  });
+  const isAdminUnlocked = externalIsAdminUnlocked !== undefined ? externalIsAdminUnlocked : internalIsAdminUnlocked;
+  const setIsAdminUnlocked = externalSetIsAdminUnlocked || setInternalIsAdminUnlocked;
+
+  const [isPinModalOpen, setIsPinModalOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  const handlePinSuccess = () => {
+    setIsAdminUnlocked(true);
+    sessionStorage.setItem('admin_unlocked', 'true');
+    setIsPinModalOpen(false);
+    // Note: Do NOT directly open admin modal - user wants option to appear in navbar
+  };
+
+  const handleLockAdmin = (e) => {
+    if (e) e.stopPropagation();
+    setIsAdminUnlocked(false);
+    sessionStorage.removeItem('admin_unlocked');
+  };
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -221,41 +251,99 @@ export default function TopBar({ lang, setLang, t, onOpenAdmin, theme, toggleThe
             </button>
           </div>
 
-          {/* Admin Portal Button */}
-          <button
-            type="button"
-            onClick={onOpenAdmin}
-            style={{
-              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%)',
-              border: '1px solid rgba(255, 255, 255, 0.25)',
-              color: '#ffffff',
-              fontSize: '0.76rem',
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.35rem',
-              padding: '0.32rem 0.8rem',
-              borderRadius: '9999px',
-              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
-              backdropFilter: 'blur(4px)',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%)';
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.45)';
-              e.currentTarget.style.transform = 'translateY(-1px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%)';
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.25)';
-              e.currentTarget.style.transform = 'none';
-            }}
-            title="Admin Portal Login"
-          >
-            <ShieldCheck size={14} style={{ color: '#fbbf24' }} />
-            <span>{t.nav.admin}</span>
-          </button>
+          {/* Admin or Develop By Button (Desktop) */}
+          {!isAdminUnlocked ? (
+            <button
+              type="button"
+              onClick={() => setIsPinModalOpen(true)}
+              style={{
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%)',
+                border: '1px solid rgba(255, 255, 255, 0.25)',
+                color: '#ffffff',
+                fontSize: '0.76rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                padding: '0.32rem 0.8rem',
+                borderRadius: '9999px',
+                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
+                backdropFilter: 'blur(4px)',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(56, 189, 248, 0.3) 0%, rgba(37, 99, 235, 0.2) 100%)';
+                e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.5)';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%)';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.25)';
+                e.currentTarget.style.transform = 'none';
+              }}
+              title="Develop By"
+            >
+              <Code2 size={13} style={{ color: '#38bdf8' }} />
+              <span>Develop By</span>
+            </button>
+          ) : (
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+              <button
+                type="button"
+                onClick={onOpenAdmin}
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%)',
+                  border: '1px solid rgba(255, 255, 255, 0.25)',
+                  color: '#ffffff',
+                  fontSize: '0.76rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  padding: '0.32rem 0.8rem',
+                  borderRadius: '9999px',
+                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
+                  backdropFilter: 'blur(4px)',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.45)';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.25)';
+                  e.currentTarget.style.transform = 'none';
+                }}
+                title="Admin Portal Login"
+              >
+                <ShieldCheck size={14} style={{ color: '#fbbf24' }} />
+                <span>{t.nav.admin}</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleLockAdmin}
+                style={{
+                  background: 'rgba(239, 68, 68, 0.2)',
+                  border: '1px solid rgba(239, 68, 68, 0.4)',
+                  color: '#fca5a5',
+                  padding: '0.32rem 0.45rem',
+                  borderRadius: '9999px',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease'
+                }}
+                title="Admin लॉक करा (Lock Admin)"
+              >
+                <Lock size={12} />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Mobile Right Side: Dropdown Toggle Button & Menu */}
@@ -397,38 +485,100 @@ export default function TopBar({ lang, setLang, t, onOpenAdmin, theme, toggleThe
                 </div>
               </div>
 
-              {/* Admin Portal Button */}
-              <button
-                type="button"
-                onClick={() => {
-                  setIsOpen(false);
-                  onOpenAdmin();
-                }}
-                style={{
-                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.08) 100%)',
-                  border: '1px solid rgba(255, 255, 255, 0.25)',
-                  color: '#ffffff',
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.45rem',
-                  padding: '0.45rem 0.75rem',
-                  borderRadius: '9999px',
-                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
-                  transition: 'all 0.2s ease'
-                }}
-                title="Admin Portal Login"
-              >
-                <ShieldCheck size={14} style={{ color: '#fbbf24' }} />
-                <span>{t.nav.admin}</span>
-              </button>
+              {/* Admin or Develop By Button (Mobile Dropdown) */}
+              {!isAdminUnlocked ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsOpen(false);
+                    setIsPinModalOpen(true);
+                  }}
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.08) 100%)',
+                    border: '1px solid rgba(255, 255, 255, 0.25)',
+                    color: '#ffffff',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.45rem',
+                    padding: '0.45rem 0.75rem',
+                    borderRadius: '9999px',
+                    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
+                    transition: 'all 0.2s ease'
+                  }}
+                  title="Develop By"
+                >
+                  <Code2 size={14} style={{ color: '#38bdf8' }} />
+                  <span>Develop By</span>
+                </button>
+              ) : (
+                <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsOpen(false);
+                      onOpenAdmin();
+                    }}
+                    style={{
+                      flex: 1,
+                      background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.08) 100%)',
+                      border: '1px solid rgba(255, 255, 255, 0.25)',
+                      color: '#ffffff',
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.45rem',
+                      padding: '0.45rem 0.75rem',
+                      borderRadius: '9999px',
+                      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
+                      transition: 'all 0.2s ease'
+                    }}
+                    title="Admin Portal Login"
+                  >
+                    <ShieldCheck size={14} style={{ color: '#fbbf24' }} />
+                    <span>{t.nav.admin}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleLockAdmin();
+                    }}
+                    style={{
+                      background: 'rgba(239, 68, 68, 0.2)',
+                      border: '1px solid rgba(239, 68, 68, 0.4)',
+                      color: '#fca5a5',
+                      padding: '0.45rem 0.65rem',
+                      borderRadius: '9999px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s ease'
+                    }}
+                    title="Admin लॉक करा (Lock Admin)"
+                  >
+                    <Lock size={13} />
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
       </div>
+
+      {/* Developer PIN Verification Modal */}
+      <DeveloperPinModal
+        isOpen={isPinModalOpen}
+        onClose={() => setIsPinModalOpen(false)}
+        onSuccess={handlePinSuccess}
+        lang={lang}
+      />
     </div>
   );
 }

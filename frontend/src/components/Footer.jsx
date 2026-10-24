@@ -1,7 +1,7 @@
 import React from 'react';
 import { Heart, MapPin, Phone, Mail, ArrowUpRight } from 'lucide-react';
 
-export default function Footer({ t, onOpenAdmin }) {
+export default function Footer({ t, onOpenAdmin, trustInfo }) {
   const socialLinks = [
     {
       name: 'Instagram (@its_sonyaa1113)',
@@ -181,18 +181,18 @@ export default function Footer({ t, onOpenAdmin }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', color: '#94a3b8', fontSize: '0.88rem' }}>
               <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center' }}>
                 <MapPin size={18} style={{ color: 'var(--accent-saffron)', flexShrink: 0 }} />
-                <span>Palghar</span>
+                <span>{trustInfo?.address || 'Palghar'}</span>
               </div>
               <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center' }}>
                 <Phone size={18} style={{ color: 'var(--accent-green)', flexShrink: 0 }} />
-                <a href={`tel:${t.phone.replace(/\s+/g, '')}`} style={{ color: '#ffffff', textDecoration: 'none', fontWeight: 600 }}>
-                  {t.phone}
+                <a href={`tel:${(trustInfo?.phone || t.phone).replace(/\s+/g, '')}`} style={{ color: '#ffffff', textDecoration: 'none', fontWeight: 600 }}>
+                  {trustInfo?.phone || t.phone}
                 </a>
               </div>
               <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center' }}>
                 <Mail size={18} style={{ color: 'var(--primary-light)', flexShrink: 0 }} />
-                <a href={`mailto:${t.email}`} style={{ color: '#ffffff', textDecoration: 'none' }}>
-                  {t.email}
+                <a href={`mailto:${trustInfo?.email || t.email}`} style={{ color: '#ffffff', textDecoration: 'none' }}>
+                  {trustInfo?.email || t.email}
                 </a>
               </div>
             </div>

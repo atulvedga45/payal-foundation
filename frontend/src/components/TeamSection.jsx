@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { UserCheck, Shield, Phone, Copy, Check, QrCode, X, Download, Sparkles, ExternalLink } from 'lucide-react';
 import QRCode from 'qrcode';
 import confetti from 'canvas-confetti';
+import { getImageUrl } from '../api';
 
 const TRUSTEE_CARD_THEMES = [
   {
@@ -64,7 +65,9 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
   // Keep strictly 6 trustees (3 per row)
   const displayTrustees = (trustees && trustees.length > 0 ? trustees : []).slice(0, 6);
 
-  const defaultUpi = trustInfo?.upi_id || 'payalfoundation@ybl';
+  const defaultUpi = (trustInfo?.upi_id && trustInfo.upi_id !== 'payalfoundation@ybl' && trustInfo.upi_id !== '9225243552@ybl')
+    ? trustInfo.upi_id
+    : 'payalghe04102004@okaxis';
   const orgName = trustInfo?.name || 'Payal Foundation and Social Service';
 
   // Generate QR code whenever a trustee is selected
@@ -162,9 +165,9 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
         <div className="trustees-grid">
           {displayTrustees.map((member, idx) => {
             const displayName = member.name || 'Sonya Oghe';
-            const photoSrc = member.photo_url || '/sonya.jpg';
+            const photoSrc = getImageUrl(member.photo_url) || '/sonya.jpg';
             const phoneNumber = member.phone || '1234567890';
-            const hasPhoto = Boolean(photoSrc);
+            const hasPhoto = Boolean(member.photo_url);
             const theme = TRUSTEE_CARD_THEMES[idx % TRUSTEE_CARD_THEMES.length];
 
             return (
@@ -276,7 +279,7 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
               <div className="trustee-modal-profile">
                 <div className="modal-avatar-container">
                   <img
-                    src={selectedTrustee.photo_url || '/sonya.jpg'}
+                    src={getImageUrl(selectedTrustee.photo_url) || '/sonya.jpg'}
                     alt={selectedTrustee.name || 'Trustee'}
                     className="modal-avatar-img"
                     onError={(e) => {
@@ -284,7 +287,7 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
                     }}
                   />
                   <div className="modal-avatar-badge">
-                    <Shield size={16} color="#ffffff" />
+                    <Shield size={12} color="#ffffff" />
                   </div>
                 </div>
 
@@ -302,7 +305,7 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
               <div className="trustee-contact-card">
                 <div className="contact-card-left">
                   <div className="contact-icon-circle">
-                    <Phone size={20} />
+                    <Phone size={16} />
                   </div>
                   <div>
                     <div className="contact-label">
@@ -318,7 +321,7 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
                     href={`tel:${selectedTrustee.phone || '1234567890'}`}
                     className="btn-contact-action btn-call"
                   >
-                    <Phone size={14} />
+                    <Phone size={13} />
                     <span>{lang === 'mr' ? 'कॉल करा' : 'Call'}</span>
                   </a>
                   <button
@@ -327,12 +330,12 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
                   >
                     {copiedField === 'phone' ? (
                       <>
-                        <Check size={14} color="#16a34a" />
+                        <Check size={13} color="#16a34a" />
                         <span style={{ color: '#16a34a' }}>{lang === 'mr' ? 'कॉपी झाले!' : 'Copied!'}</span>
                       </>
                     ) : (
                       <>
-                        <Copy size={14} />
+                        <Copy size={13} />
                         <span>{lang === 'mr' ? 'कॉपी' : 'Copy'}</span>
                       </>
                     )}
@@ -359,24 +362,11 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
                       />
                     ) : (
                       <div className="qr-loading-box">
-                        <QrCode size={48} className="qr-pulse-icon" />
+                        <QrCode size={36} className="qr-pulse-icon" />
                         <span>Generating Scanner...</span>
                       </div>
                     )}
                   </div>
-                </div>
-
-                {/* UPI ID Pill */}
-                <div className="upi-id-pill">
-                  <span className="upi-id-label">UPI ID:</span>
-                  <span className="upi-id-value">{selectedTrustee.upi_id || defaultUpi}</span>
-                  <button
-                    className="upi-copy-btn"
-                    onClick={() => copyToClipboard(selectedTrustee.upi_id || defaultUpi, 'upi')}
-                    title="Copy UPI ID"
-                  >
-                    {copiedField === 'upi' ? <Check size={14} color="#16a34a" /> : <Copy size={14} />}
-                  </button>
                 </div>
 
                 {/* Scanner Actions (Download & Pay App) */}
@@ -385,7 +375,7 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
                     href={`upi://pay?pa=${encodeURIComponent(selectedTrustee.upi_id || defaultUpi)}&pn=${encodeURIComponent(selectedTrustee.name || orgName)}&cu=INR`}
                     className="btn btn-primary btn-scanner-pay"
                   >
-                    <QrCode size={16} />
+                    <QrCode size={14} />
                     <span>{lang === 'mr' ? 'UPI ॲपद्वारे पैसे पाठवा' : 'Pay via UPI App'}</span>
                   </a>
 
@@ -394,7 +384,7 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
                     onClick={handleDownloadQr}
                     disabled={isDownloading || !modalQrUrl}
                   >
-                    <Download size={16} />
+                    <Download size={14} />
                     <span>
                       {isDownloading
                         ? (lang === 'mr' ? 'डाउनलोड होत आहे...' : 'Downloading...')
@@ -763,13 +753,19 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
           background: #ffffff;
           border-radius: var(--radius-lg, 1.25rem);
           width: 100%;
-          max-width: 560px;
-          max-height: 92vh;
-          overflow-y: auto;
+          max-width: 440px;
+          max-height: 96vh;
+          overflow: hidden;
           box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.45);
           position: relative;
           border: 1px solid rgba(255, 255, 255, 0.15);
           animation: modalScaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @media (max-height: 560px) {
+          .trustee-modal-card {
+            overflow-y: auto;
+          }
         }
 
         @keyframes modalScaleUp {
@@ -779,10 +775,10 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
 
         .trustee-modal-close {
           position: absolute;
-          top: 1rem;
-          right: 1rem;
-          width: 38px;
-          height: 38px;
+          top: 0.75rem;
+          right: 0.75rem;
+          width: 32px;
+          height: 32px;
           border-radius: 50%;
           border: none;
           background: rgba(0, 0, 0, 0.06);
@@ -802,24 +798,24 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
         }
 
         .trustee-modal-body {
-          padding: 2rem 1.75rem 1.75rem 1.75rem;
+          padding: 1.15rem 1.35rem 1.25rem 1.35rem;
           display: flex;
           flex-direction: column;
-          gap: 1.25rem;
+          gap: 0.75rem;
         }
 
         .trustee-modal-profile {
           display: flex;
           align-items: center;
-          gap: 1.25rem;
-          padding-bottom: 1.25rem;
+          gap: 0.85rem;
+          padding-bottom: 0.7rem;
           border-bottom: 1px solid #f1f5f9;
         }
 
         .modal-avatar-container {
           position: relative;
-          width: 96px;
-          height: 96px;
+          width: 56px;
+          height: 56px;
           flex-shrink: 0;
         }
 
@@ -829,19 +825,19 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
           border-radius: 50%;
           object-fit: cover;
           object-position: center 10%;
-          border: 4px solid var(--primary);
-          box-shadow: 0 8px 18px rgba(11, 98, 164, 0.3);
+          border: 3px solid var(--primary);
+          box-shadow: 0 4px 12px rgba(11, 98, 164, 0.25);
         }
 
         .modal-avatar-badge {
           position: absolute;
           bottom: 0;
           right: 0;
-          width: 28px;
-          height: 28px;
+          width: 20px;
+          height: 20px;
           border-radius: 50%;
           background: #16a34a;
-          border: 2.5px solid #ffffff;
+          border: 2px solid #ffffff;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -852,15 +848,15 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
         }
 
         .modal-trustee-name {
-          font-size: 1.85rem;
+          font-size: 1.35rem;
           font-weight: 800;
           color: var(--text-main);
           line-height: 1.2;
-          margin-bottom: 0.35rem;
+          margin-bottom: 0.2rem;
         }
 
         .modal-org-title {
-          font-size: 0.85rem;
+          font-size: 0.78rem;
           color: var(--text-muted);
           margin: 0;
           font-weight: 600;
@@ -870,35 +866,35 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
         .trustee-contact-card {
           background: #f8fafc;
           border: 1.5px solid #e2e8f0;
-          border-radius: var(--radius-md);
-          padding: 1rem 1.15rem;
+          border-radius: 10px;
+          padding: 0.55rem 0.85rem;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 1rem;
+          gap: 0.65rem;
           flex-wrap: wrap;
         }
 
         .contact-card-left {
           display: flex;
           align-items: center;
-          gap: 0.85rem;
+          gap: 0.65rem;
         }
 
         .contact-icon-circle {
-          width: 42px;
-          height: 42px;
+          width: 34px;
+          height: 34px;
           border-radius: 50%;
           background: linear-gradient(135deg, var(--primary) 0%, #1e40af 100%);
           color: #ffffff;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 4px 10px rgba(11, 98, 164, 0.25);
+          box-shadow: 0 3px 8px rgba(11, 98, 164, 0.22);
         }
 
         .contact-label {
-          font-size: 0.74rem;
+          font-size: 0.68rem;
           text-transform: uppercase;
           font-weight: 700;
           letter-spacing: 0.04em;
@@ -906,7 +902,7 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
         }
 
         .contact-val {
-          font-size: 1.15rem;
+          font-size: 0.98rem;
           font-weight: 800;
           color: var(--text-main);
           letter-spacing: 0.02em;
@@ -914,16 +910,16 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
 
         .contact-actions {
           display: flex;
-          gap: 0.5rem;
+          gap: 0.4rem;
         }
 
         .btn-contact-action {
           display: inline-flex;
           align-items: center;
-          gap: 0.35rem;
-          padding: 0.45rem 0.85rem;
-          border-radius: var(--radius-sm);
-          font-size: 0.82rem;
+          gap: 0.3rem;
+          padding: 0.35rem 0.65rem;
+          border-radius: 6px;
+          font-size: 0.78rem;
           font-weight: 700;
           cursor: pointer;
           text-decoration: none;
@@ -955,8 +951,8 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
         .trustee-scanner-section {
           background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
           border: 1.5px solid #e2e8f0;
-          border-radius: var(--radius-md);
-          padding: 1.35rem;
+          border-radius: 12px;
+          padding: 0.75rem 0.95rem;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -964,45 +960,14 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
           position: relative;
         }
 
-        .scanner-header {
-          margin-bottom: 1.15rem;
-        }
-
-        .scanner-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.35rem;
-          background: rgba(11, 98, 164, 0.1);
-          color: var(--primary);
-          padding: 0.25rem 0.75rem;
-          border-radius: 9999px;
-          font-size: 0.75rem;
-          font-weight: 700;
-          margin-bottom: 0.45rem;
-        }
-
-        .scanner-title {
-          font-size: 1.05rem;
-          font-weight: 800;
-          color: var(--text-main);
-          margin-bottom: 0.25rem;
-        }
-
-        .scanner-subtitle {
-          font-size: 0.78rem;
-          color: var(--text-muted);
-          margin: 0;
-          max-width: 380px;
-        }
-
         /* Realistic Camera Scanner Frame */
         .qr-scanner-box {
           position: relative;
-          padding: 14px;
+          padding: 8px;
           background: #ffffff;
-          border-radius: 1rem;
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-          margin-bottom: 1rem;
+          border-radius: 10px;
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
+          margin-bottom: 0.65rem;
           display: inline-flex;
           align-items: center;
           justify-content: center;
@@ -1010,62 +975,62 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
 
         .scanner-frame-corner {
           position: absolute;
-          width: 22px;
-          height: 22px;
+          width: 16px;
+          height: 16px;
           border-color: var(--primary);
           border-style: solid;
         }
 
         .scanner-frame-corner.top-left {
-          top: 6px;
-          left: 6px;
-          border-width: 3.5px 0 0 3.5px;
-          border-top-left-radius: 6px;
+          top: 4px;
+          left: 4px;
+          border-width: 2.5px 0 0 2.5px;
+          border-top-left-radius: 5px;
         }
 
         .scanner-frame-corner.top-right {
-          top: 6px;
-          right: 6px;
-          border-width: 3.5px 3.5px 0 0;
-          border-top-right-radius: 6px;
+          top: 4px;
+          right: 4px;
+          border-width: 2.5px 2.5px 0 0;
+          border-top-right-radius: 5px;
         }
 
         .scanner-frame-corner.bottom-left {
-          bottom: 6px;
-          left: 6px;
-          border-width: 0 0 3.5px 3.5px;
-          border-bottom-left-radius: 6px;
+          bottom: 4px;
+          left: 4px;
+          border-width: 0 0 2.5px 2.5px;
+          border-bottom-left-radius: 5px;
         }
 
         .scanner-frame-corner.bottom-right {
-          bottom: 6px;
-          right: 6px;
-          border-width: 0 3.5px 3.5px 0;
-          border-bottom-right-radius: 6px;
+          bottom: 4px;
+          right: 4px;
+          border-width: 0 2.5px 2.5px 0;
+          border-bottom-right-radius: 5px;
         }
 
         .scanner-laser-line {
           position: absolute;
-          left: 14px;
-          right: 14px;
-          height: 2.5px;
+          left: 8px;
+          right: 8px;
+          height: 2px;
           background: linear-gradient(90deg, transparent 0%, #38bdf8 50%, transparent 100%);
-          box-shadow: 0 0 10px #38bdf8;
+          box-shadow: 0 0 8px #38bdf8;
           animation: laserScan 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
           pointer-events: none;
           z-index: 2;
         }
 
         @keyframes laserScan {
-          0% { top: 16px; opacity: 0; }
+          0% { top: 10px; opacity: 0; }
           15% { opacity: 1; }
           85% { opacity: 1; }
-          100% { top: calc(100% - 18px); opacity: 0; }
+          100% { top: calc(100% - 12px); opacity: 0; }
         }
 
         .qr-image-wrapper {
-          width: 280px;
-          height: 280px;
+          width: 175px;
+          height: 175px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1083,9 +1048,9 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 0.5rem;
+          gap: 0.4rem;
           color: var(--text-muted);
-          font-size: 0.8rem;
+          font-size: 0.75rem;
         }
 
         .qr-pulse-icon {
@@ -1093,53 +1058,11 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
           color: var(--primary);
         }
 
-        /* UPI ID Pill */
-        .upi-id-pill {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
-          background: #ffffff;
-          border: 1px solid #cbd5e1;
-          border-radius: 9999px;
-          padding: 0.35rem 0.85rem;
-          font-size: 0.84rem;
-          margin-bottom: 1.15rem;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-        }
-
-        .upi-id-label {
-          font-weight: 700;
-          color: var(--text-muted);
-          font-size: 0.76rem;
-        }
-
-        .upi-id-value {
-          font-weight: 700;
-          color: var(--text-main);
-          font-family: monospace;
-          letter-spacing: 0.02em;
-        }
-
-        .upi-copy-btn {
-          background: none;
-          border: none;
-          color: var(--text-muted);
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          padding: 0.2rem;
-          transition: color 0.2s ease;
-        }
-
-        .upi-copy-btn:hover {
-          color: var(--primary);
-        }
-
         /* Scanner Action Buttons */
         .scanner-actions-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 0.75rem;
+          gap: 0.6rem;
           width: 100%;
         }
 
@@ -1150,28 +1073,31 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
         }
 
         .btn-scanner-pay {
-          padding: 0.65rem 1rem;
-          font-size: 0.85rem;
+          padding: 0.52rem 0.8rem;
+          font-size: 0.8rem;
           font-weight: 700;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 0.45rem;
+          gap: 0.4rem;
           text-decoration: none;
+          border-radius: 8px;
         }
 
         .btn-scanner-download {
-          padding: 0.65rem 1rem;
-          font-size: 0.85rem;
+          padding: 0.52rem 0.8rem;
+          font-size: 0.8rem;
           font-weight: 700;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 0.45rem;
+          gap: 0.4rem;
           background: #ffffff;
-          border-color: #cbd5e1;
+          border: 1px solid #cbd5e1;
           color: var(--text-main);
           cursor: pointer;
+          border-radius: 8px;
+          transition: background 0.2s ease;
         }
 
         .btn-scanner-download:hover {

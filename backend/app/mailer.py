@@ -7,10 +7,19 @@ from .config import SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, NOTIFY_EMAIL
 
 logger = logging.getLogger(__name__)
 
-def send_contact_email_notification(name: str, phone: str, address: str = "", message: str = "") -> dict:
+def send_contact_email_notification(
+    name: str,
+    phone: str,
+    phone2: str = "",
+    address: str = "",
+    taluka: str = "",
+    district: str = "",
+    message: str = ""
+) -> dict:
     """
     Sends an immediate HTML + Plain text email alert to payalfoundation212@gmail.com
     when someone fills out the contact form on Payal Foundation website.
+    Includes: Name, Phone 1, Phone 2, Address, Taluka, District, Message.
     """
     if not SMTP_PASSWORD:
         logger.warning(
@@ -24,7 +33,10 @@ def send_contact_email_notification(name: str, phone: str, address: str = "", me
         }
 
     recipient_list = [e.strip() for e in (NOTIFY_EMAIL or "payalfoundation212@gmail.com").split(",") if e.strip()]
-    clean_address = address.strip() if address else "पत्ता दिलेला नाही (Not provided)"
+    clean_phone2 = phone2.strip() if phone2 and phone2.strip() else "दिलेला नाही (Not provided)"
+    clean_address = address.strip() if address and address.strip() else "दिलेला नाही (Not provided)"
+    clean_taluka = taluka.strip() if taluka and taluka.strip() else "दिलेला नाही (Not provided)"
+    clean_district = district.strip() if district and district.strip() else "दिलेला नाही (Not provided)"
     now_str = datetime.now().strftime("%d-%m-%Y %I:%M %p")
 
     subject = f"🔔 नवीन संपर्क संदेश: {name} ({phone}) - Payal Foundation"
@@ -33,15 +45,30 @@ def send_contact_email_notification(name: str, phone: str, address: str = "", me
     text_content = f"""
 नवीन संपर्क संदेश - पायल फाउंडेशन आणि सोशल सर्व्हिस
 ==================================================
-नाव: {name}
-फोन नंबर: {phone}
-पत्ता: {clean_address}
-संदेश:
+नाव (Name): {name}
+फोन नंबर १ (Phone 1): {phone}
+फोन नंबर २ (Phone 2): {clean_phone2}
+पत्ता (Address): {clean_address}
+तालुका (Taluka): {clean_taluka}
+जिल्हा (District): {clean_district}
+
+संदेश (Message):
 {message}
 
 तारीख व वेळ: {now_str}
 वेबसाइट: Payal Foundation and Social Service
 """
+
+    # Format Phone 2 HTML and call button
+    if phone2 and phone2.strip():
+        phone2_digits = phone2.replace("+", "").replace(" ", "").strip()
+        phone2_html = f'<a href="tel:{phone2.strip()}" style="color: #2563eb; text-decoration: none; font-weight: 600;">{phone2.strip()}</a>'
+        phone2_btn = f'<a href="tel:{phone2.strip()}" class="btn" style="background: #0284c7;">📱 फोन २ वर कॉल करा</a>'
+    else:
+        phone2_html = '<span style="color: #94a3b8; font-style: italic;">दिलेला नाही (Not provided)</span>'
+        phone2_btn = ''
+
+    phone1_digits = phone.replace("+", "").replace(" ", "").strip()
 
     # Rich HTML Email Version
     html_content = f"""
@@ -59,11 +86,11 @@ def send_contact_email_notification(name: str, phone: str, address: str = "", me
     .badge {{ display: inline-block; background: #dbeafe; color: #1e40af; font-size: 12px; font-weight: bold; padding: 4px 10px; border-radius: 20px; margin-bottom: 15px; }}
     .info-table {{ width: 100%; border-collapse: collapse; margin-bottom: 20px; }}
     .info-table td {{ padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; vertical-align: top; }}
-    .info-table .label {{ font-weight: bold; width: 30%; color: #64748b; background: #f8fafc; }}
+    .info-table .label {{ font-weight: bold; width: 32%; color: #64748b; background: #f8fafc; }}
     .info-table .value {{ font-weight: 600; color: #0f172a; }}
     .message-box {{ background: #f8fafc; border-left: 4px solid #2563eb; padding: 15px; border-radius: 4px; font-size: 14px; line-height: 1.6; color: #334155; margin-bottom: 25px; }}
     .btn-row {{ text-align: center; margin-top: 15px; }}
-    .btn {{ display: inline-block; background: #2563eb; color: #ffffff !important; text-decoration: none; padding: 10px 22px; border-radius: 25px; font-weight: bold; font-size: 14px; margin: 0 5px 10px 5px; }}
+    .btn {{ display: inline-block; background: #2563eb; color: #ffffff !important; text-decoration: none; padding: 10px 20px; border-radius: 25px; font-weight: bold; font-size: 13px; margin: 0 4px 10px 4px; }}
     .btn-whatsapp {{ background: #25D366; }}
     .email-footer {{ background: #f8fafc; padding: 15px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; }}
   </style>
@@ -84,12 +111,24 @@ def send_contact_email_notification(name: str, phone: str, address: str = "", me
           <td class="value">{name}</td>
         </tr>
         <tr>
-          <td class="label">📞 फोन नंबर</td>
+          <td class="label">📞 फोन नंबर १</td>
           <td class="value"><a href="tel:{phone}" style="color: #2563eb; text-decoration: none;">{phone}</a></td>
+        </tr>
+        <tr>
+          <td class="label">📱 फोन नंबर २</td>
+          <td class="value">{phone2_html}</td>
         </tr>
         <tr>
           <td class="label">📍 पत्ता (Address)</td>
           <td class="value">{clean_address}</td>
+        </tr>
+        <tr>
+          <td class="label">🏛️ तालुका (Taluka)</td>
+          <td class="value">{clean_taluka}</td>
+        </tr>
+        <tr>
+          <td class="label">🌍 जिल्हा (District)</td>
+          <td class="value">{clean_district}</td>
         </tr>
         <tr>
           <td class="label">⏰ तारीख व वेळ</td>
@@ -103,8 +142,9 @@ def send_contact_email_notification(name: str, phone: str, address: str = "", me
       </div>
 
       <div class="btn-row">
-        <a href="tel:{phone}" class="btn">📞 थेट कॉल करा</a>
-        <a href="https://wa.me/91{phone.replace('+', '').replace(' ', '')}" class="btn btn-whatsapp">💬 WhatsApp रिप्लाय द्या</a>
+        <a href="tel:{phone}" class="btn">📞 फोन १ वर कॉल करा</a>
+        <a href="https://wa.me/91{phone1_digits}" class="btn btn-whatsapp">💬 WhatsApp वर बोला</a>
+        {phone2_btn}
       </div>
     </div>
 

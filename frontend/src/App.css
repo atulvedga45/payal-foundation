@@ -537,7 +537,7 @@ body.drawer-open .floating-action-btn {
   font-weight: 800;
   letter-spacing: -0.025em;
   margin-bottom: 0.75rem;
-  color: var(--text-main);
+  color: #000000;
   line-height: 1.25;
 }
 
@@ -799,18 +799,24 @@ body.drawer-open .floating-action-btn {
 }
 
 .dot-visual {
-  width: 10px;
-  height: 10px;
-  border-radius: var(--radius-full);
-  background: rgba(148, 163, 184, 0.5);
-  transition: all 0.35s ease;
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  background: rgba(148, 163, 184, 0.55);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slider-dot-btn:hover .dot-visual {
+  background: rgba(238, 114, 20, 0.6);
+  transform: scale(1.15);
 }
 
 .slider-dot-btn.active .dot-visual {
-  width: 32px;
-  background: linear-gradient(90deg, #2563eb, #d97706);
-  border-radius: var(--radius-full);
-  box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+  width: 34px;
+  background: linear-gradient(90deg, #ee7214, #f59e0b);
+  border-radius: 9999px;
+  box-shadow: 0 2px 12px rgba(238, 114, 20, 0.5);
+  transform: scale(1);
 }
 
 .slider-counter {
