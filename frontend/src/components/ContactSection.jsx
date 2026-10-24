@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Phone, Mail, MapPin, Send, CheckCircle2, MessageSquare } from 'lucide-react';
-import { submitContact } from '../api';
+import { submitContact, sendEmailViaVercel } from '../api';
 import confetti from 'canvas-confetti';
 
 export default function ContactSection({ t, lang = 'mr', trustInfo }) {
@@ -90,14 +90,21 @@ export default function ContactSection({ t, lang = 'mr', trustInfo }) {
         district: dataToSubmit.district || '',
         message: dataToSubmit.message
       };
-      await submitContact(payload);
+
+      // 1. Submit to Render backend (saves to database for Admin Panel)
+      // 2. Submit to Vercel Email Endpoint (delivers email directly to payalfoundation212@gmail.com)
+      await Promise.allSettled([
+        submitContact(payload),
+        sendEmailViaVercel(payload)
+      ]);
+
       setSentSuccess(true);
       try { confetti({ particleCount: 85, spread: 75, origin: { y: 0.6 } }); } catch (_) {}
       setFormData({ name: '', phone: '', phone2: '', address: '', taluka: '', district: '', message: '' });
       setPhoneError('');
       setPhone2Error('');
     } catch (err) {
-      console.warn("Backend not reachable, setting sent locally", err);
+      console.warn("Contact submission error:", err);
       setSentSuccess(true);
       try { confetti({ particleCount: 85, spread: 75, origin: { y: 0.6 } }); } catch (_) {}
     } finally {
@@ -338,9 +345,9 @@ export default function ContactSection({ t, lang = 'mr', trustInfo }) {
                         <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.75 }}>
                           {t.contact.phoneLabel || (isEn ? 'Phone Number' : 'फोन क्रमांक')}
                         </div>
-                        <a href={`tel:${(trustInfo?.phone || t.phone).replace(/\s+/g, '')}`}
+                        <a href={`tel:${t.phone.replace(/\s+/g, '')}`}
                           style={{ color: '#fff', textDecoration: 'none', fontSize: '1rem', fontWeight: 700, display: 'block', marginTop: '2px' }}>
-                          {trustInfo?.phone || t.phone}
+                          {t.phone}
                         </a>
                       </div>
                     </div>
@@ -354,7 +361,7 @@ export default function ContactSection({ t, lang = 'mr', trustInfo }) {
                           {t.contact.addressLabel || (isEn ? 'Registered Office' : 'नोंदणीकृत पत्ता')}
                         </div>
                         <div style={{ color: '#fff', fontSize: '0.95rem', fontWeight: 600, marginTop: '2px' }}>
-                          {trustInfo?.address || t.address}
+                          {t.address}
                         </div>
                       </div>
                     </div>

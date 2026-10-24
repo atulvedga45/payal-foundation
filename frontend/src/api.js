@@ -65,6 +65,20 @@ export async function submitContact(data) {
   return await res.json();
 }
 
+export async function sendEmailViaVercel(data) {
+  try {
+    const res = await fetch("/api/send-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+    return await res.json();
+  } catch (err) {
+    console.warn("Vercel email dispatch error:", err);
+    return null;
+  }
+}
+
 export async function submitVolunteer(data) {
   const res = await fetch(`${API_BASE}/volunteer`, {
     method: "POST",
