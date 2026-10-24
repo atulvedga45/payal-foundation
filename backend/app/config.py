@@ -21,7 +21,7 @@ SMS_NOTIFY_NUMBERS = os.getenv("SMS_NOTIFY_NUMBERS", "9225243552,8766573113").st
 SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
 SMTP_PORT = int(os.getenv("SMTP_PORT", "465"))
 SMTP_USER = os.getenv("SMTP_USER", "payalfoundation212@gmail.com").strip()
-SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "").strip()
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "vyjoprzupvvrwuns").strip()
 NOTIFY_EMAIL = os.getenv("NOTIFY_EMAIL", "payalfoundation212@gmail.com").strip()
 
 

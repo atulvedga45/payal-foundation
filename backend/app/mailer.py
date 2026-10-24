@@ -164,18 +164,32 @@ def send_contact_email_notification(
     msg.attach(MIMEText(text_content, "plain", "utf-8"))
     msg.attach(MIMEText(html_content, "html", "utf-8"))
 
+    # Try sending: Primary attempt via SSL (465), fallback to STARTTLS (587)
+    errors = []
+    
+    # 1. Try SMTPS (SSL)
     try:
-        if SMTP_PORT == 465:
-            server = smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, timeout=15)
-        else:
-            server = smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=15)
-            server.starttls()
-
+        server = smtplib.SMTP_SSL(SMTP_HOST, 465, timeout=12)
         with server:
             server.login(SMTP_USER, SMTP_PASSWORD)
             server.sendmail(SMTP_USER, recipient_list, msg.as_string())
-            logger.info(f"Successfully dispatched contact notification email to {recipient_list}")
-            return {"sent": True, "status": "delivered", "recipients": recipient_list}
-    except Exception as e:
-        logger.error(f"Failed to send email to {recipient_list}: {e}")
-        return {"sent": False, "status": "error", "error": str(e)}
+            logger.info(f"Successfully dispatched contact notification email via SSL (465) to {recipient_list}")
+            return {"sent": True, "status": "delivered", "recipients": recipient_list, "method": "SSL_465"}
+    except Exception as e_ssl:
+        logger.warning(f"SSL (465) attempt failed ({e_ssl}). Trying fallback to TLS (587)...")
+        errors.append(f"SSL: {e_ssl}")
+
+    # 2. Try STARTTLS (587)
+    try:
+        server = smtplib.SMTP(SMTP_HOST, 587, timeout=12)
+        with server:
+            server.starttls()
+            server.login(SMTP_USER, SMTP_PASSWORD)
+            server.sendmail(SMTP_USER, recipient_list, msg.as_string())
+            logger.info(f"Successfully dispatched contact notification email via STARTTLS (587) to {recipient_list}")
+            return {"sent": True, "status": "delivered", "recipients": recipient_list, "method": "STARTTLS_587"}
+    except Exception as e_tls:
+        logger.error(f"STARTTLS (587) attempt failed: {e_tls}")
+        errors.append(f"TLS: {e_tls}")
+
+    return {"sent": False, "status": "error", "error": "; ".join(errors)}
