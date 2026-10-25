@@ -914,17 +914,19 @@ export default function AdminModal({
           /* Authenticated Dashboard View */
           <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, overflow: 'hidden' }}>
             
-            {/* Admin Navbar */}
-            <div style={{
-              padding: '0.75rem 1.25rem',
-              backgroundColor: 'var(--light-bg)',
-              borderBottom: '1px solid var(--border-color)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexWrap: 'nowrap',
-              gap: '0.5rem'
-            }}>
+            {/* Admin Navbar: Hidden on 3s Welcome Admin intro, visible on profile card & all other tabs */}
+            {!(activeTab === 'welcome' && welcomePhase === 'intro') && (
+              <div style={{
+                padding: '0.75rem 1.25rem',
+                backgroundColor: 'var(--light-bg)',
+                borderBottom: '1px solid var(--border-color)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'nowrap',
+                gap: '0.5rem',
+                animation: 'adminFadeInUp 0.35s ease-out'
+              }}>
               {/* Left Side: Edit Dropdown only */}
               <div ref={editDropdownRef} style={{ position: 'relative' }}>
                 <button
@@ -1158,6 +1160,7 @@ export default function AdminModal({
                 <span>Logout</span>
               </button>
             </div>
+            )}
 
             {/* Tab Contents with Scrollable Tables */}
             <div style={{ padding: '1.25rem 1rem', overflowY: 'auto', overflowX: 'hidden', flexGrow: 1, width: '100%', boxSizing: 'border-box' }}>
@@ -1335,41 +1338,10 @@ export default function AdminModal({
                         fontSize: '0.86rem',
                         color: '#64748b',
                         lineHeight: 1.5,
-                        margin: '0 0 1.5rem 0'
+                        margin: 0
                       }}>
                         Edit किंवा बदल करण्यासाठी वर दिलेल्या <strong style={{ color: 'var(--primary)' }}>Edit</strong> बटणावर क्लिक करा.
                       </p>
-
-                      <button
-                        type="button"
-                        onClick={() => setIsEditDropdownOpen(true)}
-                        style={{
-                          padding: '0.6rem 1.4rem',
-                          borderRadius: '9999px',
-                          border: 'none',
-                          background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-                          color: '#ffffff',
-                          fontWeight: 700,
-                          fontSize: '0.88rem',
-                          cursor: 'pointer',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '0.45rem',
-                          boxShadow: '0 4px 14px rgba(37, 99, 235, 0.35)',
-                          transition: 'all 0.2s ease'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.transform = 'translateY(-1px)';
-                          e.currentTarget.style.boxShadow = '0 6px 18px rgba(37, 99, 235, 0.45)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.transform = 'none';
-                          e.currentTarget.style.boxShadow = '0 4px 14px rgba(37, 99, 235, 0.35)';
-                        }}
-                      >
-                        <Edit3 size={15} />
-                        <span>Edit करा (Open Menu)</span>
-                      </button>
                     </div>
                   )}
                 </div>
