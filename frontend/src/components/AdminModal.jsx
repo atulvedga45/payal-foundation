@@ -407,8 +407,10 @@ export default function AdminModal({
     // Read as Data URL immediately so the live preview box updates on screen instantaneously
     const reader = new FileReader();
     reader.onload = async (readEvt) => {
-      const dataUrl = readEvt.target.result;
-      setEditingInit((prev) => ({ ...prev, image_url: dataUrl }));
+      const dataUrl = readEvt.target?.result;
+      if (dataUrl) {
+        setEditingInit((prev) => ({ ...prev, image_url: dataUrl }));
+      }
 
       try {
         // Compress large camera photos and upload to server
@@ -416,7 +418,7 @@ export default function AdminModal({
         const url = await uploadInitiativeImage(token, compressedFile);
         if (url) {
           setEditingInit((prev) => ({ ...prev, image_url: url }));
-          setInitMsg({ type: 'success', text: 'फोटो यशस्वीरीत्या निवडला व अपलोड झाला!' });
+          setInitMsg({ type: 'success', text: 'फोटो यशस्वीरीत्या निवडला व सेव्हसाठी तयार झाला!' });
         }
       } catch (err) {
         console.warn("Upload fallback to dataUrl:", err);
@@ -426,7 +428,6 @@ export default function AdminModal({
       }
     };
     reader.readAsDataURL(file);
-    if (e.target) e.target.value = '';
   };
 
   const handleSaveInitiative = async (e) => {
@@ -1898,24 +1899,31 @@ export default function AdminModal({
                               </div>
                             </div>
 
-                            {/* File input for device/phone gallery */}
+                            {/* Hidden file input for device/phone gallery */}
                             <input
-                              id="initiative-gallery-input"
                               type="file"
+                              ref={fileInputRef}
                               accept="image/*"
                               onChange={handleImageUpload}
-                              style={{ position: 'absolute', opacity: 0, width: '1px', height: '1px', pointerEvents: 'none' }}
+                              style={{ display: 'none' }}
                             />
 
-                            {/* Choose from Gallery Button via native Label */}
-                            <div style={{ marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
-                              <label
-                                htmlFor="initiative-gallery-input"
+                            {/* Choose from Gallery Button */}
+                            <div style={{ marginBottom: '0.75rem', width: '100%', boxSizing: 'border-box' }}>
+                              <button
+                                type="button"
+                                disabled={initUploading}
+                                onClick={() => {
+                                  if (fileInputRef.current) {
+                                    fileInputRef.current.value = '';
+                                    fileInputRef.current.click();
+                                  }
+                                }}
                                 style={{
                                   width: '100%',
                                   maxWidth: '100%',
                                   boxSizing: 'border-box',
-                                  padding: '0.8rem 1rem',
+                                  padding: '0.85rem 1rem',
                                   borderRadius: '8px',
                                   border: '1.5px solid var(--primary)',
                                   background: 'var(--primary-light)',
@@ -1927,13 +1935,51 @@ export default function AdminModal({
                                   justifyContent: 'center',
                                   gap: '0.5rem',
                                   cursor: initUploading ? 'wait' : 'pointer',
-                                  boxShadow: '0 2px 6px rgba(37, 99, 235, 0.15)',
-                                  userSelect: 'none'
+                                  boxShadow: '0 2px 6px rgba(37, 99, 235, 0.15)'
                                 }}
                               >
                                 <Camera size={18} />
-                                <span>{initUploading ? 'फोटो लोड होत आहे...' : 'Choose from Gallery'}</span>
-                              </label>
+                                <span>{initUploading ? 'फोटो लोड होत आहे...' : '📁 Choose from Gallery (फोटो निवडा)'}</span>
+                              </button>
+                            </div>
+
+                            {/* Preset Charity Photos for 1-Click Fast Selection */}
+                            <div style={{
+                              background: '#f8fafc',
+                              border: '1px solid var(--border-color)',
+                              borderRadius: '8px',
+                              padding: '0.65rem 0.75rem',
+                              width: '100%',
+                              boxSizing: 'border-box'
+                            }}>
+                              <div style={{ fontSize: '0.76rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.45rem' }}>
+                                किंवा उपलब्ध फोटोंमधून थेट निवडा (Quick Pick):
+                              </div>
+                              <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
+                                {PRESET_IMAGES.map((preset, pIdx) => (
+                                  <button
+                                    key={pIdx}
+                                    type="button"
+                                    onClick={() => {
+                                      setEditingInit(prev => ({ ...prev, image_url: preset.path }));
+                                      setInitMsg({ type: 'success', text: `फोटो निवडला: ${preset.label}` });
+                                    }}
+                                    style={{
+                                      fontSize: '0.75rem',
+                                      padding: '0.35rem 0.65rem',
+                                      borderRadius: '6px',
+                                      border: editingInit.image_url === preset.path ? '1.5px solid var(--primary)' : '1px solid var(--border-color)',
+                                      background: editingInit.image_url === preset.path ? 'var(--primary-light)' : '#ffffff',
+                                      color: editingInit.image_url === preset.path ? 'var(--primary)' : 'var(--text-main)',
+                                      cursor: 'pointer',
+                                      fontWeight: 600,
+                                      transition: 'all 0.15s ease'
+                                    }}
+                                  >
+                                    {preset.label}
+                                  </button>
+                                ))}
+                              </div>
                             </div>
 
                           </div>

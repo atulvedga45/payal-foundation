@@ -239,9 +239,6 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
                         e.target.src = 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=600&q=80';
                       }}
                     />
-                    <div className="initiative-category-badge">
-                      {item.category || (lang === 'mr' ? 'समाजकार्य' : 'Social Service')}
-                    </div>
                     {/* Click hint */}
                     <div className="initiative-click-hint">
                       {lang === 'mr' ? 'माहिती पाहा ↗' : 'View Details ↗'}
@@ -257,28 +254,24 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
 
                     <h3 className="initiative-title">{title}</h3>
 
-                    {/* Progress */}
+                    {/* Minimum Expense (कमीत कमी खर्च) */}
                     <div className="initiative-card-bottom">
-                      <div className="initiative-progress-section">
-                        <div className="initiative-amounts">
-                          <span className="amount-raised">
-                            {t.initiatives.raised}: <strong>₹{(item.raised_amount || 0).toLocaleString('en-IN')}</strong>
+                      <div className="initiative-progress-section" style={{ marginBottom: '1.15rem' }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          background: 'rgba(37, 99, 235, 0.06)',
+                          padding: '0.65rem 0.9rem',
+                          borderRadius: '10px',
+                          border: '1px solid rgba(37, 99, 235, 0.12)'
+                        }}>
+                          <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-muted)' }}>
+                            कमीत कमी खर्च:
                           </span>
-                          <span className="amount-goal">
-                            {t.initiatives.goal}: ₹{(item.target_amount || 0).toLocaleString('en-IN')}
-                          </span>
-                        </div>
-                        <div className="initiative-progress-track">
-                          <div
-                            className="progress-bar-animated"
-                            style={{
-                              width: `${percentage}%`,
-                              height: '100%',
-                              background: 'var(--primary-gradient)',
-                              borderRadius: '9999px',
-                              transition: 'width 0.8s ease'
-                            }}
-                          />
+                          <strong style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--primary)' }}>
+                            ₹{(item.target_amount || 0).toLocaleString('en-IN')}
+                          </strong>
                         </div>
                       </div>
 
@@ -333,22 +326,25 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
 
         .initiatives-track {
           display: flex;
-          gap: 1.15rem;
+          justify-content: center;
+          gap: 1.25rem;
           overflow-x: auto;
           scroll-behavior: smooth;
           scroll-snap-type: x mandatory;
           scrollbar-width: none;
           -ms-overflow-style: none;
           padding: 0.75rem 0.25rem 1.25rem 0.25rem;
+          width: 100%;
+          box-sizing: border-box;
         }
 
         .initiatives-track::-webkit-scrollbar { display: none; }
 
         .initiatives-track .initiative-card {
-          flex: 0 0 calc((100% - 3.45rem) / 4);
-          min-width: calc((100% - 3.45rem) / 4);
-          max-width: calc((100% - 3.45rem) / 4);
-          scroll-snap-align: start;
+          flex: 0 0 min(100%, 310px);
+          min-width: min(100%, 280px);
+          max-width: 330px;
+          scroll-snap-align: center;
           display: flex;
           flex-direction: column;
           border-radius: var(--radius-md);
