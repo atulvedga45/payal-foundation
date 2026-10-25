@@ -1160,7 +1160,7 @@ export default function AdminModal({
             </div>
 
             {/* Tab Contents with Scrollable Tables */}
-            <div style={{ padding: '1.5rem 1.75rem', overflowY: 'auto', flexGrow: 1 }}>
+            <div style={{ padding: '1.25rem 1rem', overflowY: 'auto', overflowX: 'hidden', flexGrow: 1, width: '100%', boxSizing: 'border-box' }}>
               {/* Animation Styles */}
               <style>{`
                 @keyframes adminPulseGlow {
@@ -1719,20 +1719,21 @@ export default function AdminModal({
                     </div>
 
                     {/* Submit Button */}
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '1.25rem' }}>
                       <button
                         type="submit"
                         disabled={statsSaving}
                         className="btn btn-primary"
                         style={{
-                          padding: '0.75rem 1.75rem',
+                          padding: '0.75rem 2.25rem',
                           fontSize: '0.95rem',
                           fontWeight: 700,
                           display: 'flex',
                           alignItems: 'center',
                           gap: '0.5rem',
                           cursor: statsSaving ? 'not-allowed' : 'pointer',
-                          boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)'
+                          boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
+                          borderRadius: '9999px'
                         }}
                       >
                         <Save size={18} />
@@ -2067,15 +2068,12 @@ export default function AdminModal({
                     </div>
                   ) : (
                     /* Initiatives List View */
-                    <div>
+                    <div style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
                         <div>
-                          <h4 style={{ fontSize: '1.2rem', fontWeight: 800, margin: '0 0 0.25rem 0', color: 'var(--text-main)' }}>
+                          <h4 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>
                             Initiatives & Projects Management (उपक्रम व्यवस्थापन)
                           </h4>
-                          <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                            येथून तुम्ही उपक्रमांची नावे, माहिती, निधीचे आकडे आणि फोटो सहज बदलू शकता.
-                          </p>
                         </div>
                         <button
                           type="button"
@@ -2102,8 +2100,11 @@ export default function AdminModal({
                       ) : (
                         <div style={{
                           display: 'grid',
-                          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-                          gap: '1.25rem'
+                          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))',
+                          gap: '1.25rem',
+                          width: '100%',
+                          maxWidth: '100%',
+                          boxSizing: 'border-box'
                         }}>
                           {localInitiatives.map((item) => (
                             <div
@@ -2116,7 +2117,9 @@ export default function AdminModal({
                                 display: 'flex',
                                 flexDirection: 'column',
                                 boxShadow: '0 2px 4px rgba(0,0,0,0.03)',
-                                transition: 'transform 0.2s, box-shadow 0.2s'
+                                width: '100%',
+                                maxWidth: '100%',
+                                boxSizing: 'border-box'
                               }}
                             >
                               {/* Card Image */}
@@ -2143,11 +2146,11 @@ export default function AdminModal({
                               </div>
 
                               {/* Card Info */}
-                              <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                                <div style={{ fontWeight: 800, fontSize: '0.98rem', color: 'var(--text-main)', marginBottom: '0.25rem' }}>
+                              <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', flexGrow: 1, minWidth: 0, boxSizing: 'border-box' }}>
+                                <div style={{ fontWeight: 800, fontSize: '0.98rem', color: 'var(--text-main)', marginBottom: '0.25rem', wordBreak: 'break-word' }}>
                                   {item.title_mr || item.title}
                                 </div>
-                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.65rem' }}>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.65rem', wordBreak: 'break-word' }}>
                                   {item.title}
                                 </div>
 
@@ -2165,13 +2168,14 @@ export default function AdminModal({
                                 </div>
 
                                 {/* Buttons */}
-                                <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }}>
+                                <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto', width: '100%', boxSizing: 'border-box' }}>
                                   <button
                                     type="button"
                                     onClick={() => handleEditInitiative(item)}
                                     style={{
                                       flex: 1,
-                                      padding: '0.5rem 0.75rem',
+                                      minWidth: 0,
+                                      padding: '0.5rem 0.6rem',
                                       borderRadius: '6px',
                                       border: '1px solid var(--primary)',
                                       background: 'var(--primary-light)',
@@ -2182,16 +2186,20 @@ export default function AdminModal({
                                       alignItems: 'center',
                                       justifyContent: 'center',
                                       gap: '0.35rem',
-                                      cursor: 'pointer'
+                                      cursor: 'pointer',
+                                      whiteSpace: 'nowrap',
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis'
                                     }}
                                   >
-                                    <Edit3 size={14} />
-                                    <span>माहिती व फोटो बदला (Edit)</span>
+                                    <Edit3 size={14} style={{ flexShrink: 0 }} />
+                                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>माहिती व फोटो बदला</span>
                                   </button>
                                   <button
                                     type="button"
                                     onClick={() => handleDeleteInitiative(item.id)}
                                     style={{
+                                      flexShrink: 0,
                                       padding: '0.5rem 0.75rem',
                                       borderRadius: '6px',
                                       border: '1px solid #fecaca',
@@ -2622,8 +2630,11 @@ export default function AdminModal({
                       ) : (
                         <div style={{
                           display: 'grid',
-                          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                          gap: '1.25rem'
+                          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))',
+                          gap: '1.25rem',
+                          width: '100%',
+                          maxWidth: '100%',
+                          boxSizing: 'border-box'
                         }}>
                           {localTrustees.map((item, idx) => (
                             <div
@@ -2636,7 +2647,10 @@ export default function AdminModal({
                                 display: 'flex',
                                 flexDirection: 'column',
                                 boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
-                                padding: '1.25rem'
+                                padding: '1.25rem',
+                                width: '100%',
+                                maxWidth: '100%',
+                                boxSizing: 'border-box'
                               }}
                             >
                               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
@@ -2700,7 +2714,7 @@ export default function AdminModal({
                               </div>
 
                               {/* Card Action Buttons */}
-                              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.6rem', marginTop: 'auto' }}>
+                              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.6rem', marginTop: 'auto', width: '100%', boxSizing: 'border-box' }}>
                                 <button
                                   type="button"
                                   onClick={() => setEditingTrustee({ ...item })}
@@ -2714,7 +2728,7 @@ export default function AdminModal({
                                   }}
                                 >
                                   <Edit3 size={14} />
-                                  <span>संपादित करा (Edit)</span>
+                                  <span>संपादित करा</span>
                                 </button>
                                 <button
                                   type="button"
