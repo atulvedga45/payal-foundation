@@ -339,15 +339,21 @@ export default function AdminModal({
       if (onUpdateHomeStats) {
         onUpdateHomeStats(updated || statsForm);
       }
-      setStatsSuccess('होम पेज आकडेवारी यशस्वीरीत्या सेव्ह केली गेली! (Home stats updated live!)');
-      setTimeout(() => setStatsSuccess(''), 4500);
+      setStatsSuccess('होम पेज आकडेवारी यशस्वीरीत्या सेव्ह केली गेली! (Saved!)');
+      setTimeout(() => {
+        setActiveTab('welcome');
+        setWelcomePhase('profile');
+      }, 400);
     } catch (err) {
       console.error(err);
       if (onUpdateHomeStats) {
         onUpdateHomeStats(statsForm);
       }
-      setStatsSuccess('बदल सेव्ह झाले (Local cache updated).');
-      setTimeout(() => setStatsSuccess(''), 4500);
+      setStatsSuccess('बदल सेव्ह झाले.');
+      setTimeout(() => {
+        setActiveTab('welcome');
+        setWelcomePhase('profile');
+      }, 400);
     } finally {
       setStatsSaving(false);
     }
@@ -1390,36 +1396,9 @@ export default function AdminModal({
                   )}
 
                   <div style={{ marginBottom: '1.25rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
-                      <div>
-                        <h4 style={{ fontSize: '1.15rem', fontWeight: 800, margin: '0 0 0.25rem 0', color: 'var(--text-main)' }}>
-                          Home Page Impact Numbers (मुख्यपृष्ठ आकडेवारी व्यवस्थापन)
-                        </h4>
-                        <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                          मुख्यपृष्ठावरील ३ प्रमुख आकडेवारी (Community Dedicated, Active Social Workers, Families Impacted) येथे बदला. बदल त्वरित मुख्यपृष्ठावर दिसतील.
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={handleResetDefaults}
-                        style={{
-                          background: '#f1f5f9',
-                          border: '1px solid var(--border-color)',
-                          borderRadius: 'var(--radius-sm)',
-                          padding: '0.4rem 0.85rem',
-                          fontSize: '0.8rem',
-                          fontWeight: 600,
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '0.35rem',
-                          color: 'var(--text-muted)'
-                        }}
-                      >
-                        <RotateCcw size={14} />
-                        <span>Reset Defaults (मूळ मूल्ये)</span>
-                      </button>
-                    </div>
+                    <h4 style={{ fontSize: '1.15rem', fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>
+                      Home Page Impact Numbers (मुख्यपृष्ठ आकडेवारी व्यवस्थापन)
+                    </h4>
                   </div>
 
                   <form onSubmit={handleSaveHomeStats}>
@@ -1757,7 +1736,7 @@ export default function AdminModal({
                         }}
                       >
                         <Save size={18} />
-                        <span>{statsSaving ? 'Saving...' : 'Save & Update Homepage (बदल सेव्ह करा)'}</span>
+                        <span>{statsSaving ? 'Saving...' : 'Save & Update'}</span>
                       </button>
                     </div>
                   </form>
