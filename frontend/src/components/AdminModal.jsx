@@ -28,7 +28,8 @@ import {
   updateGalleryItem,
   deleteGalleryItem,
   updateTrustInfo,
-  getImageUrl
+  getImageUrl,
+  compressImage
 } from '../api';
 
 const PRESET_IMAGES = [
@@ -399,19 +400,36 @@ export default function AdminModal({
   const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Instant local preview for immediate visual feedback
+    const instantPreview = URL.createObjectURL(file);
+    setEditingInit((prev) => ({ ...prev, image_url: instantPreview }));
     setInitUploading(true);
     setInitMsg({ type: '', text: '' });
+
     try {
-      const url = await uploadInitiativeImage(token, file);
+      // Compress large phone/camera photos to fast, clean web image (~150KB)
+      const compressedFile = await compressImage(file, 1200, 1200, 0.82);
+      const url = await uploadInitiativeImage(token, compressedFile);
       if (url) {
         setEditingInit((prev) => ({ ...prev, image_url: url }));
-        setInitMsg({ type: 'success', text: 'फोटो यशस्वीरीत्या अपलोड झाला! (Image uploaded successfully!)' });
+        setInitMsg({ type: 'success', text: 'फोटो यशस्वीरीत्या अपलोड व निवडला गेला!' });
       }
     } catch (err) {
-      console.error(err);
-      setInitMsg({ type: 'error', text: 'फोटो अपलोड करताना अडचण आली.' });
+      console.warn("Upload failed, converting to data URL:", err);
+      try {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setEditingInit((prev) => ({ ...prev, image_url: reader.result }));
+          setInitMsg({ type: 'success', text: 'फोटो निवडला गेला!' });
+        };
+        reader.readAsDataURL(file);
+      } catch (_) {
+        setInitMsg({ type: 'error', text: 'फोटो अपलोड करताना अडचण आली.' });
+      }
     } finally {
       setInitUploading(false);
+      if (e.target) e.target.value = '';
     }
   };
 
@@ -424,10 +442,25 @@ export default function AdminModal({
     setInitSaving(true);
     setInitMsg({ type: '', text: '' });
     try {
+      // If image is a temporary blob URL, convert to permanent data URL
+      let finalImageUrl = editingInit.image_url;
+      if (finalImageUrl && finalImageUrl.startsWith('blob:')) {
+        try {
+          const blobRes = await fetch(finalImageUrl);
+          const blobData = await blobRes.blob();
+          finalImageUrl = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(blobData);
+          });
+        } catch (_) {}
+      }
+
       let updatedList = [];
       if (editingInit.id === 'new') {
         const payload = {
           ...editingInit,
+          image_url: finalImageUrl || '/food_distribution.jpg',
           title_mr: editingInit.title_mr || editingInit.title,
           description_mr: editingInit.description_mr || editingInit.description,
           target_amount: Number(editingInit.target_amount) || 0,
@@ -438,6 +471,7 @@ export default function AdminModal({
       } else {
         const payload = {
           ...editingInit,
+          image_url: finalImageUrl || '/food_distribution.jpg',
           target_amount: Number(editingInit.target_amount) || 0,
           raised_amount: Number(editingInit.raised_amount) || 0
         };
@@ -450,6 +484,8 @@ export default function AdminModal({
       } catch (_) {}
       if (onUpdateInitiatives) onUpdateInitiatives(updatedList);
       setEditingInit(null);
+      setActiveTab('welcome');
+      setWelcomePhase('profile');
       setInitMsg({ type: 'success', text: 'उपक्रम यशस्वीरीत्या सेव्ह झाला! (Initiative saved successfully!)' });
       setTimeout(() => setInitMsg({ type: '', text: '' }), 4000);
     } catch (err) {
@@ -1751,18 +1787,19 @@ export default function AdminModal({
                           type="button"
                           onClick={() => setEditingInit(null)}
                           style={{
-                            padding: '0.5rem 1.1rem',
+                            padding: '0.55rem 1.25rem',
                             borderRadius: '8px',
-                            border: '1.5px solid var(--border-color)',
-                            background: '#f8fafc',
-                            color: 'var(--text-main)',
+                            border: 'none',
+                            background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
+                            color: '#ffffff',
                             fontSize: '0.88rem',
                             fontWeight: 700,
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '0.45rem',
                             cursor: 'pointer',
-                            boxShadow: '0 1px 3px rgba(0,0,0,0.06)'
+                            boxShadow: '0 3px 10px rgba(22, 163, 74, 0.35)',
+                            transition: 'all 0.2s ease'
                           }}
                         >
                           <ArrowLeft size={16} />
@@ -1872,7 +1909,7 @@ export default function AdminModal({
                               boxShadow: '0 4px 6px rgba(0,0,0,0.06)'
                             }}>
                               <img
-                                src={editingInit.image_url || '/food_distribution.jpg'}
+                                src={getImageUrl(editingInit.image_url) || '/food_distribution.jpg'}
                                 alt="Preview"
                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                 onError={(e) => { e.target.src = '/food_distribution.jpg'; }}
@@ -2020,7 +2057,7 @@ export default function AdminModal({
                               {/* Card Image */}
                               <div style={{ height: '140px', position: 'relative', backgroundColor: '#f1f5f9' }}>
                                 <img
-                                  src={item.image_url || '/food_distribution.jpg'}
+                                  src={getImageUrl(item.image_url) || '/food_distribution.jpg'}
                                   alt={item.title}
                                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                   onError={(e) => { e.target.src = '/food_distribution.jpg'; }}

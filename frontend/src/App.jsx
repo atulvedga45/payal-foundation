@@ -200,20 +200,8 @@ export default function App() {
         localStorage.setItem('payal_trustees', JSON.stringify(trusteesData.value));
       }
       if (initData.status === 'fulfilled' && Array.isArray(initData.value) && initData.value.length > 0) {
-        let mergedInits = initData.value;
-        try {
-          const cachedRaw = localStorage.getItem('payal_initiatives');
-          if (cachedRaw) {
-            const cachedList = JSON.parse(cachedRaw);
-            if (Array.isArray(cachedList)) {
-              const serverIds = new Set(initData.value.map((i) => i.id));
-              const localOnly = cachedList.filter((i) => !serverIds.has(i.id));
-              mergedInits = [...localOnly, ...initData.value];
-            }
-          }
-        } catch (_) {}
-        setInitiatives(mergedInits);
-        localStorage.setItem('payal_initiatives', JSON.stringify(mergedInits));
+        setInitiatives(initData.value);
+        localStorage.setItem('payal_initiatives', JSON.stringify(initData.value));
       }
       if (statsData.status === 'fulfilled' && statsData.value) {
         setHomeStats(statsData.value);

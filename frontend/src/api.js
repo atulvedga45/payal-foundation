@@ -1,19 +1,26 @@
-// In development: reads from frontend/.env → VITE_API_BASE=http://localhost:8000/api
-// In production (Vercel): reads from frontend/.env.production → VITE_API_BASE=https://your-render-app.onrender.com/api
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000/api";
+// Read VITE_API_BASE from env or fallback to live Render production API
+const envApi = import.meta.env.VITE_API_BASE;
+export const API_BASE = (envApi && !envApi.includes("YOUR_RENDER_BACKEND_URL"))
+  ? envApi
+  : (import.meta.env.DEV ? "http://localhost:8000/api" : "https://payal-foundation.onrender.com/api");
 
 // Backend root URL (without /api) — used to prefix /uploads/ image paths
 export const BACKEND_BASE = API_BASE.replace(/\/api$/, "");
 
 /**
  * Convert a stored image path to a proper display URL.
- * - If it starts with http/https → already absolute, return as-is
+ * - If it starts with http/https, data:, or blob: → already renderable, return as-is
  * - If it starts with /uploads/ → prepend BACKEND_BASE (Render served images)
  * - Otherwise → treat as local public asset path
  */
 export function getImageUrl(url) {
   if (!url) return "";
-  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:")) {
+  if (
+    url.startsWith("http://") ||
+    url.startsWith("https://") ||
+    url.startsWith("data:") ||
+    url.startsWith("blob:")
+  ) {
     return url;
   }
   if (url.startsWith("/uploads/")) {
@@ -21,6 +28,58 @@ export function getImageUrl(url) {
   }
   return url;
 }
+
+/**
+ * Client-side image compressor before upload.
+ * Resizes large camera photos (e.g. 10MB) to fast web-ready images (~150KB).
+ */
+export async function compressImage(file, maxWidth = 1200, maxHeight = 1200, quality = 0.82) {
+  return new Promise((resolve) => {
+    if (!file || !file.type || !file.type.startsWith("image/")) {
+      return resolve(file);
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth || height > maxHeight) {
+          if (width > height) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          } else {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) return resolve(file);
+            const compressedFile = new File(
+              [blob],
+              file.name.replace(/\.[^/.]+$/, "") + ".jpg",
+              { type: "image/jpeg", lastModified: Date.now() }
+            );
+            resolve(compressedFile);
+          },
+          "image/jpeg",
+          quality
+        );
+      };
+      img.onerror = () => resolve(file);
+      img.src = e.target.result;
+    };
+    reader.onerror = () => resolve(file);
+    reader.readAsDataURL(file);
+  });
+}
+
 
 export async function fetchTrustInfo() {
   try {
@@ -115,10 +174,10 @@ export async function adminLogin(password) {
     if (err.message === "INVALID_PASSWORD") {
       throw err;
     }
-    // If backend is not running or offline, verify against default admin password
-    console.warn("Backend not reachable on port 8000, checking fallback login:", err);
-    if (password === "admin123") {
-      return { success: true, token: "admin123", role: "admin", is_offline: true };
+    // If backend is temporarily waking up (cold start) or offline, allow fallback
+    console.warn("Backend not reachable or waking up, checking fallback login:", err);
+    if (password === "admin123" || password === "sonya-payal@palghar@1741") {
+      return { success: true, token: "sonya-payal@palghar@1741", role: "admin", is_offline: true };
     }
     throw new Error("INVALID_PASSWORD");
   }
