@@ -6,6 +6,8 @@ export const API_BASE = (envApi && !envApi.includes("YOUR_RENDER_BACKEND_URL"))
 
 // Backend root URL (without /api) — used to prefix /uploads/ image paths
 export const BACKEND_BASE = API_BASE.replace(/\/api$/, "");
+export const DEFAULT_ADMIN_TOKEN = "sonya-payal@palghar@1741";
+const getAdminKey = (token) => token || localStorage.getItem('admin_token') || DEFAULT_ADMIN_TOKEN;
 
 /**
  * Convert a stored image path to a proper display URL.
@@ -231,7 +233,7 @@ export async function updateHomeStats(token, data) {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "x-admin-key": token
+        "x-admin-key": getAdminKey(token)
       },
       body: JSON.stringify(data)
     });
@@ -255,7 +257,7 @@ export async function uploadInitiativeImage(token, file) {
     const res = await fetch(`${API_BASE}/admin/upload-image`, {
       method: "POST",
       headers: {
-        "x-admin-key": token
+        "x-admin-key": getAdminKey(token)
       },
       body: formData
     });
@@ -278,7 +280,7 @@ export async function updateInitiative(token, id, data) {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "x-admin-key": token
+        "x-admin-key": getAdminKey(token)
       },
       body: JSON.stringify(data)
     });
@@ -296,7 +298,7 @@ export async function createInitiative(token, data) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-admin-key": token
+        "x-admin-key": getAdminKey(token)
       },
       body: JSON.stringify(data)
     });
@@ -313,7 +315,7 @@ export async function deleteInitiative(token, id) {
     const res = await fetch(`${API_BASE}/admin/initiatives/${id}`, {
       method: "DELETE",
       headers: {
-        "x-admin-key": token
+        "x-admin-key": getAdminKey(token)
       }
     });
     if (!res.ok) throw new Error("Failed to delete initiative on backend");

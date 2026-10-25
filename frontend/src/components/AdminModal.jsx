@@ -397,46 +397,43 @@ export default function AdminModal({
     setInitMsg({ type: '', text: '' });
   };
 
-  const handleImageUpload = async (e) => {
+  const handleImageUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Instant local preview for immediate visual feedback
-    const instantPreview = URL.createObjectURL(file);
-    setEditingInit((prev) => ({ ...prev, image_url: instantPreview }));
     setInitUploading(true);
     setInitMsg({ type: '', text: '' });
 
-    try {
-      // Compress large phone/camera photos to fast, clean web image (~150KB)
-      const compressedFile = await compressImage(file, 1200, 1200, 0.82);
-      const url = await uploadInitiativeImage(token, compressedFile);
-      if (url) {
-        setEditingInit((prev) => ({ ...prev, image_url: url }));
-        setInitMsg({ type: 'success', text: 'फोटो यशस्वीरीत्या अपलोड व निवडला गेला!' });
-      }
-    } catch (err) {
-      console.warn("Upload failed, converting to data URL:", err);
+    // Read as Data URL immediately so the live preview box updates on screen instantaneously
+    const reader = new FileReader();
+    reader.onload = async (readEvt) => {
+      const dataUrl = readEvt.target.result;
+      setEditingInit((prev) => ({ ...prev, image_url: dataUrl }));
+
       try {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setEditingInit((prev) => ({ ...prev, image_url: reader.result }));
-          setInitMsg({ type: 'success', text: 'फोटो निवडला गेला!' });
-        };
-        reader.readAsDataURL(file);
-      } catch (_) {
-        setInitMsg({ type: 'error', text: 'फोटो अपलोड करताना अडचण आली.' });
+        // Compress large camera photos and upload to server
+        const compressedFile = await compressImage(file, 1200, 1200, 0.82);
+        const url = await uploadInitiativeImage(token, compressedFile);
+        if (url) {
+          setEditingInit((prev) => ({ ...prev, image_url: url }));
+          setInitMsg({ type: 'success', text: 'फोटो यशस्वीरीत्या निवडला व अपलोड झाला!' });
+        }
+      } catch (err) {
+        console.warn("Upload fallback to dataUrl:", err);
+        setInitMsg({ type: 'success', text: 'फोटो निवडला गेला!' });
+      } finally {
+        setInitUploading(false);
       }
-    } finally {
-      setInitUploading(false);
-      if (e.target) e.target.value = '';
-    }
+    };
+    reader.readAsDataURL(file);
+    if (e.target) e.target.value = '';
   };
 
   const handleSaveInitiative = async (e) => {
     e.preventDefault();
-    if (!editingInit.title.trim()) {
-      setInitMsg({ type: 'error', text: 'कृपया उपक्रमाचे नाव (Title) प्रविष्ट करा.' });
+    const initiativeTitle = (editingInit.title_mr || editingInit.title || '').trim();
+    if (!initiativeTitle) {
+      setInitMsg({ type: 'error', text: 'कृपया उपक्रमाचे नाव प्रविष्ट करा.' });
       return;
     }
     setInitSaving(true);
@@ -449,32 +446,29 @@ export default function AdminModal({
           const blobRes = await fetch(finalImageUrl);
           const blobData = await blobRes.blob();
           finalImageUrl = await new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result);
-            reader.readAsDataURL(blobData);
+            const r = new FileReader();
+            r.onloadend = () => resolve(r.result);
+            r.readAsDataURL(blobData);
           });
         } catch (_) {}
       }
 
       let updatedList = [];
+      const payload = {
+        ...editingInit,
+        title: initiativeTitle,
+        title_mr: initiativeTitle,
+        description: editingInit.description_mr || editingInit.description || '',
+        description_mr: editingInit.description_mr || editingInit.description || '',
+        image_url: finalImageUrl || '/food_distribution.jpg',
+        target_amount: Number(editingInit.target_amount) || 0,
+        raised_amount: Number(editingInit.raised_amount) || 0
+      };
+
       if (editingInit.id === 'new') {
-        const payload = {
-          ...editingInit,
-          image_url: finalImageUrl || '/food_distribution.jpg',
-          title_mr: editingInit.title_mr || editingInit.title,
-          description_mr: editingInit.description_mr || editingInit.description,
-          target_amount: Number(editingInit.target_amount) || 0,
-          raised_amount: Number(editingInit.raised_amount) || 0
-        };
         const created = await createInitiative(token, payload);
         updatedList = [created, ...localInitiatives];
       } else {
-        const payload = {
-          ...editingInit,
-          image_url: finalImageUrl || '/food_distribution.jpg',
-          target_amount: Number(editingInit.target_amount) || 0,
-          raised_amount: Number(editingInit.raised_amount) || 0
-        };
         const saved = await updateInitiative(token, editingInit.id, payload);
         updatedList = localInitiatives.map((item) => item.id === editingInit.id ? (saved || payload) : item);
       }
@@ -495,6 +489,7 @@ export default function AdminModal({
       setInitSaving(false);
     }
   };
+
 
   const handleDeleteInitiative = async (id) => {
     if (!window.confirm('हा उपक्रम खरोखर हटवायचा आहे का? (Are you sure you want to delete this initiative?)')) {
@@ -1821,35 +1816,22 @@ export default function AdminModal({
                           {/* Left Column: Text & Details */}
                           <div style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
                             <div style={{ marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
-                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem', color: 'var(--text-main)' }}>
-                                Initiative Title (English) *
+                              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.35rem', color: 'var(--text-main)' }}>
+                                उपक्रमाचे नाव (मराठी) *
                               </label>
                               <input
                                 type="text"
-                                value={editingInit.title}
-                                onChange={(e) => setEditingInit({ ...editingInit, title: e.target.value })}
-                                placeholder="e.g. Community Food & Ration Distribution"
-                                required
-                                style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
-                              />
-                            </div>
-
-                            <div style={{ marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
-                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem', color: 'var(--text-main)' }}>
-                                उपक्रमाचे नाव (मराठी)
-                              </label>
-                              <input
-                                type="text"
-                                value={editingInit.title_mr || ''}
-                                onChange={(e) => setEditingInit({ ...editingInit, title_mr: e.target.value })}
+                                value={editingInit.title_mr || editingInit.title || ''}
+                                onChange={(e) => setEditingInit({ ...editingInit, title_mr: e.target.value, title: e.target.value })}
                                 placeholder="उदा. अन्नदान व अन्नधान्य वाटप मोहीम"
+                                required
                                 style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
                               />
                             </div>
 
                             {/* कमीत कमी खर्च (Target Amount in Marathi) */}
                             <div style={{ marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
-                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem', color: 'var(--text-main)' }}>
+                              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.35rem', color: 'var(--text-main)' }}>
                                 कमीत कमी खर्च (₹)
                               </label>
                               <input
@@ -1861,27 +1843,14 @@ export default function AdminModal({
                               />
                             </div>
 
-                            <div style={{ marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
-                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem', color: 'var(--text-main)' }}>
-                                Description (English)
-                              </label>
-                              <textarea
-                                rows={3}
-                                value={editingInit.description || ''}
-                                onChange={(e) => setEditingInit({ ...editingInit, description: e.target.value })}
-                                placeholder="Providing nutritious meals and monthly ration kits..."
-                                style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.88rem', resize: 'vertical' }}
-                              />
-                            </div>
-
                             <div style={{ width: '100%', boxSizing: 'border-box' }}>
-                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem', color: 'var(--text-main)' }}>
+                              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.35rem', color: 'var(--text-main)' }}>
                                 वर्णन (मराठी)
                               </label>
                               <textarea
-                                rows={3}
-                                value={editingInit.description_mr || ''}
-                                onChange={(e) => setEditingInit({ ...editingInit, description_mr: e.target.value })}
+                                rows={4}
+                                value={editingInit.description_mr || editingInit.description || ''}
+                                onChange={(e) => setEditingInit({ ...editingInit, description_mr: e.target.value, description: e.target.value })}
                                 placeholder="गरीब व गरजू कुटुंबांना दरमहा पोषण आहार व रेशन किट वाटप करणे..."
                                 style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.88rem', resize: 'vertical' }}
                               />
@@ -1929,26 +1898,24 @@ export default function AdminModal({
                               </div>
                             </div>
 
-                            {/* Hidden file input for device/phone gallery */}
+                            {/* File input for device/phone gallery */}
                             <input
+                              id="initiative-gallery-input"
                               type="file"
-                              ref={fileInputRef}
                               accept="image/*"
                               onChange={handleImageUpload}
-                              style={{ display: 'none' }}
+                              style={{ position: 'absolute', opacity: 0, width: '1px', height: '1px', pointerEvents: 'none' }}
                             />
 
-                            {/* Choose from Gallery Button */}
+                            {/* Choose from Gallery Button via native Label */}
                             <div style={{ marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
-                              <button
-                                type="button"
-                                disabled={initUploading}
-                                onClick={() => fileInputRef.current?.click()}
+                              <label
+                                htmlFor="initiative-gallery-input"
                                 style={{
                                   width: '100%',
                                   maxWidth: '100%',
                                   boxSizing: 'border-box',
-                                  padding: '0.75rem 1rem',
+                                  padding: '0.8rem 1rem',
                                   borderRadius: '8px',
                                   border: '1.5px solid var(--primary)',
                                   background: 'var(--primary-light)',
@@ -1959,13 +1926,14 @@ export default function AdminModal({
                                   alignItems: 'center',
                                   justifyContent: 'center',
                                   gap: '0.5rem',
-                                  cursor: initUploading ? 'not-allowed' : 'pointer',
-                                  boxShadow: '0 2px 6px rgba(37, 99, 235, 0.15)'
+                                  cursor: initUploading ? 'wait' : 'pointer',
+                                  boxShadow: '0 2px 6px rgba(37, 99, 235, 0.15)',
+                                  userSelect: 'none'
                                 }}
                               >
                                 <Camera size={18} />
                                 <span>{initUploading ? 'फोटो लोड होत आहे...' : 'Choose from Gallery'}</span>
-                              </button>
+                              </label>
                             </div>
 
                           </div>

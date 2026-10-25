@@ -64,13 +64,6 @@ function InitiativeModal({ item, idx, lang, t, onClose, onSelectCause }) {
               e.target.src = 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=900&q=80';
             }}
           />
-          {/* Category badge over image */}
-          <span className="initiative-modal-category-badge">
-            <Tag size={11} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-            {item.category || (lang === 'mr' ? 'समाजकार्य' : 'Social Service')}
-          </span>
-          {/* Progress % overlay */}
-          <span className="initiative-modal-pct-badge">{percentage}% {lang === 'mr' ? 'पूर्ण' : 'Funded'}</span>
         </div>
 
         {/* Content */}
@@ -94,33 +87,38 @@ function InitiativeModal({ item, idx, lang, t, onClose, onSelectCause }) {
             </p>
           )}
 
-          {/* Stats Row */}
-          <div className="initiative-modal-stats">
-            <div className="initiative-modal-stat-card">
-              <TrendingUp size={18} className="initiative-modal-stat-icon raised-icon" />
-              <div>
-                <div className="initiative-modal-stat-label">{t.initiatives.raised}</div>
-                <div className="initiative-modal-stat-value raised-value">₹{(item.raised_amount || 0).toLocaleString('en-IN')}</div>
+          {/* Minimum Expense (कमीत कमी खर्च) */}
+          <div style={{
+            background: 'var(--light-bg, #f8fafc)',
+            border: '1.5px solid var(--border-color, #e2e8f0)',
+            borderRadius: '12px',
+            padding: '0.75rem 1.15rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '1.25rem',
+            boxShadow: '0 2px 5px rgba(0,0,0,0.03)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <div style={{
+                width: '34px',
+                height: '34px',
+                borderRadius: '8px',
+                background: 'rgba(37, 99, 235, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--primary, #2563eb)'
+              }}>
+                <Target size={18} />
               </div>
+              <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-muted, #64748b)' }}>
+                {lang === 'mr' ? 'कमीत कमी खर्च' : 'Minimum Expense'}
+              </span>
             </div>
-            <div className="initiative-modal-stat-card">
-              <Target size={18} className="initiative-modal-stat-icon goal-icon" />
-              <div>
-                <div className="initiative-modal-stat-label">{t.initiatives.goal}</div>
-                <div className="initiative-modal-stat-value">₹{(item.target_amount || 0).toLocaleString('en-IN')}</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Progress Bar */}
-          <div className="initiative-modal-progress-wrap">
-            <div className="initiative-modal-progress-track">
-              <div
-                className="initiative-modal-progress-fill progress-bar-animated"
-                style={{ width: `${percentage}%` }}
-              />
-            </div>
-            <span className="initiative-modal-progress-label">{percentage}%</span>
+            <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main, #0f172a)' }}>
+              ₹{(item.target_amount || 0).toLocaleString('en-IN')}
+            </span>
           </div>
 
           {/* Donate Button */}
@@ -508,12 +506,11 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
           background: #ffffff;
           border-radius: 20px;
           width: 100%;
-          max-width: 600px;
-          max-height: 90vh;
-          overflow-y: auto;
+          max-width: 540px;
+          max-height: 94vh;
+          overflow: hidden;
           box-shadow: 0 32px 80px -8px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.1);
           animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-          scrollbar-width: thin;
         }
 
         @keyframes modalSlideUp {
@@ -551,7 +548,7 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
 
         .initiative-modal-img-wrap {
           position: relative;
-          height: 260px;
+          height: 200px;
           overflow: hidden;
           border-radius: 20px 20px 0 0;
         }
