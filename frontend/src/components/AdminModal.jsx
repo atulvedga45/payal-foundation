@@ -1774,46 +1774,45 @@ export default function AdminModal({
                       padding: '1.5rem',
                       boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)'
                     }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--border-color)' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                          <button
-                            type="button"
-                            onClick={() => setEditingInit(null)}
-                            style={{
-                              background: '#f1f5f9',
-                              border: 'none',
-                              borderRadius: 'var(--radius-full)',
-                              width: '32px',
-                              height: '32px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              cursor: 'pointer',
-                              color: 'var(--text-main)'
-                            }}
-                          >
-                            <ArrowLeft size={16} />
-                          </button>
-                          <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)' }}>
-                            {editingInit.id === 'new' ? 'नवीन उपक्रम जोडा (Add New Initiative)' : `उपक्रम संपादित करा: ${editingInit.title_mr || editingInit.title}`}
-                          </h4>
-                        </div>
+                      <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--border-color)', width: '100%', boxSizing: 'border-box' }}>
                         <button
                           type="button"
                           onClick={() => setEditingInit(null)}
-                          style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.85rem' }}
+                          style={{
+                            padding: '0.5rem 1.1rem',
+                            borderRadius: '8px',
+                            border: '1.5px solid var(--border-color)',
+                            background: '#f8fafc',
+                            color: 'var(--text-main)',
+                            fontSize: '0.88rem',
+                            fontWeight: 700,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.45rem',
+                            cursor: 'pointer',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.06)'
+                          }}
                         >
-                          रद्द करा (Cancel)
+                          <ArrowLeft size={16} />
+                          <span>Go Back</span>
                         </button>
                       </div>
 
-                      <form onSubmit={handleSaveInitiative}>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                      <form onSubmit={handleSaveInitiative} style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
+                        <div style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+                          gap: '1.25rem',
+                          marginBottom: '1.5rem',
+                          width: '100%',
+                          maxWidth: '100%',
+                          boxSizing: 'border-box'
+                        }}>
                           
                           {/* Left Column: Text & Details */}
-                          <div>
-                            <div style={{ marginBottom: '1rem' }}>
-                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
+                          <div style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
+                            <div style={{ marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
+                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem', color: 'var(--text-main)' }}>
                                 Initiative Title (English) *
                               </label>
                               <input
@@ -1822,12 +1821,12 @@ export default function AdminModal({
                                 onChange={(e) => setEditingInit({ ...editingInit, title: e.target.value })}
                                 placeholder="e.g. Community Food & Ration Distribution"
                                 required
-                                style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
+                                style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
                               />
                             </div>
 
-                            <div style={{ marginBottom: '1rem' }}>
-                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
+                            <div style={{ marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
+                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem', color: 'var(--text-main)' }}>
                                 उपक्रमाचे नाव (मराठी)
                               </label>
                               <input
@@ -1835,52 +1834,26 @@ export default function AdminModal({
                                 value={editingInit.title_mr || ''}
                                 onChange={(e) => setEditingInit({ ...editingInit, title_mr: e.target.value })}
                                 placeholder="उदा. अन्नदान व अन्नधान्य वाटप मोहीम"
-                                style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
+                                style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
                               />
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                              <div>
-                                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
-                                  Category (श्रेणी)
-                                </label>
-                                <input
-                                  type="text"
-                                  value={editingInit.category || ''}
-                                  onChange={(e) => setEditingInit({ ...editingInit, category: e.target.value })}
-                                  placeholder="e.g. Hunger Relief, Healthcare"
-                                  style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
-                                />
-                              </div>
-                              <div>
-                                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
-                                  Target Amount (₹ लक्ष)
-                                </label>
-                                <input
-                                  type="number"
-                                  value={editingInit.target_amount || ''}
-                                  onChange={(e) => setEditingInit({ ...editingInit, target_amount: e.target.value })}
-                                  placeholder="200000"
-                                  style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
-                                />
-                              </div>
-                            </div>
-
-                            <div style={{ marginBottom: '1rem' }}>
-                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
-                                Raised Amount (₹ जमा झालेला निधी)
+                            {/* कमीत कमी खर्च (Target Amount in Marathi) */}
+                            <div style={{ marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
+                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem', color: 'var(--text-main)' }}>
+                                कमीत कमी खर्च (₹)
                               </label>
                               <input
                                 type="number"
-                                value={editingInit.raised_amount || ''}
-                                onChange={(e) => setEditingInit({ ...editingInit, raised_amount: e.target.value })}
-                                placeholder="140000"
-                                style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
+                                value={editingInit.target_amount || ''}
+                                onChange={(e) => setEditingInit({ ...editingInit, target_amount: e.target.value })}
+                                placeholder="उदा. 150000"
+                                style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
                               />
                             </div>
 
-                            <div style={{ marginBottom: '1rem' }}>
-                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
+                            <div style={{ marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
+                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem', color: 'var(--text-main)' }}>
                                 Description (English)
                               </label>
                               <textarea
@@ -1888,12 +1861,12 @@ export default function AdminModal({
                                 value={editingInit.description || ''}
                                 onChange={(e) => setEditingInit({ ...editingInit, description: e.target.value })}
                                 placeholder="Providing nutritious meals and monthly ration kits..."
-                                style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.88rem', resize: 'vertical' }}
+                                style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.88rem', resize: 'vertical' }}
                               />
                             </div>
 
-                            <div>
-                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
+                            <div style={{ width: '100%', boxSizing: 'border-box' }}>
+                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem', color: 'var(--text-main)' }}>
                                 वर्णन (मराठी)
                               </label>
                               <textarea
@@ -1901,13 +1874,13 @@ export default function AdminModal({
                                 value={editingInit.description_mr || ''}
                                 onChange={(e) => setEditingInit({ ...editingInit, description_mr: e.target.value })}
                                 placeholder="गरीब व गरजू कुटुंबांना दरमहा पोषण आहार व रेशन किट वाटप करणे..."
-                                style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.88rem', resize: 'vertical' }}
+                                style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.88rem', resize: 'vertical' }}
                               />
                             </div>
                           </div>
 
                           {/* Right Column: Image Selection & Upload */}
-                          <div>
+                          <div style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
                             <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--text-main)' }}>
                               🖼️ उपक्रमाचा फोटो (Initiative Image)
                             </label>
@@ -1915,6 +1888,8 @@ export default function AdminModal({
                             {/* Live Image Preview Card */}
                             <div style={{
                               width: '100%',
+                              maxWidth: '100%',
+                              boxSizing: 'border-box',
                               height: '200px',
                               borderRadius: '10px',
                               overflow: 'hidden',
@@ -1945,7 +1920,7 @@ export default function AdminModal({
                               </div>
                             </div>
 
-                            {/* Hidden file input */}
+                            {/* Hidden file input for device/phone gallery */}
                             <input
                               type="file"
                               ref={fileInputRef}
@@ -1954,114 +1929,62 @@ export default function AdminModal({
                               style={{ display: 'none' }}
                             />
 
-                            {/* Upload Button */}
-                            <div style={{ marginBottom: '1.25rem' }}>
+                            {/* Choose from Gallery Button */}
+                            <div style={{ marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
                               <button
                                 type="button"
                                 disabled={initUploading}
                                 onClick={() => fileInputRef.current?.click()}
                                 style={{
                                   width: '100%',
-                                  padding: '0.65rem 1rem',
-                                  borderRadius: '6px',
+                                  maxWidth: '100%',
+                                  boxSizing: 'border-box',
+                                  padding: '0.75rem 1rem',
+                                  borderRadius: '8px',
                                   border: '1.5px solid var(--primary)',
                                   background: 'var(--primary-light)',
                                   color: 'var(--primary)',
                                   fontWeight: 700,
-                                  fontSize: '0.88rem',
+                                  fontSize: '0.92rem',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
                                   gap: '0.5rem',
-                                  cursor: initUploading ? 'not-allowed' : 'pointer'
+                                  cursor: initUploading ? 'not-allowed' : 'pointer',
+                                  boxShadow: '0 2px 6px rgba(37, 99, 235, 0.15)'
                                 }}
                               >
-                                <Upload size={16} />
-                                <span>{initUploading ? 'फोटो अपलोड होत आहे...' : '📁 डिव्हाइसवरून नवीन फोटो निवडा (Upload Image)'}</span>
+                                <Camera size={18} />
+                                <span>{initUploading ? 'फोटो लोड होत आहे...' : 'Choose from Gallery'}</span>
                               </button>
-                            </div>
-
-                            {/* Preset Images Gallery */}
-                            <div style={{ marginBottom: '1.25rem' }}>
-                              <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
-                                किंवा खालील उपलब्ध फोटोंमधून निवडा (Choose Preset):
-                              </div>
-                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
-                                {PRESET_IMAGES.map((p, idx) => {
-                                  const isSelected = editingInit.image_url === p.path;
-                                  return (
-                                    <div
-                                      key={idx}
-                                      onClick={() => setEditingInit({ ...editingInit, image_url: p.path })}
-                                      title={p.label}
-                                      style={{
-                                        cursor: 'pointer',
-                                        borderRadius: '6px',
-                                        overflow: 'hidden',
-                                        height: '56px',
-                                        border: isSelected ? '2.5px solid var(--primary)' : '1px solid var(--border-color)',
-                                        opacity: isSelected ? 1 : 0.75,
-                                        transform: isSelected ? 'scale(1.04)' : 'none',
-                                        transition: 'all 0.15s ease',
-                                        boxShadow: isSelected ? '0 0 0 2px var(--primary-light)' : 'none'
-                                      }}
-                                    >
-                                      <img src={p.path} alt={p.label} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-
-                            {/* Direct URL input */}
-                            <div>
-                              <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
-                                Image Path / URL:
-                              </div>
-                              <input
-                                type="text"
-                                value={editingInit.image_url || ''}
-                                onChange={(e) => setEditingInit({ ...editingInit, image_url: e.target.value })}
-                                placeholder="/food_distribution.jpg"
-                                style={{ width: '100%', padding: '0.55rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.85rem', fontFamily: 'monospace' }}
-                              />
                             </div>
 
                           </div>
                         </div>
 
-                        {/* Save / Cancel buttons */}
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.85rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)' }}>
-                          <button
-                            type="button"
-                            onClick={() => setEditingInit(null)}
-                            style={{
-                              padding: '0.65rem 1.25rem',
-                              borderRadius: '6px',
-                              border: '1px solid var(--border-color)',
-                              background: '#f8fafc',
-                              color: 'var(--text-main)',
-                              fontWeight: 600,
-                              cursor: 'pointer'
-                            }}
-                          >
-                            रद्द करा (Cancel)
-                          </button>
+                        {/* Save Button (Centered, single Save & Update) */}
+                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', paddingTop: '1.25rem', borderTop: '1px solid var(--border-color)', width: '100%', boxSizing: 'border-box' }}>
                           <button
                             type="submit"
                             disabled={initSaving}
                             className="btn btn-primary"
                             style={{
-                              padding: '0.65rem 1.5rem',
+                              padding: '0.75rem 2.25rem',
                               fontWeight: 700,
+                              fontSize: '0.95rem',
                               display: 'flex',
                               alignItems: 'center',
-                              gap: '0.45rem',
-                              cursor: initSaving ? 'not-allowed' : 'pointer'
+                              justifyContent: 'center',
+                              gap: '0.5rem',
+                              cursor: initSaving ? 'not-allowed' : 'pointer',
+                              boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
+                              width: '100%',
+                              maxWidth: '320px',
+                              boxSizing: 'border-box'
                             }}
                           >
                             <Save size={16} />
-                            <span>{initSaving ? 'सेव्ह होत आहे...' : 'उपक्रम सेव्ह करा (Save Changes)'}</span>
+                            <span>{initSaving ? 'सेव्ह होत आहे...' : 'Save & Update'}</span>
                           </button>
                         </div>
                       </form>
@@ -2288,12 +2211,20 @@ export default function AdminModal({
                         </button>
                       </div>
 
-                      <form onSubmit={handleSaveTrustee}>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                      <form onSubmit={handleSaveTrustee} style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
+                        <div style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+                          gap: '1.25rem',
+                          marginBottom: '1.5rem',
+                          width: '100%',
+                          maxWidth: '100%',
+                          boxSizing: 'border-box'
+                        }}>
                           
                           {/* Left Column: Trustee Details */}
-                          <div>
-                            <div style={{ marginBottom: '1rem' }}>
+                          <div style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
+                            <div style={{ marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
                               <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
                                 विश्वस्ताचे नाव (Full Name) *
                               </label>
@@ -2303,11 +2234,11 @@ export default function AdminModal({
                                 onChange={(e) => setEditingTrustee({ ...editingTrustee, name: e.target.value })}
                                 placeholder="उदा. Sonya Oghe किंवा Zakir Hussain"
                                 required
-                                style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
+                                style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
                               />
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '0.75rem', marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
                               <div>
                                 <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
                                   Role / Designation (English) *
@@ -2318,7 +2249,7 @@ export default function AdminModal({
                                   onChange={(e) => setEditingTrustee({ ...editingTrustee, role: e.target.value })}
                                   placeholder="President / Secretary / Trustee"
                                   required
-                                  style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
+                                  style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
                                 />
                               </div>
                               <div>
@@ -2330,12 +2261,12 @@ export default function AdminModal({
                                   value={editingTrustee.role_mr || ''}
                                   onChange={(e) => setEditingTrustee({ ...editingTrustee, role_mr: e.target.value })}
                                   placeholder="अध्यक्ष / सचिव / विश्वस्त सदस्य"
-                                  style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
+                                  style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
                                 />
                               </div>
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '0.75rem', marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
                               <div>
                                 <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
                                   मोबाईल नंबर (Mobile Number) *
@@ -2346,7 +2277,7 @@ export default function AdminModal({
                                   onChange={(e) => setEditingTrustee({ ...editingTrustee, phone: e.target.value })}
                                   placeholder="1234567890"
                                   required
-                                  style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
+                                  style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
                                 />
                               </div>
                               <div>
@@ -2357,7 +2288,7 @@ export default function AdminModal({
                                   type="number"
                                   value={editingTrustee.order || 0}
                                   onChange={(e) => setEditingTrustee({ ...editingTrustee, order: Number(e.target.value) })}
-                                  style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
+                                  style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
                                 />
                               </div>
                             </div>
