@@ -125,10 +125,22 @@ export default function AdminModal({
   const [token, setToken] = useState(localStorage.getItem('admin_token') || '');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
-  const [activeTab, setActiveTab] = useState('initiatives');
+  const [activeTab, setActiveTab] = useState('welcome');
+  const [welcomePhase, setWelcomePhase] = useState('intro'); // 'intro' (3s animation) -> 'profile'
   const [loading, setLoading] = useState(false);
   const [isEditDropdownOpen, setIsEditDropdownOpen] = useState(false);
   const editDropdownRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen && token) {
+      setActiveTab('welcome');
+      setWelcomePhase('intro');
+      const timer = setTimeout(() => {
+        setWelcomePhase('profile');
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, token]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -146,7 +158,8 @@ export default function AdminModal({
     if (activeTab === 'homestats') return 'Home Stats (आकडेवारी)';
     if (activeTab === 'initiatives') return `Initiatives (उपक्रम - ${localInitiatives.length})`;
     if (activeTab === 'trustees') return `Trustees (विश्वस्त मंडळ - ${localTrustees.length})`;
-    return 'Initiatives (उपक्रम)';
+    if (activeTab === 'welcome') return 'Admin Profile';
+    return 'Edit';
   };
 
   const [stats, setStats] = useState({
@@ -689,6 +702,11 @@ export default function AdminModal({
         const adminToken = res.token || 'admin123';
         setToken(adminToken);
         localStorage.setItem('admin_token', adminToken);
+        setActiveTab('welcome');
+        setWelcomePhase('intro');
+        setTimeout(() => {
+          setWelcomePhase('profile');
+        }, 3000);
         loadAllAdminData();
       }
     } catch (err) {
@@ -963,6 +981,40 @@ export default function AdminModal({
                       बदल करण्यासाठी निवडा (Select Option)
                     </div>
 
+                    {/* 0. Owner / Admin Profile */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTab('welcome');
+                        setWelcomePhase('profile');
+                        setIsEditDropdownOpen(false);
+                      }}
+                      style={{
+                        padding: '0.65rem 0.85rem',
+                        borderRadius: '10px',
+                        border: 'none',
+                        background: activeTab === 'welcome' ? 'rgba(37, 99, 235, 0.12)' : 'transparent',
+                        color: activeTab === 'welcome' ? 'var(--primary)' : '#1e293b',
+                        fontWeight: activeTab === 'welcome' ? 700 : 500,
+                        fontSize: '0.88rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.65rem',
+                        textAlign: 'left',
+                        transition: 'all 0.15s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (activeTab !== 'welcome') e.currentTarget.style.background = '#f1f5f9';
+                      }}
+                      onMouseLeave={(e) => {
+                        if (activeTab !== 'welcome') e.currentTarget.style.background = 'transparent';
+                      }}
+                    >
+                      <UserCheck size={16} style={{ color: activeTab === 'welcome' ? 'var(--primary)' : '#64748b', flexShrink: 0 }} />
+                      <span>Admin Profile (Pravesh Oghe)</span>
+                    </button>
+
                     {/* 1. Home Stats */}
                     <button
                       type="button"
@@ -1067,69 +1119,255 @@ export default function AdminModal({
                 )}
               </div>
 
-              {/* Right Side: Refresh & Logout (in the exact same row/line) */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
-                <button
-                  type="button"
-                  onClick={loadAllAdminData}
-                  style={{
-                    background: '#ffffff',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: 'var(--radius-full)',
-                    padding: '0.45rem 0.8rem',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.3rem',
-                    fontSize: '0.8rem',
-                    fontWeight: 600,
-                    color: 'var(--text-main)',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-                    transition: 'all 0.2s ease',
-                    whiteSpace: 'nowrap'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = '#f8fafc'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = '#ffffff'}
-                >
-                  <RefreshCw size={13} className={loading ? 'spin' : ''} />
-                  <span>Refresh</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  style={{
-                    background: 'rgba(239, 68, 68, 0.08)',
-                    border: '1px solid rgba(239, 68, 68, 0.25)',
-                    borderRadius: 'var(--radius-full)',
-                    padding: '0.45rem 0.8rem',
-                    color: '#ef4444',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.3rem',
-                    fontSize: '0.8rem',
-                    fontWeight: 700,
-                    transition: 'all 0.2s ease',
-                    whiteSpace: 'nowrap'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#ef4444';
-                    e.currentTarget.style.color = '#ffffff';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'rgba(239, 68, 68, 0.08)';
-                    e.currentTarget.style.color = '#ef4444';
-                  }}
-                >
-                  <LogOut size={13} />
-                  <span>Logout</span>
-                </button>
-              </div>
+              {/* Right Side: Logout Only (Refresh removed) */}
+              <button
+                type="button"
+                onClick={handleLogout}
+                style={{
+                  background: 'rgba(239, 68, 68, 0.08)',
+                  border: '1px solid rgba(239, 68, 68, 0.25)',
+                  borderRadius: 'var(--radius-full)',
+                  padding: '0.45rem 0.85rem',
+                  color: '#ef4444',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  transition: 'all 0.2s ease',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#ef4444';
+                  e.currentTarget.style.color = '#ffffff';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(239, 68, 68, 0.08)';
+                  e.currentTarget.style.color = '#ef4444';
+                }}
+              >
+                <LogOut size={13} />
+                <span>Logout</span>
+              </button>
             </div>
 
             {/* Tab Contents with Scrollable Tables */}
             <div style={{ padding: '1.5rem 1.75rem', overflowY: 'auto', flexGrow: 1 }}>
+              {/* Animation Styles */}
+              <style>{`
+                @keyframes adminPulseGlow {
+                  0%, 100% {
+                    transform: scale(1);
+                    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
+                  }
+                  50% {
+                    transform: scale(1.06);
+                    box-shadow: 0 16px 36px rgba(16, 185, 129, 0.45);
+                  }
+                }
+                @keyframes adminSlideUpText {
+                  0% {
+                    opacity: 0;
+                    transform: translateY(18px) scale(0.96);
+                  }
+                  100% {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                  }
+                }
+                @keyframes adminProgressFill {
+                  0% {
+                    width: 0%;
+                  }
+                  100% {
+                    width: 100%;
+                  }
+                }
+                @keyframes adminFadeInUp {
+                  0% {
+                    opacity: 0;
+                    transform: translateY(20px);
+                  }
+                  100% {
+                    opacity: 1;
+                    transform: translateY(0);
+                  }
+                }
+              `}</style>
+
+              {/* Welcome Screen & Owner Profile Card */}
+              {activeTab === 'welcome' && (
+                <div style={{
+                  padding: '1rem',
+                  minHeight: '380px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  {welcomePhase === 'intro' ? (
+                    <div style={{
+                      textAlign: 'center',
+                      padding: '2.5rem 1.5rem',
+                      animation: 'adminSlideUpText 0.6s cubic-bezier(0.16, 1, 0.3, 1)'
+                    }}>
+                      {/* Pulsing Animated Shield */}
+                      <div style={{
+                        width: '78px',
+                        height: '78px',
+                        borderRadius: '24px',
+                        background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '0 auto 1.5rem auto',
+                        animation: 'adminPulseGlow 2s infinite ease-in-out'
+                      }}>
+                        <ShieldCheck size={42} color="#ffffff" />
+                      </div>
+
+                      {/* Welcome Admin Animated Heading */}
+                      <h2 style={{
+                        fontSize: '2.1rem',
+                        fontWeight: 800,
+                        letterSpacing: '-0.02em',
+                        background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #059669 100%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        margin: '0 0 0.5rem 0'
+                      }}>
+                        Welcome Admin
+                      </h2>
+
+                      <p style={{
+                        fontSize: '0.95rem',
+                        color: '#64748b',
+                        margin: '0 auto 1.75rem auto',
+                        fontWeight: 600,
+                        maxWidth: '300px'
+                      }}>
+                        Payal Foundation व्यवस्थापन पॅनेल
+                      </p>
+
+                      {/* 3-Second Loading Bar */}
+                      <div style={{
+                        width: '180px',
+                        height: '5px',
+                        backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                        borderRadius: '9999px',
+                        overflow: 'hidden',
+                        margin: '0 auto'
+                      }}>
+                        <div style={{
+                          height: '100%',
+                          background: 'linear-gradient(90deg, #2563eb, #10b981)',
+                          borderRadius: '9999px',
+                          animation: 'adminProgressFill 3s linear forwards'
+                        }} />
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{
+                      textAlign: 'center',
+                      padding: '2rem 1.5rem',
+                      maxWidth: '420px',
+                      width: '100%',
+                      animation: 'adminFadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1)'
+                    }}>
+                      {/* Owner Photo in Square Box */}
+                      <div style={{
+                        width: '140px',
+                        height: '140px',
+                        borderRadius: '22px',
+                        overflow: 'hidden',
+                        margin: '0 auto 1.25rem auto',
+                        border: '4px solid #ffffff',
+                        boxShadow: '0 12px 30px rgba(0, 0, 0, 0.16), 0 0 0 1.5px rgba(37, 99, 235, 0.25)',
+                        backgroundColor: '#f1f5f9',
+                        position: 'relative'
+                      }}>
+                        <img
+                          src="/sonya.jpg"
+                          alt="Pravesh Oghe"
+                          onError={(e) => { e.target.src = '/young_samaj_seva_trust_logo.jpeg'; }}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            display: 'block'
+                          }}
+                        />
+                      </div>
+
+                      {/* Owner Name: Pravesh Oghe */}
+                      <h3 style={{
+                        fontSize: '1.5rem',
+                        fontWeight: 800,
+                        color: 'var(--text-main)',
+                        margin: '0 0 0.25rem 0',
+                        letterSpacing: '-0.01em'
+                      }}>
+                        Pravesh Oghe
+                      </h3>
+
+                      <div style={{
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        color: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                        padding: '0.22rem 0.8rem',
+                        borderRadius: '9999px',
+                        marginBottom: '1rem',
+                        display: 'inline-block'
+                      }}>
+                        संस्थापक / Trustee
+                      </div>
+
+                      {/* Instruction text in small letters */}
+                      <p style={{
+                        fontSize: '0.86rem',
+                        color: '#64748b',
+                        lineHeight: 1.5,
+                        margin: '0 0 1.5rem 0'
+                      }}>
+                        Edit किंवा बदल करण्यासाठी वर दिलेल्या <strong style={{ color: 'var(--primary)' }}>Edit</strong> बटणावर क्लिक करा.
+                      </p>
+
+                      <button
+                        type="button"
+                        onClick={() => setIsEditDropdownOpen(true)}
+                        style={{
+                          padding: '0.6rem 1.4rem',
+                          borderRadius: '9999px',
+                          border: 'none',
+                          background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                          color: '#ffffff',
+                          fontWeight: 700,
+                          fontSize: '0.88rem',
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.45rem',
+                          boxShadow: '0 4px 14px rgba(37, 99, 235, 0.35)',
+                          transition: 'all 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-1px)';
+                          e.currentTarget.style.boxShadow = '0 6px 18px rgba(37, 99, 235, 0.45)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'none';
+                          e.currentTarget.style.boxShadow = '0 4px 14px rgba(37, 99, 235, 0.35)';
+                        }}
+                      >
+                        <Edit3 size={15} />
+                        <span>Edit करा (Open Menu)</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
               {activeTab === 'homestats' && (
                 <div>
                   {statsSuccess && (
