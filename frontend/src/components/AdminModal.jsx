@@ -29,7 +29,8 @@ import {
   deleteGalleryItem,
   updateTrustInfo,
   getImageUrl,
-  compressImage
+  compressImage,
+  fileToDataUrl
 } from '../api';
 
 const PRESET_IMAGES = [
@@ -400,38 +401,42 @@ export default function AdminModal({
     setInitMsg({ type: '', text: '' });
   };
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    pendingInitiativeFileRef.current = file;
     setInitUploading(true);
-    setInitMsg({ type: '', text: '' });
+    setInitMsg({ type: '', text: 'फोटो लोड होत आहे...' });
 
-    // Read as Data URL immediately so the live preview box updates on screen instantaneously (<100ms)
-    const reader = new FileReader();
-    reader.onload = async (readEvt) => {
-      const dataUrl = readEvt.target?.result;
+    try {
+      // 1. Immediately compress the file (max 1200x1200, 0.8 quality) to web size (~100KB)
+      const compressedFile = await compressImage(file, 1200, 1200, 0.8);
+      const dataUrl = await fileToDataUrl(compressedFile);
+
+      // 2. Set the dataUrl into editingInit immediately so user sees the preview change instantly!
       if (dataUrl) {
         setEditingInit((prev) => ({ ...prev, image_url: dataUrl }));
+        pendingInitiativeFileRef.current = compressedFile;
       }
 
+      // 3. Upload to backend in background
       try {
-        // Compress large camera photos and upload to server
-        const compressedFile = await compressImage(file, 1200, 1200, 0.82);
-        const url = await uploadInitiativeImage(token, compressedFile);
-        if (url && !url.startsWith('data:')) {
-          setEditingInit((prev) => ({ ...prev, image_url: url }));
+        const serverUrl = await uploadInitiativeImage(token, compressedFile);
+        if (serverUrl && !serverUrl.startsWith('data:')) {
+          setEditingInit((prev) => ({ ...prev, image_url: serverUrl }));
           pendingInitiativeFileRef.current = null;
-          setInitMsg({ type: 'success', text: 'फोटो यशस्वीरीत्या निवडला व सेव्हसाठी तयार झाला!' });
         }
-      } catch (err) {
-        console.warn("Upload fallback to dataUrl:", err);
-      } finally {
-        setInitUploading(false);
+      } catch (uploadErr) {
+        console.warn("Background upload failed, will save as dataUrl:", uploadErr);
       }
-    };
-    reader.readAsDataURL(file);
+
+      setInitMsg({ type: 'success', text: 'नवीन फोटो यशस्वीरीत्या निवडला! सेव्ह करण्यासाठी खालील बटण दाबा.' });
+    } catch (err) {
+      console.error("Image processing error:", err);
+      setInitMsg({ type: 'error', text: 'फोटो निवडताना त्रुटी आली. कृपया पुन्हा प्रयत्न करा.' });
+    } finally {
+      setInitUploading(false);
+    }
   };
 
   const handleSaveInitiative = async (e) => {
@@ -1880,8 +1885,8 @@ export default function AdminModal({
                               <img
                                 src={getImageUrl(editingInit.image_url)}
                                 alt="Preview"
+                                key={editingInit.image_url}
                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                onError={(e) => { e.target.src = '/food_distribution.jpg'; }}
                               />
                             ) : (
                               <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '1rem' }}>

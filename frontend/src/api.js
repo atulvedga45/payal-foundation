@@ -82,6 +82,16 @@ export async function compressImage(file, maxWidth = 1200, maxHeight = 1200, qua
   });
 }
 
+export function fileToDataUrl(file) {
+  return new Promise((resolve) => {
+    if (!file) return resolve("");
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => resolve("");
+    reader.readAsDataURL(file);
+  });
+}
+
 
 export async function fetchTrustInfo() {
   try {
