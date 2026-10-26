@@ -178,8 +178,8 @@ export default function AdminModal({
   const [editingInit, setEditingInit] = useState(null);
   const [initSaving, setInitSaving] = useState(false);
   const [initUploading, setInitUploading] = useState(false);
-  const [initMsg, setInitMsg] = useState({ type: '', text: '' });
   const fileInputRef = useRef(null);
+  const pendingInitiativeFileRef = useRef(null);
 
   useEffect(() => {
     if (initiatives && initiatives.length > 0) {
@@ -377,11 +377,13 @@ export default function AdminModal({
 
   // Initiative Management Handlers
   const handleEditInitiative = (item) => {
+    pendingInitiativeFileRef.current = null;
     setEditingInit({ ...item });
     setInitMsg({ type: '', text: '' });
   };
 
   const handleAddNewInitiative = () => {
+    pendingInitiativeFileRef.current = null;
     setEditingInit({
       id: 'new',
       title: '',
@@ -401,10 +403,11 @@ export default function AdminModal({
     const file = e.target.files?.[0];
     if (!file) return;
 
+    pendingInitiativeFileRef.current = file;
     setInitUploading(true);
     setInitMsg({ type: '', text: '' });
 
-    // Read as Data URL immediately so the live preview box updates on screen instantaneously
+    // Read as Data URL immediately so the live preview box updates on screen instantaneously (<100ms)
     const reader = new FileReader();
     reader.onload = async (readEvt) => {
       const dataUrl = readEvt.target?.result;
@@ -416,13 +419,13 @@ export default function AdminModal({
         // Compress large camera photos and upload to server
         const compressedFile = await compressImage(file, 1200, 1200, 0.82);
         const url = await uploadInitiativeImage(token, compressedFile);
-        if (url) {
+        if (url && !url.startsWith('data:')) {
           setEditingInit((prev) => ({ ...prev, image_url: url }));
+          pendingInitiativeFileRef.current = null;
           setInitMsg({ type: 'success', text: 'फोटो यशस्वीरीत्या निवडला व सेव्हसाठी तयार झाला!' });
         }
       } catch (err) {
         console.warn("Upload fallback to dataUrl:", err);
-        setInitMsg({ type: 'success', text: 'फोटो निवडला गेला!' });
       } finally {
         setInitUploading(false);
       }
@@ -440,8 +443,23 @@ export default function AdminModal({
     setInitSaving(true);
     setInitMsg({ type: '', text: '' });
     try {
-      // If image is a temporary blob URL, convert to permanent data URL
       let finalImageUrl = editingInit.image_url;
+
+      // If a new photo was selected and not yet uploaded, upload now before saving
+      if (pendingInitiativeFileRef.current) {
+        try {
+          const compressedFile = await compressImage(pendingInitiativeFileRef.current, 1200, 1200, 0.82);
+          const url = await uploadInitiativeImage(token, compressedFile);
+          if (url && !url.startsWith('data:')) {
+            finalImageUrl = url;
+            pendingInitiativeFileRef.current = null;
+          }
+        } catch (uploadErr) {
+          console.warn("Could not upload directly, passing image data to server:", uploadErr);
+        }
+      }
+
+      // If image is a temporary blob URL, convert to permanent data URL
       if (finalImageUrl && finalImageUrl.startsWith('blob:')) {
         try {
           const blobRes = await fetch(finalImageUrl);

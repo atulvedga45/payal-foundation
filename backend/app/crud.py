@@ -1,5 +1,35 @@
+import base64
+import os
+import time
+import uuid
 from sqlalchemy.orm import Session
 from . import models, schemas
+
+_render_uploads = os.getenv("UPLOADS_PATH", "")
+if _render_uploads:
+    UPLOADS_DIR = _render_uploads
+else:
+    UPLOADS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "public", "uploads"))
+os.makedirs(UPLOADS_DIR, exist_ok=True)
+
+def save_base64_image(image_data: str) -> str:
+    if not image_data or not isinstance(image_data, str) or not image_data.startswith("data:image/"):
+        return image_data
+    try:
+        header, encoded = image_data.split(",", 1)
+        ext = "jpg"
+        if "png" in header:
+            ext = "png"
+        elif "webp" in header:
+            ext = "webp"
+        clean_name = f"{int(time.time())}_{uuid.uuid4().hex[:8]}.{ext}"
+        file_path = os.path.join(UPLOADS_DIR, clean_name)
+        with open(file_path, "wb") as fh:
+            fh.write(base64.b64decode(encoded))
+        return f"/uploads/{clean_name}"
+    except Exception as e:
+        print("Failed to save base64 image to file:", e)
+        return image_data
 
 def get_trust_info(db: Session):
     return db.query(models.TrustInfo).first()
@@ -20,14 +50,16 @@ def get_trustees(db: Session):
     return db.query(models.Trustee).order_by(models.Trustee.order.asc(), models.Trustee.id.asc()).all()
 
 def create_trustee(db: Session, trustee: schemas.TrusteeCreate):
+    photo = save_base64_image(trustee.photo_url) if trustee.photo_url else None
+    qr = save_base64_image(trustee.upi_qr_url) if trustee.upi_qr_url else None
     db_obj = models.Trustee(
         name=trustee.name,
         role=trustee.role,
         role_mr=trustee.role_mr,
-        photo_url=trustee.photo_url,
+        photo_url=photo,
         phone=trustee.phone or "1234567890",
         upi_id=trustee.upi_id or "payalfoundation@ybl",
-        upi_qr_url=trustee.upi_qr_url,
+        upi_qr_url=qr,
         order=trustee.order or 0
     )
     db.add(db_obj)
@@ -40,6 +72,10 @@ def update_trustee(db: Session, trustee_id: int, trustee_data: schemas.TrusteeUp
     if not db_obj:
         return None
     data = trustee_data.model_dump(exclude_unset=True) if hasattr(trustee_data, "model_dump") else trustee_data.dict(exclude_unset=True)
+    if "photo_url" in data and data["photo_url"]:
+        data["photo_url"] = save_base64_image(data["photo_url"])
+    if "upi_qr_url" in data and data["upi_qr_url"]:
+        data["upi_qr_url"] = save_base64_image(data["upi_qr_url"])
     for field, val in data.items():
         if val is not None:
             setattr(db_obj, field, val)
@@ -59,6 +95,7 @@ def get_initiatives(db: Session):
     return db.query(models.Initiative).order_by(models.Initiative.id.asc()).all()
 
 def create_initiative(db: Session, init: schemas.InitiativeCreate):
+    img = save_base64_image(init.image_url) if init.image_url else None
     db_obj = models.Initiative(
         title=init.title,
         title_mr=init.title_mr,
@@ -66,7 +103,7 @@ def create_initiative(db: Session, init: schemas.InitiativeCreate):
         description_mr=init.description_mr,
         category=init.category,
         icon=init.icon or "Heart",
-        image_url=init.image_url,
+        image_url=img,
         target_amount=init.target_amount,
         raised_amount=init.raised_amount
     )
@@ -80,6 +117,8 @@ def update_initiative(db: Session, initiative_id: int, init_data: schemas.Initia
     if not db_obj:
         return None
     data = init_data.model_dump(exclude_unset=True) if hasattr(init_data, "model_dump") else init_data.dict(exclude_unset=True)
+    if "image_url" in data and data["image_url"]:
+        data["image_url"] = save_base64_image(data["image_url"])
     for field, val in data.items():
         if val is not None:
             setattr(db_obj, field, val)

@@ -37,6 +37,22 @@ async def lifespan(app: FastAPI):
                 conn.execute(text("ALTER TABLE contact_messages ADD COLUMN address VARCHAR(255)"))
             except Exception:
                 pass
+            try:
+                conn.execute(text("ALTER TABLE initiatives ALTER COLUMN image_url TYPE TEXT"))
+            except Exception:
+                pass
+            try:
+                conn.execute(text("ALTER TABLE trustees ALTER COLUMN photo_url TYPE TEXT"))
+            except Exception:
+                pass
+            try:
+                conn.execute(text("ALTER TABLE trustees ALTER COLUMN upi_qr_url TYPE TEXT"))
+            except Exception:
+                pass
+            try:
+                conn.execute(text("ALTER TABLE gallery_items ALTER COLUMN image_url TYPE TEXT"))
+            except Exception:
+                pass
     except Exception:
         pass
     # Seed default data

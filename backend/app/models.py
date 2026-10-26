@@ -29,10 +29,10 @@ class Trustee(Base):
     name = Column(String(255), nullable=False)
     role = Column(String(100), nullable=False)
     role_mr = Column(String(100), nullable=True)
-    photo_url = Column(String(500), nullable=True)
+    photo_url = Column(Text, nullable=True)
     phone = Column(String(50), default="1234567890", nullable=True)
     upi_id = Column(String(100), default="payalfoundation@ybl", nullable=True)
-    upi_qr_url = Column(String(500), nullable=True)
+    upi_qr_url = Column(Text, nullable=True)
     order = Column(Integer, default=0)
 
 class Initiative(Base):
@@ -45,7 +45,7 @@ class Initiative(Base):
     description_mr = Column(Text, nullable=True)
     category = Column(String(100), default="Social Welfare")
     icon = Column(String(50), default="Heart")
-    image_url = Column(String(500), nullable=True)
+    image_url = Column(Text, nullable=True)
     target_amount = Column(Float, default=0.0)
     raised_amount = Column(Float, default=0.0)
 
@@ -114,7 +114,7 @@ class GalleryItem(Base):
     __tablename__ = "gallery_items"
 
     id = Column(Integer, primary_key=True, index=True)
-    image_url = Column(String(500), nullable=False)
+    image_url = Column(Text, nullable=False)
     title = Column(String(255), nullable=False)
     title_mr = Column(String(255), nullable=True)
     category = Column(String(100), default="Social Service")
