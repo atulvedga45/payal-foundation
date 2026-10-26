@@ -323,39 +323,35 @@ export async function uploadInitiativeImage(token, file) {
 }
 
 export async function updateInitiative(token, id, data) {
-  try {
-    const res = await fetch(`${API_BASE}/admin/initiatives/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "x-admin-key": getAdminKey(token)
-      },
-      body: JSON.stringify(data)
-    });
-    if (!res.ok) throw new Error("Failed to update initiative on backend");
-    return await res.json();
-  } catch (err) {
-    console.warn("Backend update failed, using local fallback", err);
-    return { id, ...data };
+  const res = await fetch(`${API_BASE}/admin/initiatives/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "x-admin-key": getAdminKey(token)
+    },
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Failed to update initiative on backend: ${res.status} ${errText}`);
   }
+  return await res.json();
 }
 
 export async function createInitiative(token, data) {
-  try {
-    const res = await fetch(`${API_BASE}/admin/initiatives`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-admin-key": getAdminKey(token)
-      },
-      body: JSON.stringify(data)
-    });
-    if (!res.ok) throw new Error("Failed to create initiative on backend");
-    return await res.json();
-  } catch (err) {
-    console.warn("Backend create failed, generating local fallback", err);
-    return { id: Date.now(), ...data };
+  const res = await fetch(`${API_BASE}/admin/initiatives`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-admin-key": getAdminKey(token)
+    },
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Failed to create initiative on backend: ${res.status} ${errText}`);
   }
+  return await res.json();
 }
 
 export async function deleteInitiative(token, id) {

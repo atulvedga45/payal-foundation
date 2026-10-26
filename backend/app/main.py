@@ -29,32 +29,23 @@ os.makedirs(UPLOADS_DIR, exist_ok=True)
 async def lifespan(app: FastAPI):
     # Create DB tables
     Base.metadata.create_all(bind=engine)
-    # Ensure 'address' column exists in contact_messages
+    # Run DB schema migrations (each in its own transaction block so failure of one does not abort others)
     try:
         from sqlalchemy import text
-        with engine.begin() as conn:
+        for sql_stmt in [
+            "ALTER TABLE contact_messages ADD COLUMN IF NOT EXISTS address VARCHAR(255)",
+            "ALTER TABLE initiatives ALTER COLUMN image_url TYPE TEXT",
+            "ALTER TABLE trustees ALTER COLUMN photo_url TYPE TEXT",
+            "ALTER TABLE trustees ALTER COLUMN upi_qr_url TYPE TEXT",
+            "ALTER TABLE gallery_items ALTER COLUMN image_url TYPE TEXT"
+        ]:
             try:
-                conn.execute(text("ALTER TABLE contact_messages ADD COLUMN address VARCHAR(255)"))
-            except Exception:
-                pass
-            try:
-                conn.execute(text("ALTER TABLE initiatives ALTER COLUMN image_url TYPE TEXT"))
-            except Exception:
-                pass
-            try:
-                conn.execute(text("ALTER TABLE trustees ALTER COLUMN photo_url TYPE TEXT"))
-            except Exception:
-                pass
-            try:
-                conn.execute(text("ALTER TABLE trustees ALTER COLUMN upi_qr_url TYPE TEXT"))
-            except Exception:
-                pass
-            try:
-                conn.execute(text("ALTER TABLE gallery_items ALTER COLUMN image_url TYPE TEXT"))
-            except Exception:
-                pass
-    except Exception:
-        pass
+                with engine.begin() as conn:
+                    conn.execute(text(sql_stmt))
+            except Exception as stmt_err:
+                print(f"Migration note for '{sql_stmt}': {stmt_err}")
+    except Exception as e:
+        print("Lifespan migration error:", e)
     # Seed default data
     db = SessionLocal()
     try:
@@ -257,6 +248,25 @@ def delete_initiative_endpoint(
     if not success:
         raise HTTPException(status_code=404, detail="Initiative not found")
     return {"success": True, "message": "Initiative deleted successfully"}
+
+@app.post("/api/admin/migrate-columns")
+def run_migrations_endpoint(authorized: bool = Depends(verify_admin)):
+    results = {}
+    from sqlalchemy import text
+    for sql_stmt in [
+        "ALTER TABLE contact_messages ADD COLUMN IF NOT EXISTS address VARCHAR(255)",
+        "ALTER TABLE initiatives ALTER COLUMN image_url TYPE TEXT",
+        "ALTER TABLE trustees ALTER COLUMN photo_url TYPE TEXT",
+        "ALTER TABLE trustees ALTER COLUMN upi_qr_url TYPE TEXT",
+        "ALTER TABLE gallery_items ALTER COLUMN image_url TYPE TEXT"
+    ]:
+        try:
+            with engine.begin() as conn:
+                conn.execute(text(sql_stmt))
+            results[sql_stmt] = "OK"
+        except Exception as e:
+            results[sql_stmt] = str(e)
+    return {"status": "complete", "details": results}
 
 # Trustee Admin Endpoints
 @app.post("/api/admin/trustees", response_model=schemas.TrusteeSchema)
