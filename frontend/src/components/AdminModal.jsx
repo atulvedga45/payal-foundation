@@ -474,11 +474,29 @@ export default function AdminModal({
       };
 
       if (editingInit.id === 'new') {
+        const currentDate = new Date().toISOString();
         const created = await createInitiative(token, payload);
-        updatedList = [created, ...localInitiatives];
+        const itemWithDate = {
+          ...created,
+          date: currentDate
+        };
+        try {
+          const dates = JSON.parse(localStorage.getItem('payal_initiative_dates') || '{}');
+          dates[created.id] = currentDate;
+          localStorage.setItem('payal_initiative_dates', JSON.stringify(dates));
+        } catch (_) {}
+        updatedList = [itemWithDate, ...localInitiatives];
       } else {
         const saved = await updateInitiative(token, editingInit.id, payload);
-        updatedList = localInitiatives.map((item) => item.id === editingInit.id ? (saved || payload) : item);
+        const savedItem = saved || payload;
+        try {
+          const dates = JSON.parse(localStorage.getItem('payal_initiative_dates') || '{}');
+          if (!dates[editingInit.id]) {
+            dates[editingInit.id] = new Date().toISOString();
+            localStorage.setItem('payal_initiative_dates', JSON.stringify(dates));
+          }
+        } catch (_) {}
+        updatedList = localInitiatives.map((item) => item.id === editingInit.id ? { ...item, ...savedItem } : item);
       }
       setLocalInitiatives(updatedList);
       try {

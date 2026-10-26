@@ -2,33 +2,56 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Heart, ArrowUpRight, ChevronLeft, ChevronRight, Calendar, X, Target, TrendingUp, Tag } from 'lucide-react';
 import { getImageUrl } from '../api';
 
-const DEFAULT_DATES_MR = [
-  '१० मार्च २०२६',
-  '२५ फेब्रुवारी २०२६',
-  '१४ जानेवारी २०२६',
-  '२८ डिसेंबर २०२५',
-  '१५ नोव्हेंबर २०२५',
-  '०२ ऑक्टोबर २०२५'
+const MARATHI_MONTHS = [
+  'जानेवारी', 'फेब्रुवारी', 'मार्च', 'एप्रिल', 'मे', 'जून',
+  'जुलै', 'ऑगस्ट', 'सप्टेंबर', 'ऑक्टोबर', 'नोव्हेंबर', 'डिसेंबर'
 ];
+const MARATHI_DIGITS = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
 
-const DEFAULT_DATES_EN = [
-  '10 March 2026',
-  '25 February 2026',
-  '14 January 2026',
-  '28 December 2025',
-  '15 November 2025',
-  '02 October 2025'
-];
+function toMarathiDigits(num) {
+  return String(num).replace(/[0-9]/g, (d) => MARATHI_DIGITS[d]);
+}
+
+function getStoredDate(itemId) {
+  if (!itemId) return new Date().toISOString();
+  try {
+    const dates = JSON.parse(localStorage.getItem('payal_initiative_dates') || '{}');
+    if (dates[itemId]) return dates[itemId];
+    const today = new Date().toISOString();
+    dates[itemId] = today;
+    localStorage.setItem('payal_initiative_dates', JSON.stringify(dates));
+    return today;
+  } catch (_) {
+    return new Date().toISOString();
+  }
+}
+
+function getDisplayDate(dateInput, lang = 'mr') {
+  let d = dateInput ? new Date(dateInput) : new Date();
+  if (isNaN(d.getTime())) {
+    d = new Date();
+  }
+  const day = d.getDate();
+  const month = d.getMonth();
+  const year = d.getFullYear();
+
+  if (lang === 'mr') {
+    return `${toMarathiDigits(day)} ${MARATHI_MONTHS[month]} ${toMarathiDigits(year)}`;
+  } else {
+    const enMonths = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    return `${day} ${enMonths[month]} ${year}`;
+  }
+}
 
 /* ── Initiative Detail Modal ── */
 function InitiativeModal({ item, idx, lang, t, onClose, onSelectCause }) {
   const title = lang === 'mr' && item.title_mr ? item.title_mr : item.title;
   const desc  = lang === 'mr' && item.description_mr ? item.description_mr : item.description;
 
-  const defaultDate = lang === 'mr'
-    ? DEFAULT_DATES_MR[idx % DEFAULT_DATES_MR.length]
-    : DEFAULT_DATES_EN[idx % DEFAULT_DATES_EN.length];
-  const dateText = item.date || defaultDate;
+  const dateText = getDisplayDate(item.date || item.created_at || getStoredDate(item.id), lang);
 
   const percentage = item.target_amount > 0
     ? Math.min(Math.round((item.raised_amount / item.target_amount) * 100), 100)
@@ -191,9 +214,8 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
       <div className="container">
 
         {/* Section Header */}
-        <div className="section-header reveal" style={{ marginBottom: '2.5rem' }}>
+        <div className="section-header reveal" style={{ marginBottom: '1.75rem', textAlign: 'center' }}>
           <h2 className="section-title">{t.initiatives.title}</h2>
-          <p className="section-subtitle">{t.initiatives.subtitle}</p>
         </div>
 
         {/* Carousel */}
@@ -205,7 +227,7 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
             disabled={!canScrollLeft}
             aria-label="Previous initiatives"
           >
-            <ChevronLeft size={24} strokeWidth={2.4} />
+            <ChevronLeft size={24} strokeWidth={2.6} />
           </button>
 
           <div className="initiatives-track" ref={carouselRef}>
@@ -216,10 +238,7 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
 
               const title = lang === 'mr' && item.title_mr ? item.title_mr : item.title;
 
-              const defaultDate = lang === 'mr'
-                ? DEFAULT_DATES_MR[idx % DEFAULT_DATES_MR.length]
-                : DEFAULT_DATES_EN[idx % DEFAULT_DATES_EN.length];
-              const dateText = item.date || defaultDate;
+              const dateText = getDisplayDate(item.date || item.created_at || getStoredDate(item.id), lang);
 
               return (
                 <div
@@ -365,7 +384,7 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
         }
 
         .initiative-img-box {
-          height: 190px;
+          height: 240px;
           position: relative;
           overflow: hidden;
         }
@@ -752,7 +771,7 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
             box-sizing: border-box;
           }
 
-          .initiative-img-box { height: 180px; }
+          .initiative-img-box { height: 230px; }
 
           .initiative-click-hint {
             opacity: 1;
@@ -764,21 +783,21 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
           .initiative-modal-title    { font-size: 1.15rem; }
           .initiative-modal-stats    { flex-direction: column; gap: 0.6rem; }
 
-          .carousel-nav-btn { width: 34px; height: 34px; }
-          .carousel-nav-btn svg { width: 18px; height: 18px; }
-          .carousel-nav-btn.prev-btn { left: 0px; }
-          .carousel-nav-btn.next-btn { right: 0px; }
+          .carousel-nav-btn { width: 38px; height: 38px; }
+          .carousel-nav-btn svg { width: 20px; height: 20px; }
+          .carousel-nav-btn.prev-btn { left: -4px; }
+          .carousel-nav-btn.next-btn { right: -4px; }
         }
 
         @media (max-width: 400px) {
           .initiatives-carousel-wrapper { padding: 0 28px; }
           .initiatives-track .initiative-card { border-radius: 14px; }
-          .initiative-img-box { height: 160px; }
+          .initiative-img-box { height: 210px; }
           .initiative-modal-title { font-size: 1.05rem; }
-          .carousel-nav-btn { width: 30px; height: 30px; }
-          .carousel-nav-btn svg { width: 16px; height: 16px; }
-          .carousel-nav-btn.prev-btn { left: -2px; }
-          .carousel-nav-btn.next-btn { right: -2px; }
+          .carousel-nav-btn { width: 34px; height: 34px; }
+          .carousel-nav-btn svg { width: 18px; height: 18px; }
+          .carousel-nav-btn.prev-btn { left: -4px; }
+          .carousel-nav-btn.next-btn { right: -4px; }
         }
 
         /* Nav buttons */
@@ -786,37 +805,52 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
           position: absolute;
           top: 50%;
           transform: translateY(-50%);
-          width: 42px; height: 42px;
+          width: 44px; height: 44px;
           border-radius: 50%;
-          background: #ffffff;
-          color: var(--primary);
-          border: 2px solid rgba(11,98,164,0.22);
+          background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+          color: #ffffff;
+          border: 2.5px solid #ffffff;
           display: flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
           z-index: 10;
-          box-shadow: 0 4px 16px rgba(11,98,164,0.2);
+          box-shadow: 0 4px 16px rgba(29, 78, 216, 0.42), 0 2px 6px rgba(0,0,0,0.18);
           transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
+        .carousel-nav-btn svg {
+          stroke: #ffffff;
+          stroke-width: 2.8px;
+        }
+
         .carousel-nav-btn:hover:not(:disabled) {
-          background: var(--primary);
+          background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
           color: #ffffff;
-          border-color: var(--primary);
-          transform: translateY(-50%) scale(1.1);
-          box-shadow: 0 8px 24px rgba(11,98,164,0.38);
+          transform: translateY(-50%) scale(1.14);
+          box-shadow: 0 6px 22px rgba(29, 78, 216, 0.62), 0 3px 8px rgba(0,0,0,0.24);
+        }
+
+        .carousel-nav-btn:active:not(:disabled) {
+          transform: translateY(-50%) scale(0.96);
         }
 
         .carousel-nav-btn:disabled {
-          opacity: 0.3;
+          background: #e2e8f0;
+          color: #94a3b8;
+          border-color: #f1f5f9;
+          opacity: 0.42;
           cursor: not-allowed;
-          transform: translateY(-50%) scale(0.95);
+          transform: translateY(-50%) scale(0.94);
           box-shadow: none;
         }
 
-        .carousel-nav-btn.prev-btn { left: 0px; }
-        .carousel-nav-btn.next-btn { right: 0px; }
+        .carousel-nav-btn:disabled svg {
+          stroke: #94a3b8;
+        }
+
+        .carousel-nav-btn.prev-btn { left: -6px; }
+        .carousel-nav-btn.next-btn { right: -6px; }
 
         .initiative-card.in-view {
           transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1), transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s ease, border-color 0.4s ease;
