@@ -1804,185 +1804,164 @@ export default function AdminModal({
                       </div>
 
                       <form onSubmit={handleSaveInitiative} style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
+                        
+                        {/* 1. TOP: Image Selection & Preview */}
                         <div style={{
-                          display: 'grid',
-                          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
-                          gap: '1.25rem',
-                          marginBottom: '1.5rem',
-                          width: '100%',
-                          maxWidth: '100%',
-                          boxSizing: 'border-box'
+                          marginBottom: '1.25rem',
+                          background: '#f8fafc',
+                          padding: '1.15rem',
+                          borderRadius: '12px',
+                          border: '1px solid var(--border-color)',
+                          boxSizing: 'border-box',
+                          width: '100%'
                         }}>
-                          
-                          {/* Left Column: Text & Details */}
-                          <div style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
-                            <div style={{ marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
-                              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.35rem', color: 'var(--text-main)' }}>
-                                उपक्रमाचे नाव (मराठी) *
-                              </label>
-                              <input
-                                type="text"
-                                value={editingInit.title_mr || editingInit.title || ''}
-                                onChange={(e) => setEditingInit({ ...editingInit, title_mr: e.target.value, title: e.target.value })}
-                                placeholder="उदा. अन्नदान व अन्नधान्य वाटप मोहीम"
-                                required
-                                style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
-                              />
-                            </div>
+                          <label style={{ display: 'block', fontSize: '0.95rem', fontWeight: 800, marginBottom: '0.65rem', color: 'var(--text-main)' }}>
+                            🖼️ उपक्रमाचा फोटो
+                          </label>
 
-                            {/* कमीत कमी खर्च (Target Amount in Marathi) */}
-                            <div style={{ marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
-                              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.35rem', color: 'var(--text-main)' }}>
-                                कमीत कमी खर्च (₹)
-                              </label>
-                              <input
-                                type="number"
-                                value={editingInit.target_amount || ''}
-                                onChange={(e) => setEditingInit({ ...editingInit, target_amount: e.target.value })}
-                                placeholder="उदा. 150000"
-                                style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
-                              />
-                            </div>
-
-                            <div style={{ width: '100%', boxSizing: 'border-box' }}>
-                              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.35rem', color: 'var(--text-main)' }}>
-                                वर्णन (मराठी)
-                              </label>
-                              <textarea
-                                rows={4}
-                                value={editingInit.description_mr || editingInit.description || ''}
-                                onChange={(e) => setEditingInit({ ...editingInit, description_mr: e.target.value, description: e.target.value })}
-                                placeholder="गरीब व गरजू कुटुंबांना दरमहा पोषण आहार व रेशन किट वाटप करणे..."
-                                style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.88rem', resize: 'vertical' }}
-                              />
-                            </div>
-                          </div>
-
-                          {/* Right Column: Image Selection & Upload */}
-                          <div style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
-                            <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--text-main)' }}>
-                              🖼️ उपक्रमाचा फोटो (Initiative Image)
-                            </label>
-                            
-                            {/* Live Image Preview Card */}
-                            <div style={{
-                              width: '100%',
-                              maxWidth: '100%',
-                              boxSizing: 'border-box',
-                              height: '200px',
-                              borderRadius: '10px',
-                              overflow: 'hidden',
-                              backgroundColor: '#f1f5f9',
-                              border: '2px dashed var(--border-color)',
-                              position: 'relative',
-                              marginBottom: '1rem',
-                              boxShadow: '0 4px 6px rgba(0,0,0,0.06)'
-                            }}>
+                          {/* Live Image Preview Card */}
+                          <div style={{
+                            width: '100%',
+                            maxWidth: '100%',
+                            boxSizing: 'border-box',
+                            height: '210px',
+                            borderRadius: '10px',
+                            overflow: 'hidden',
+                            backgroundColor: '#ffffff',
+                            border: '2px dashed var(--border-color)',
+                            position: 'relative',
+                            marginBottom: '0.85rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
+                          }}>
+                            {editingInit.image_url ? (
                               <img
-                                src={getImageUrl(editingInit.image_url) || '/food_distribution.jpg'}
+                                src={getImageUrl(editingInit.image_url)}
                                 alt="Preview"
                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                 onError={(e) => { e.target.src = '/food_distribution.jpg'; }}
                               />
-                              <div style={{
-                                position: 'absolute',
-                                bottom: '8px',
-                                right: '8px',
-                                background: 'rgba(0,0,0,0.7)',
-                                color: '#ffffff',
-                                padding: '0.2rem 0.6rem',
-                                borderRadius: '4px',
-                                fontSize: '0.72rem',
-                                fontWeight: 600
-                              }}>
-                                Current Image Preview
+                            ) : (
+                              <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '1rem' }}>
+                                <ImageIcon size={38} style={{ opacity: 0.35, marginBottom: '0.35rem' }} />
+                                <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>कोणताही फोटो निवडलेला नाही</div>
                               </div>
-                            </div>
+                            )}
+                          </div>
 
-                            {/* Hidden file input for device/phone gallery */}
-                            <input
-                              type="file"
-                              ref={fileInputRef}
-                              accept="image/*"
-                              onChange={handleImageUpload}
-                              style={{ display: 'none' }}
-                            />
+                          {/* Hidden File Input */}
+                          <input
+                            type="file"
+                            ref={fileInputRef}
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            style={{ display: 'none' }}
+                          />
 
-                            {/* Choose from Gallery Button */}
-                            <div style={{ marginBottom: '0.75rem', width: '100%', boxSizing: 'border-box' }}>
+                          {/* Action Buttons: Choose from Gallery & Remove Image */}
+                          <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap', width: '100%', boxSizing: 'border-box' }}>
+                            <button
+                              type="button"
+                              disabled={initUploading}
+                              onClick={() => {
+                                if (fileInputRef.current) {
+                                  fileInputRef.current.value = '';
+                                  fileInputRef.current.click();
+                                }
+                              }}
+                              style={{
+                                flex: '1 1 200px',
+                                boxSizing: 'border-box',
+                                padding: '0.75rem 1rem',
+                                borderRadius: '8px',
+                                border: '1.5px solid var(--primary)',
+                                background: 'var(--primary-light)',
+                                color: 'var(--primary)',
+                                fontWeight: 700,
+                                fontSize: '0.92rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '0.5rem',
+                                cursor: initUploading ? 'wait' : 'pointer',
+                                boxShadow: '0 2px 6px rgba(37, 99, 235, 0.15)'
+                              }}
+                            >
+                              <Camera size={18} />
+                              <span>{initUploading ? 'फोटो लोड होत आहे...' : '📁 Choose from Gallery'}</span>
+                            </button>
+
+                            {editingInit.image_url && (
                               <button
                                 type="button"
-                                disabled={initUploading}
                                 onClick={() => {
-                                  if (fileInputRef.current) {
-                                    fileInputRef.current.value = '';
-                                    fileInputRef.current.click();
-                                  }
+                                  setEditingInit(prev => ({ ...prev, image_url: '' }));
+                                  setInitMsg({ type: 'success', text: 'फोटो काढला गेला.' });
                                 }}
                                 style={{
-                                  width: '100%',
-                                  maxWidth: '100%',
-                                  boxSizing: 'border-box',
-                                  padding: '0.85rem 1rem',
+                                  padding: '0.75rem 1rem',
                                   borderRadius: '8px',
-                                  border: '1.5px solid var(--primary)',
-                                  background: 'var(--primary-light)',
-                                  color: 'var(--primary)',
+                                  border: '1.5px solid #ef4444',
+                                  background: '#fef2f2',
+                                  color: '#ef4444',
                                   fontWeight: 700,
-                                  fontSize: '0.92rem',
+                                  fontSize: '0.88rem',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
-                                  gap: '0.5rem',
-                                  cursor: initUploading ? 'wait' : 'pointer',
-                                  boxShadow: '0 2px 6px rgba(37, 99, 235, 0.15)'
+                                  gap: '0.4rem',
+                                  cursor: 'pointer'
                                 }}
                               >
-                                <Camera size={18} />
-                                <span>{initUploading ? 'फोटो लोड होत आहे...' : '📁 Choose from Gallery (फोटो निवडा)'}</span>
+                                <Trash2 size={16} />
+                                <span>Remove Image (फोटो काढा)</span>
                               </button>
-                            </div>
-
-                            {/* Preset Charity Photos for 1-Click Fast Selection */}
-                            <div style={{
-                              background: '#f8fafc',
-                              border: '1px solid var(--border-color)',
-                              borderRadius: '8px',
-                              padding: '0.65rem 0.75rem',
-                              width: '100%',
-                              boxSizing: 'border-box'
-                            }}>
-                              <div style={{ fontSize: '0.76rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.45rem' }}>
-                                किंवा उपलब्ध फोटोंमधून थेट निवडा (Quick Pick):
-                              </div>
-                              <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
-                                {PRESET_IMAGES.map((preset, pIdx) => (
-                                  <button
-                                    key={pIdx}
-                                    type="button"
-                                    onClick={() => {
-                                      setEditingInit(prev => ({ ...prev, image_url: preset.path }));
-                                      setInitMsg({ type: 'success', text: `फोटो निवडला: ${preset.label}` });
-                                    }}
-                                    style={{
-                                      fontSize: '0.75rem',
-                                      padding: '0.35rem 0.65rem',
-                                      borderRadius: '6px',
-                                      border: editingInit.image_url === preset.path ? '1.5px solid var(--primary)' : '1px solid var(--border-color)',
-                                      background: editingInit.image_url === preset.path ? 'var(--primary-light)' : '#ffffff',
-                                      color: editingInit.image_url === preset.path ? 'var(--primary)' : 'var(--text-main)',
-                                      cursor: 'pointer',
-                                      fontWeight: 600,
-                                      transition: 'all 0.15s ease'
-                                    }}
-                                  >
-                                    {preset.label}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-
+                            )}
                           </div>
+                        </div>
+
+                        {/* 2. Details (After Image) */}
+                        <div style={{ marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
+                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.35rem', color: 'var(--text-main)' }}>
+                            उपक्रमाचे नाव (मराठी) *
+                          </label>
+                          <input
+                            type="text"
+                            value={editingInit.title_mr || editingInit.title || ''}
+                            onChange={(e) => setEditingInit({ ...editingInit, title_mr: e.target.value, title: e.target.value })}
+                            placeholder="उदा. अन्नदान व अन्नधान्य वाटप मोहीम"
+                            required
+                            style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
+                          />
+                        </div>
+
+                        {/* कमीत कमी खर्च (Target Amount in Marathi) */}
+                        <div style={{ marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
+                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.35rem', color: 'var(--text-main)' }}>
+                            कमीत कमी खर्च (₹)
+                          </label>
+                          <input
+                            type="number"
+                            value={editingInit.target_amount || ''}
+                            onChange={(e) => setEditingInit({ ...editingInit, target_amount: e.target.value })}
+                            placeholder="उदा. 150000"
+                            style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
+                          />
+                        </div>
+
+                        <div style={{ marginBottom: '1.5rem', width: '100%', boxSizing: 'border-box' }}>
+                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.35rem', color: 'var(--text-main)' }}>
+                            वर्णन (मराठी)
+                          </label>
+                          <textarea
+                            rows={4}
+                            value={editingInit.description_mr || editingInit.description || ''}
+                            onChange={(e) => setEditingInit({ ...editingInit, description_mr: e.target.value, description: e.target.value })}
+                            placeholder="गरीब व गरजू कुटुंबांना दरमहा पोषण आहार व रेशन किट वाटप करणे..."
+                            style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.88rem', resize: 'vertical' }}
+                          />
                         </div>
 
                         {/* Save Button (Centered, single Save & Update) */}
