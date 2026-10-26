@@ -486,8 +486,7 @@ export default function AdminModal({
       } catch (_) {}
       if (onUpdateInitiatives) onUpdateInitiatives(updatedList);
       setEditingInit(null);
-      setActiveTab('welcome');
-      setWelcomePhase('profile');
+      setActiveTab('initiatives');
       setInitMsg({ type: 'success', text: 'उपक्रम यशस्वीरीत्या सेव्ह झाला!' });
       setTimeout(() => setInitMsg({ type: '', text: '' }), 4000);
     } catch (err) {
@@ -1891,8 +1890,8 @@ export default function AdminModal({
                             style={{ display: 'none' }}
                           />
 
-                          {/* Action Buttons: Add Image & Remove Image */}
-                          <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap', width: '100%', boxSizing: 'border-box' }}>
+                          {/* Action Buttons: Add Image & Remove Image (Same Full Width) */}
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', width: '100%', boxSizing: 'border-box' }}>
                             <button
                               type="button"
                               disabled={initUploading}
@@ -1903,7 +1902,7 @@ export default function AdminModal({
                                 }
                               }}
                               style={{
-                                flex: '1 1 200px',
+                                width: '100%',
                                 boxSizing: 'border-box',
                                 padding: '0.75rem 1rem',
                                 borderRadius: '8px',
@@ -1932,18 +1931,21 @@ export default function AdminModal({
                                   setInitMsg({ type: 'success', text: 'फोटो काढला गेला.' });
                                 }}
                                 style={{
+                                  width: '100%',
+                                  boxSizing: 'border-box',
                                   padding: '0.75rem 1rem',
                                   borderRadius: '8px',
                                   border: '1.5px solid #ef4444',
                                   background: '#fef2f2',
                                   color: '#ef4444',
                                   fontWeight: 700,
-                                  fontSize: '0.88rem',
+                                  fontSize: '0.92rem',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
-                                  gap: '0.4rem',
-                                  cursor: 'pointer'
+                                  gap: '0.5rem',
+                                  cursor: 'pointer',
+                                  boxShadow: '0 2px 6px rgba(239, 68, 68, 0.1)'
                                 }}
                               >
                                 <Trash2 size={16} />
@@ -2027,7 +2029,7 @@ export default function AdminModal({
                     <div style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
                       <div style={{ marginBottom: '0.5rem', width: '100%', boxSizing: 'border-box' }}>
                         <h4 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: 'var(--text-main)', lineHeight: 1.35 }}>
-                          Initiatives & Projects Management (उपक्रम व्यवस्थापन)
+                          Initiatives & Projects Management
                         </h4>
                       </div>
                       <div style={{ height: '1px', backgroundColor: 'var(--border-color)', margin: '0.85rem 0 1.15rem 0', width: '100%' }} />
