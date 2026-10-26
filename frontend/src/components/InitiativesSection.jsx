@@ -209,7 +209,7 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
           </button>
 
           <div className="initiatives-track" ref={carouselRef}>
-            {initiatives.map((item, idx) => {
+            {(Array.isArray(initiatives) ? initiatives : []).map((item, idx) => {
               const percentage = item.target_amount > 0
                 ? Math.min(Math.round((item.raised_amount / item.target_amount) * 100), 100)
                 : 65;

@@ -178,6 +178,7 @@ export default function AdminModal({
   const [editingInit, setEditingInit] = useState(null);
   const [initSaving, setInitSaving] = useState(false);
   const [initUploading, setInitUploading] = useState(false);
+  const [initMsg, setInitMsg] = useState({ type: '', text: '' });
   const fileInputRef = useRef(null);
   const pendingInitiativeFileRef = useRef(null);
 
@@ -2067,7 +2068,7 @@ export default function AdminModal({
                         <span>नवीन उपक्रम जोडा (Add Initiative)</span>
                       </button>
 
-                      {localInitiatives.length === 0 ? (
+                      {(!Array.isArray(localInitiatives) || localInitiatives.length === 0) ? (
                         <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
                           कोणताही उपक्रम आढळला नाही. नवीन उपक्रम जोडण्यासाठी वरील बटणावर क्लिक करा.
                         </div>
@@ -2080,7 +2081,7 @@ export default function AdminModal({
                           maxWidth: '100%',
                           boxSizing: 'border-box'
                         }}>
-                          {localInitiatives.map((item) => (
+                          {(Array.isArray(localInitiatives) ? localInitiatives : []).map((item) => (
                             <div
                               key={item.id}
                               style={{
