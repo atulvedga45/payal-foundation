@@ -250,9 +250,6 @@ export default function App() {
     };
   }, [trustees, initiatives, lang]);
 
-  // Top Window Scroll Progress Bar
-  const [topScrollPercent, setTopScrollPercent] = useState(0);
-
   // WhatsApp floating button: hidden on Home page, visible on other sections, hidden at footer
   const [showWhatsApp, setShowWhatsApp] = useState(false);
 
@@ -260,11 +257,6 @@ export default function App() {
     const handleScroll = () => {
       const homeEl = document.getElementById('home');
       const footerEl = document.querySelector('footer');
-
-      // Calculate scroll progress for top progress indicator
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0;
-      setTopScrollPercent(progress);
 
       // Check if user has scrolled past home section
       let pastHome = false;
@@ -297,11 +289,6 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {/* Top Window Global Scroll Progress Bar */}
-      <div className="top-scroll-progress-track" aria-hidden="true">
-        <div className="top-scroll-progress-fill" style={{ width: `${topScrollPercent}%` }} />
-      </div>
-
       {/* Animated splash screen — shows logo on first load */}
       {showSplash && <SplashScreen onFinished={handleSplashFinish} />}
 
