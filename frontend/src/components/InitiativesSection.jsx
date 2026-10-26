@@ -398,6 +398,8 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
           object-fit: cover;
           object-position: center 38%;
           transition: transform 0.4s ease;
+          opacity: 1 !important;
+          display: block;
         }
 
         .initiative-card:hover .initiative-photo {
