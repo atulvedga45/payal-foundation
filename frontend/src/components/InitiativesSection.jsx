@@ -326,25 +326,27 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
 
         .initiatives-track {
           display: flex;
-          justify-content: center;
+          justify-content: flex-start;
+          align-items: stretch;
           gap: 1.25rem;
           overflow-x: auto;
           scroll-behavior: smooth;
           scroll-snap-type: x mandatory;
           scrollbar-width: none;
           -ms-overflow-style: none;
-          padding: 0.75rem 0.25rem 1.25rem 0.25rem;
+          padding: 0.75rem 2px 1.25rem 2px;
           width: 100%;
           box-sizing: border-box;
         }
 
         .initiatives-track::-webkit-scrollbar { display: none; }
 
+        /* Default (Laptop/Desktop >= 1024px): exactly 4 cards in one line */
         .initiatives-track .initiative-card {
-          flex: 0 0 min(100%, 310px);
-          min-width: min(100%, 280px);
-          max-width: 330px;
-          scroll-snap-align: center;
+          flex: 0 0 calc((100% - 3 * 1.25rem) / 4);
+          min-width: calc((100% - 3 * 1.25rem) / 4);
+          max-width: calc((100% - 3 * 1.25rem) / 4);
+          scroll-snap-align: start;
           display: flex;
           flex-direction: column;
           border-radius: var(--radius-md);
@@ -353,6 +355,7 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
           border: 1px solid #e2e8f0;
           box-shadow: 0 4px 14px rgba(0,0,0,0.04);
           transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+          box-sizing: border-box;
         }
 
         .initiative-card:hover {
@@ -712,7 +715,15 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
         /* ═══════════════════════════════════════
            RESPONSIVE
         ═══════════════════════════════════════ */
-        @media (max-width: 1100px) {
+        @media (max-width: 1150px) and (min-width: 861px) {
+          .initiatives-track .initiative-card {
+            flex: 0 0 calc((100% - 2 * 1.15rem) / 3);
+            min-width: calc((100% - 2 * 1.15rem) / 3);
+            max-width: calc((100% - 2 * 1.15rem) / 3);
+          }
+        }
+
+        @media (max-width: 860px) and (min-width: 768px) {
           .initiatives-track .initiative-card {
             flex: 0 0 calc((100% - 1.15rem) / 2);
             min-width: calc((100% - 1.15rem) / 2);
@@ -720,22 +731,32 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
           }
         }
 
-        @media (max-width: 640px) {
-          .initiatives-carousel-wrapper { padding: 0 28px; }
-          .initiatives-track { gap: 0.85rem; padding: 0.4rem 0.1rem 0.9rem 0.1rem; }
+        @media (max-width: 767px) {
+          .initiatives-carousel-wrapper {
+            padding: 0 34px;
+            box-sizing: border-box;
+          }
+          .initiatives-track {
+            gap: 1rem;
+            padding: 0.5rem 0 1rem 0;
+            justify-content: flex-start;
+          }
 
+          /* Mobile: exactly 1 card in line, full width, start-aligned, never cut off! */
           .initiatives-track .initiative-card {
             flex: 0 0 100%;
             min-width: 100%;
             max-width: 100%;
             border-radius: 16px;
+            scroll-snap-align: start;
+            box-sizing: border-box;
           }
 
-          .initiative-img-box { height: 160px; }
+          .initiative-img-box { height: 180px; }
 
           .initiative-click-hint {
             opacity: 1;
-            font-size: 0.7rem;
+            font-size: 0.72rem;
           }
 
           .initiative-modal-img-wrap { height: 200px; }
@@ -743,21 +764,21 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
           .initiative-modal-title    { font-size: 1.15rem; }
           .initiative-modal-stats    { flex-direction: column; gap: 0.6rem; }
 
-          .carousel-nav-btn { width: 32px; height: 32px; }
+          .carousel-nav-btn { width: 34px; height: 34px; }
           .carousel-nav-btn svg { width: 18px; height: 18px; }
-          .carousel-nav-btn.prev-btn { left: -4px; }
-          .carousel-nav-btn.next-btn { right: -4px; }
+          .carousel-nav-btn.prev-btn { left: 0px; }
+          .carousel-nav-btn.next-btn { right: 0px; }
         }
 
-        @media (max-width: 380px) {
-          .initiatives-carousel-wrapper { padding: 0 24px; }
+        @media (max-width: 400px) {
+          .initiatives-carousel-wrapper { padding: 0 28px; }
           .initiatives-track .initiative-card { border-radius: 14px; }
-          .initiative-img-box { height: 140px; }
-          .initiative-modal-title { font-size: 1rem; }
-          .carousel-nav-btn { width: 28px; height: 28px; }
+          .initiative-img-box { height: 160px; }
+          .initiative-modal-title { font-size: 1.05rem; }
+          .carousel-nav-btn { width: 30px; height: 30px; }
           .carousel-nav-btn svg { width: 16px; height: 16px; }
-          .carousel-nav-btn.prev-btn { left: -6px; }
-          .carousel-nav-btn.next-btn { right: -6px; }
+          .carousel-nav-btn.prev-btn { left: -2px; }
+          .carousel-nav-btn.next-btn { right: -2px; }
         }
 
         /* Nav buttons */

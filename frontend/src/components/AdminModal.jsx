@@ -395,8 +395,8 @@ export default function AdminModal({
       description_mr: '',
       category: 'Social Welfare',
       icon: 'Heart',
-      image_url: '/food_distribution.jpg',
-      target_amount: 100000,
+      image_url: '',
+      target_amount: '',
       raised_amount: 0
     });
     setInitMsg({ type: '', text: '' });
@@ -1876,8 +1876,8 @@ export default function AdminModal({
                               />
                             ) : (
                               <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '1rem' }}>
-                                <ImageIcon size={38} style={{ opacity: 0.35, marginBottom: '0.35rem' }} />
-                                <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>कोणताही फोटो निवडलेला नाही</div>
+                                <ImageIcon size={38} style={{ opacity: 0.4, marginBottom: '0.35rem', color: 'var(--primary)' }} />
+                                <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-main)' }}>Add Image</div>
                               </div>
                             )}
                           </div>
@@ -1891,7 +1891,7 @@ export default function AdminModal({
                             style={{ display: 'none' }}
                           />
 
-                          {/* Action Buttons: Choose from Gallery & Remove Image */}
+                          {/* Action Buttons: Add Image & Remove Image */}
                           <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap', width: '100%', boxSizing: 'border-box' }}>
                             <button
                               type="button"
@@ -1921,7 +1921,7 @@ export default function AdminModal({
                               }}
                             >
                               <Camera size={18} />
-                              <span>{initUploading ? 'फोटो लोड होत आहे...' : '📁 Choose from Gallery'}</span>
+                              <span>{initUploading ? 'फोटो लोड होत आहे...' : 'Add Image'}</span>
                             </button>
 
                             {editingInit.image_url && (
@@ -1947,7 +1947,7 @@ export default function AdminModal({
                                 }}
                               >
                                 <Trash2 size={16} />
-                                <span>Remove Image (फोटो काढा)</span>
+                                <span>Remove Image</span>
                               </button>
                             )}
                           </div>

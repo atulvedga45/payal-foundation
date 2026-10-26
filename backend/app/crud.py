@@ -98,7 +98,7 @@ def delete_trustee(db: Session, trustee_id: int):
     return True
 
 def get_initiatives(db: Session):
-    return db.query(models.Initiative).order_by(models.Initiative.id.asc()).all()
+    return db.query(models.Initiative).order_by(models.Initiative.id.desc()).all()
 
 def create_initiative(db: Session, init: schemas.InitiativeCreate):
     img = save_base64_image(init.image_url) if init.image_url else None
