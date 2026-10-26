@@ -59,6 +59,17 @@ async def lifespan(app: FastAPI):
     db = SessionLocal()
     try:
         seed_initial_data(db)
+        # Check and replace any broken /uploads/ references wiped by ephemeral container restarts
+        try:
+            initiatives = db.query(models.Initiative).all()
+            for init in initiatives:
+                if init.image_url and init.image_url.startswith("/uploads/"):
+                    fname = init.image_url.replace("/uploads/", "")
+                    if not os.path.exists(os.path.join(UPLOADS_DIR, fname)):
+                        init.image_url = "/food_distribution.jpg"
+            db.commit()
+        except Exception as e:
+            print("Upload reference cleanup warning:", e)
     finally:
         db.close()
     yield

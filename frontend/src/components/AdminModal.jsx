@@ -30,6 +30,7 @@ import {
   updateTrustInfo,
   getImageUrl,
   compressImage,
+  compressImageToDataUrl,
   fileToDataUrl
 } from '../api';
 
@@ -406,36 +407,45 @@ export default function AdminModal({
     if (!file) return;
 
     setInitUploading(true);
-    setInitMsg({ type: '', text: 'फोटो लोड होत आहे...' });
+    setInitMsg({ type: '', text: 'गॅलरीतून फोटो लोड होत आहे...' });
 
     try {
-      // 1. Immediately compress the file (max 1200x1200, 0.8 quality) to web size (~100KB)
-      const compressedFile = await compressImage(file, 1200, 1200, 0.8);
-      const dataUrl = await fileToDataUrl(compressedFile);
+      // Compress directly to base64 Data URL (max 900x900, 0.75 quality)
+      // This is ~40-60KB, crystal clear, self-contained, and works on all devices!
+      const dataUrl = await compressImageToDataUrl(file, 900, 900, 0.75);
 
-      // 2. Set the dataUrl into editingInit immediately so user sees the preview change instantly!
       if (dataUrl) {
         setEditingInit((prev) => ({ ...prev, image_url: dataUrl }));
-        pendingInitiativeFileRef.current = compressedFile;
+        pendingInitiativeFileRef.current = null;
+        setInitMsg({
+          type: 'success',
+          text: '✅ गॅलरीतून फोटो निवडला! बदल सेव्ह करण्यासाठी खालील "बदल सेव्ह करा" बटण दाबा.'
+        });
+      } else {
+        throw new Error('Image conversion failed');
       }
-
-      // 3. Upload to backend in background
-      try {
-        const serverUrl = await uploadInitiativeImage(token, compressedFile);
-        if (serverUrl && !serverUrl.startsWith('data:')) {
-          setEditingInit((prev) => ({ ...prev, image_url: serverUrl }));
-          pendingInitiativeFileRef.current = null;
-        }
-      } catch (uploadErr) {
-        console.warn("Background upload failed, will save as dataUrl:", uploadErr);
-      }
-
-      setInitMsg({ type: 'success', text: 'नवीन फोटो यशस्वीरीत्या निवडला! सेव्ह करण्यासाठी खालील बटण दाबा.' });
     } catch (err) {
-      console.error("Image processing error:", err);
-      setInitMsg({ type: 'error', text: 'फोटो निवडताना त्रुटी आली. कृपया पुन्हा प्रयत्न करा.' });
+      console.error("Image selection error:", err);
+      // Fallback: try raw FileReader if canvas compression had an issue
+      try {
+        const rawDataUrl = await fileToDataUrl(file);
+        if (rawDataUrl) {
+          setEditingInit((prev) => ({ ...prev, image_url: rawDataUrl }));
+          setInitMsg({
+            type: 'success',
+            text: '✅ गॅलरीतून फोटो निवडला! बदल सेव्ह करण्यासाठी खालील "बदल सेव्ह करा" बटण दाबा.'
+          });
+        } else {
+          setInitMsg({ type: 'error', text: 'फोटो लोड होऊ शकला नाही. कृपया दुसरा फोटो निवडा.' });
+        }
+      } catch (fallbackErr) {
+        setInitMsg({ type: 'error', text: 'फोटो लोड करताना त्रुटी आली. कृपया दुसरा फोटो निवडा.' });
+      }
     } finally {
       setInitUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -447,36 +457,9 @@ export default function AdminModal({
       return;
     }
     setInitSaving(true);
-    setInitMsg({ type: '', text: '' });
+    setInitMsg({ type: '', text: 'उपक्रम सेव्ह होत आहे...' });
     try {
-      let finalImageUrl = editingInit.image_url;
-
-      // If a new photo was selected and not yet uploaded, upload now before saving
-      if (pendingInitiativeFileRef.current) {
-        try {
-          const compressedFile = await compressImage(pendingInitiativeFileRef.current, 1200, 1200, 0.82);
-          const url = await uploadInitiativeImage(token, compressedFile);
-          if (url && !url.startsWith('data:')) {
-            finalImageUrl = url;
-            pendingInitiativeFileRef.current = null;
-          }
-        } catch (uploadErr) {
-          console.warn("Could not upload directly, passing image data to server:", uploadErr);
-        }
-      }
-
-      // If image is a temporary blob URL, convert to permanent data URL
-      if (finalImageUrl && finalImageUrl.startsWith('blob:')) {
-        try {
-          const blobRes = await fetch(finalImageUrl);
-          const blobData = await blobRes.blob();
-          finalImageUrl = await new Promise((resolve) => {
-            const r = new FileReader();
-            r.onloadend = () => resolve(r.result);
-            r.readAsDataURL(blobData);
-          });
-        } catch (_) {}
-      }
+      const finalImageUrl = editingInit.image_url || '/food_distribution.jpg';
 
       let updatedList = [];
       const payload = {
@@ -485,7 +468,7 @@ export default function AdminModal({
         title_mr: initiativeTitle,
         description: editingInit.description_mr || editingInit.description || '',
         description_mr: editingInit.description_mr || editingInit.description || '',
-        image_url: finalImageUrl || '/food_distribution.jpg',
+        image_url: finalImageUrl,
         target_amount: Number(editingInit.target_amount) || 0,
         raised_amount: Number(editingInit.raised_amount) || 0
       };
@@ -505,7 +488,7 @@ export default function AdminModal({
       setEditingInit(null);
       setActiveTab('welcome');
       setWelcomePhase('profile');
-      setInitMsg({ type: 'success', text: 'उपक्रम यशस्वीरीत्या सेव्ह झाला! (Initiative saved successfully!)' });
+      setInitMsg({ type: 'success', text: 'उपक्रम यशस्वीरीत्या सेव्ह झाला!' });
       setTimeout(() => setInitMsg({ type: '', text: '' }), 4000);
     } catch (err) {
       console.error(err);
@@ -514,7 +497,6 @@ export default function AdminModal({
       setInitSaving(false);
     }
   };
-
 
   const handleDeleteInitiative = async (id) => {
     if (!window.confirm('हा उपक्रम खरोखर हटवायचा आहे का? (Are you sure you want to delete this initiative?)')) {
@@ -1884,8 +1866,12 @@ export default function AdminModal({
                             {editingInit.image_url ? (
                               <img
                                 src={getImageUrl(editingInit.image_url)}
-                                alt="Preview"
+                                alt="उपक्रम फोटो"
                                 key={editingInit.image_url}
+                                onError={(e) => {
+                                  e.currentTarget.onerror = null;
+                                  e.currentTarget.src = '/food_distribution.jpg';
+                                }}
                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                               />
                             ) : (

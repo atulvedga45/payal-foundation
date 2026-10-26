@@ -15,6 +15,12 @@ os.makedirs(UPLOADS_DIR, exist_ok=True)
 def save_base64_image(image_data: str) -> str:
     if not image_data or not isinstance(image_data, str) or not image_data.startswith("data:image/"):
         return image_data
+    # On ephemeral hosts like Render free tier where disk gets wiped on restarts,
+    # preserve the compressed base64 data URL directly in PostgreSQL TEXT column
+    # so the image is permanently stored in the database and never 404s!
+    _render_uploads = os.getenv("UPLOADS_PATH", "")
+    if not _render_uploads:
+        return image_data
     try:
         header, encoded = image_data.split(",", 1)
         ext = "jpg"
