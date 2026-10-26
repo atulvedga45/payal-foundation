@@ -1,5 +1,99 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Heart, Users, HandHeart, ArrowRight } from 'lucide-react';
+
+function AnimatedCounter({ value }) {
+  const marathiDigits = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
+  const marathiToEnglish = (s) => s.replace(/[०-९]/g, (d) => marathiDigits.indexOf(d));
+  const englishToMarathi = (s) => s.replace(/[0-9]/g, (d) => marathiDigits[parseInt(d, 10)]);
+
+  const [displayValue, setDisplayValue] = useState(() => {
+    const raw = String(value || '');
+    const isMr = /[०-९]/.test(raw);
+    const zero = isMr ? '०' : '0';
+    if (raw.includes('%')) return `${zero}%`;
+    if (raw.includes('+')) return `${zero}+`;
+    return zero;
+  });
+
+  const ref = useRef(null);
+  const animatedRef = useRef(false);
+
+  useEffect(() => {
+    animatedRef.current = false;
+    const el = ref.current;
+    if (!el) return;
+
+    const rawStr = String(value || '');
+    const isMarathi = /[०-९]/.test(rawStr);
+    const hasComma = rawStr.includes(',');
+    const normalized = marathiToEnglish(rawStr);
+
+    // Extract digits and prefix / suffix (e.g. 50%, 20+, 400+, 1,500+)
+    const match = normalized.match(/^([^\d]*)([\d,]+)([^\d]*)$/);
+    if (!match) {
+      setDisplayValue(rawStr);
+      return;
+    }
+
+    const prefix = match[1] || '';
+    const numOnly = parseInt(match[2].replace(/,/g, ''), 10);
+    const suffix = match[3] || '';
+
+    if (isNaN(numOnly)) {
+      setDisplayValue(rawStr);
+      return;
+    }
+
+    const startAnimation = () => {
+      if (animatedRef.current) return;
+      animatedRef.current = true;
+
+      const duration = 2000; // 2 seconds for rich, noticeable count-up
+      const startTime = performance.now();
+
+      const step = (now) => {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        // easeOutExpo for energetic start and smooth landing
+        const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+        const currentNum = Math.round(numOnly * ease);
+
+        let formatted = hasComma && currentNum >= 1000
+          ? currentNum.toLocaleString('en-IN')
+          : String(currentNum);
+
+        if (isMarathi) {
+          formatted = englishToMarathi(formatted);
+        }
+
+        if (progress < 1) {
+          setDisplayValue(`${prefix}${formatted}${suffix}`);
+          requestAnimationFrame(step);
+        } else {
+          setDisplayValue(rawStr);
+        }
+      };
+
+      requestAnimationFrame(step);
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          startAnimation();
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(el);
+
+    return () => observer.disconnect();
+  }, [value]);
+
+  return <span ref={ref}>{displayValue}</span>;
+}
 
 export default function Hero({ t, lang = 'mr', homeStats = null }) {
   const stat1Number = homeStats?.stat1_number || t.hero.stat1Number;
@@ -322,7 +416,7 @@ export default function Hero({ t, lang = 'mr', homeStats = null }) {
               </div>
               <div>
                 <div style={{ fontSize: '1.85rem', fontWeight: 800, color: 'var(--primary)', lineHeight: 1.1 }}>
-                  {stat1Number}
+                  <AnimatedCounter value={stat1Number} />
                 </div>
                 <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-muted)', marginTop: '2px' }}>
                   {stat1Label}
@@ -354,7 +448,7 @@ export default function Hero({ t, lang = 'mr', homeStats = null }) {
               </div>
               <div>
                 <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#b45309', lineHeight: 1.1 }}>
-                  {stat2Number}
+                  <AnimatedCounter value={stat2Number} />
                 </div>
                 <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-muted)', marginTop: '2px' }}>
                   {stat2Label}
@@ -386,7 +480,7 @@ export default function Hero({ t, lang = 'mr', homeStats = null }) {
               </div>
               <div>
                 <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#15803d', lineHeight: 1.1 }}>
-                  {stat3Number}
+                  <AnimatedCounter value={stat3Number} />
                 </div>
                 <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-muted)', marginTop: '2px' }}>
                   {stat3Label}

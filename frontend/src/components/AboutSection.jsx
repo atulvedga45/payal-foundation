@@ -1,7 +1,27 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Award, CheckCircle, ShieldCheck } from 'lucide-react';
 
 export default function AboutSection({ t }) {
+  const [pillarsVisible, setPillarsVisible] = useState(false);
+  const pillarsRef = useRef(null);
+
+  useEffect(() => {
+    const el = pillarsRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setPillarsVisible(true);
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
   return (
     <section id="about" className="section section-bg-alt">
       <div className="container">
@@ -95,14 +115,18 @@ export default function AboutSection({ t }) {
             </p>
 
             {/* Core Pillars with Glassmorphic Tilt Cards */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
-              <div className="glass-panel tilt-card reveal-right stagger-1" style={{
+            <div ref={pillarsRef} style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
+              <div className="glass-panel tilt-card" style={{
                 display: 'flex',
                 alignItems: 'flex-start',
                 gap: '1.15rem',
                 padding: '1.25rem 1.5rem',
                 borderRadius: 'var(--radius-md)',
                 borderLeft: '4px solid var(--primary)',
+                opacity: pillarsVisible ? 1 : 0,
+                transform: pillarsVisible ? 'translateX(0)' : 'translateX(50px)',
+                transition: 'opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s',
+                willChange: 'opacity, transform',
               }}>
                 <div style={{
                   background: 'var(--primary-light)',
@@ -126,13 +150,17 @@ export default function AboutSection({ t }) {
                 </div>
               </div>
 
-              <div className="glass-panel tilt-card reveal-right stagger-2" style={{
+              <div className="glass-panel tilt-card" style={{
                 display: 'flex',
                 alignItems: 'flex-start',
                 gap: '1.15rem',
                 padding: '1.25rem 1.5rem',
                 borderRadius: 'var(--radius-md)',
                 borderLeft: '4px solid var(--accent-saffron)',
+                opacity: pillarsVisible ? 1 : 0,
+                transform: pillarsVisible ? 'translateX(0)' : 'translateX(50px)',
+                transition: 'opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.55s, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.55s',
+                willChange: 'opacity, transform',
               }}>
                 <div style={{
                   background: '#fef3c7',
@@ -156,13 +184,17 @@ export default function AboutSection({ t }) {
                 </div>
               </div>
 
-              <div className="glass-panel tilt-card reveal-right stagger-3" style={{
+              <div className="glass-panel tilt-card" style={{
                 display: 'flex',
                 alignItems: 'flex-start',
                 gap: '1.15rem',
                 padding: '1.25rem 1.5rem',
                 borderRadius: 'var(--radius-md)',
                 borderLeft: '4px solid var(--accent-green)',
+                opacity: pillarsVisible ? 1 : 0,
+                transform: pillarsVisible ? 'translateX(0)' : 'translateX(50px)',
+                transition: 'opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.95s, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.95s',
+                willChange: 'opacity, transform',
               }}>
                 <div style={{
                   background: '#dcfce7',
