@@ -243,7 +243,7 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
               return (
                 <div
                   key={`initiative-${item.id ?? 'item'}-${idx}`}
-                  className={`card initiative-card glass-panel tilt-card reveal stagger-${(idx % 4) + 1}`}
+                  className="initiative-card glass-panel"
                   style={{ display: 'flex', flexDirection: 'column', cursor: 'pointer' }}
                   onClick={() => openModal(item, idx)}
                   title={lang === 'mr' ? 'अधिक माहितीसाठी क्लिक करा' : 'Click for details'}
@@ -373,13 +373,16 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
           background: #ffffff;
           border: 1px solid #e2e8f0;
           box-shadow: 0 4px 14px rgba(0,0,0,0.04);
-          transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+          transform: none !important;
+          transition: box-shadow 0.3s ease, border-color 0.3s ease;
           box-sizing: border-box;
         }
 
-        .initiative-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 20px 35px -8px rgba(11, 98, 164, 0.2), 0 8px 16px -4px rgba(0,0,0,0.06);
+        .initiative-card:hover,
+        .initiative-card:active,
+        .initiative-card:focus {
+          transform: none !important;
+          box-shadow: 0 10px 26px -4px rgba(11, 98, 164, 0.18), 0 4px 12px rgba(0,0,0,0.06);
           border-color: rgba(11, 98, 164, 0.4);
         }
 
@@ -853,7 +856,8 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
         .carousel-nav-btn.next-btn { right: -6px; }
 
         .initiative-card.in-view {
-          transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1), transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s ease, border-color 0.4s ease;
+          transform: none !important;
+          transition: box-shadow 0.3s ease, border-color 0.3s ease;
         }
       `}</style>
     </section>

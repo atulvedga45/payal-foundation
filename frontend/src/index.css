@@ -994,8 +994,7 @@ body.modal-open .scroll-to-top-btn {
 }
 
 /* 4. Luxury 3D Card Hover Elevate */
-.card,
-.initiative-card,
+.card:not(.initiative-card),
 .trustee-card {
   transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
               box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1),
@@ -1003,12 +1002,17 @@ body.modal-open .scroll-to-top-btn {
   will-change: transform, box-shadow;
 }
 
-.card:hover,
-.initiative-card:hover,
+.card:not(.initiative-card):hover,
 .trustee-card:hover {
   transform: translateY(-8px) scale(1.012);
   box-shadow: 0 22px 40px -10px rgba(11, 98, 164, 0.16),
               0 0 0 1px rgba(11, 98, 164, 0.12);
+}
+
+.initiative-card,
+.initiative-card:hover,
+.initiative-card:active {
+  transform: none !important;
 }
 
 [data-theme="dark"] .card:hover,
