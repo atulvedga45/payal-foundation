@@ -2324,229 +2324,160 @@ export default function AdminModal({
                       padding: '1.5rem',
                       boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)'
                     }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--border-color)' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                          <button
-                            type="button"
-                            onClick={() => setEditingTrustee(null)}
-                            style={{
-                              background: '#f1f5f9',
-                              border: 'none',
-                              borderRadius: 'var(--radius-full)',
-                              width: '32px',
-                              height: '32px',
+                      <form onSubmit={handleSaveTrustee} style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
+                        {/* Profile Photo (at Top) */}
+                        <div style={{ marginBottom: '1.25rem', width: '100%', boxSizing: 'border-box' }}>
+                          <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.5rem' }}>
+                            विश्वस्त फोटो (Profile Photo)
+                          </label>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.55rem' }}>
+                            <div style={{
+                              width: '84px',
+                              height: '84px',
+                              borderRadius: '50%',
+                              overflow: 'hidden',
+                              border: '2.5px solid var(--primary)',
+                              backgroundColor: '#f1f5f9',
+                              boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                            }}>
+                              <img
+                                src={editingTrustee.photo_url || '/sonya.jpg'}
+                                alt="Trustee Preview"
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                onError={(e) => { e.target.src = '/sonya.jpg'; }}
+                              />
+                            </div>
+                            <input
+                              type="file"
+                              ref={trusteePhotoRef}
+                              accept="image/*"
+                              onChange={handleTrusteePhotoUpload}
+                              style={{ display: 'none' }}
+                            />
+                            <button
+                              type="button"
+                              disabled={trusteeUploading}
+                              onClick={() => trusteePhotoRef.current?.click()}
+                              style={{
+                                padding: '0.5rem 1rem',
+                                borderRadius: '6px',
+                                border: '1.5px solid var(--primary)',
+                                background: 'var(--primary-light)',
+                                color: 'var(--primary)',
+                                fontWeight: 700,
+                                fontSize: '0.82rem',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '0.4rem',
+                                cursor: trusteeUploading ? 'not-allowed' : 'pointer'
+                              }}
+                            >
+                              <Upload size={14} />
+                              <span>{trusteeUploading ? 'Uploading...' : 'Upload Photo'}</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Trustee Name */}
+                        <div style={{ marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
+                          <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
+                            विश्वस्ताचे नाव (Full Name) *
+                          </label>
+                          <input
+                            type="text"
+                            value={editingTrustee.name}
+                            onChange={(e) => setEditingTrustee({ ...editingTrustee, name: e.target.value })}
+                            placeholder="उदा. Sonya Oghe किंवा Zakir Hussain"
+                            required
+                            style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
+                          />
+                        </div>
+
+                        {/* Mobile Number */}
+                        <div style={{ marginBottom: '1.25rem', width: '100%', boxSizing: 'border-box' }}>
+                          <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
+                            मोबाईल नंबर (Mobile Number) *
+                          </label>
+                          <input
+                            type="text"
+                            value={editingTrustee.phone || '1234567890'}
+                            onChange={(e) => setEditingTrustee({ ...editingTrustee, phone: e.target.value })}
+                            placeholder="1234567890"
+                            required
+                            style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
+                          />
+                        </div>
+
+                        {/* UPI Scanner */}
+                        <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1.25rem', marginBottom: '1.25rem', width: '100%', boxSizing: 'border-box' }}>
+                          <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.5rem' }}>
+                            UPI Scanner
+                          </label>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.55rem' }}>
+                            <div style={{
+                              width: '110px',
+                              height: '110px',
+                              padding: '6px',
+                              background: '#ffffff',
+                              border: '1.5px solid #cbd5e1',
+                              borderRadius: '10px',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              cursor: 'pointer',
-                              color: 'var(--text-main)'
-                            }}
-                          >
-                            <ArrowLeft size={16} />
-                          </button>
-                          <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)' }}>
-                            {editingTrustee.id === 'new' ? 'नवीन विश्वस्त जोडा (Add New Trustee)' : `विश्वस्त माहिती संपादित करा: ${editingTrustee.name}`}
-                          </h4>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setEditingTrustee(null)}
-                          style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.85rem' }}
-                        >
-                          रद्द करा (Cancel)
-                        </button>
-                      </div>
-
-                      <form onSubmit={handleSaveTrustee} style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
-                        <div style={{
-                          display: 'grid',
-                          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
-                          gap: '1.25rem',
-                          marginBottom: '1.5rem',
-                          width: '100%',
-                          maxWidth: '100%',
-                          boxSizing: 'border-box'
-                        }}>
-                          
-                          {/* Left Column: Trustee Details */}
-                          <div style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
-                            <div style={{ marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
-                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
-                                विश्वस्ताचे नाव (Full Name) *
-                              </label>
-                              <input
-                                type="text"
-                                value={editingTrustee.name}
-                                onChange={(e) => setEditingTrustee({ ...editingTrustee, name: e.target.value })}
-                                placeholder="उदा. Sonya Oghe किंवा Zakir Hussain"
-                                required
-                                style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
-                              />
+                              boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+                            }}>
+                              {trusteePreviewQr ? (
+                                <img src={trusteePreviewQr} alt="QR Preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                              ) : (
+                                <QrCode size={36} color="#94a3b8" />
+                              )}
                             </div>
-
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '0.75rem', marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
-                              <div>
-                                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
-                                  मोबाईल नंबर (Mobile Number) *
-                                </label>
-                                <input
-                                  type="text"
-                                  value={editingTrustee.phone || '1234567890'}
-                                  onChange={(e) => setEditingTrustee({ ...editingTrustee, phone: e.target.value })}
-                                  placeholder="1234567890"
-                                  required
-                                  style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
-                                />
-                              </div>
-                              <div>
-                                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
-                                  क्रमवारी (Order / Sequence)
-                                </label>
-                                <input
-                                  type="number"
-                                  value={editingTrustee.order || 0}
-                                  onChange={(e) => setEditingTrustee({ ...editingTrustee, order: Number(e.target.value) })}
-                                  style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
-                                />
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Right Column: Photo & Scanner Preview */}
-                          <div>
-                            {/* Photo Upload & Preview */}
-                            <div style={{ marginBottom: '1.25rem' }}>
-                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.45rem' }}>
-                                विश्वस्त फोटो / लोगो (Profile Photo or Logo)
-                              </label>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.75rem' }}>
-                                <div style={{
-                                  width: '74px',
-                                  height: '74px',
-                                  borderRadius: '50%',
-                                  overflow: 'hidden',
-                                  border: '2.5px solid var(--primary)',
-                                  backgroundColor: '#f1f5f9',
-                                  boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
-                                }}>
-                                  <img
-                                    src={editingTrustee.photo_url || '/sonya.jpg'}
-                                    alt="Trustee Preview"
-                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                    onError={(e) => { e.target.src = '/sonya.jpg'; }}
-                                  />
-                                </div>
-                                <div style={{ flex: 1 }}>
-                                  <input
-                                    type="file"
-                                    ref={trusteePhotoRef}
-                                    accept="image/*"
-                                    onChange={handleTrusteePhotoUpload}
-                                    style={{ display: 'none' }}
-                                  />
-                                  <button
-                                    type="button"
-                                    disabled={trusteeUploading}
-                                    onClick={() => trusteePhotoRef.current?.click()}
-                                    style={{
-                                      width: '100%',
-                                      padding: '0.55rem 0.85rem',
-                                      borderRadius: '6px',
-                                      border: '1.5px solid var(--primary)',
-                                      background: 'var(--primary-light)',
-                                      color: 'var(--primary)',
-                                      fontWeight: 700,
-                                      fontSize: '0.82rem',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center',
-                                      gap: '0.4rem',
-                                      cursor: trusteeUploading ? 'not-allowed' : 'pointer'
-                                    }}
-                                  >
-                                    <Upload size={14} />
-                                    <span>{trusteeUploading ? 'अपलोड होत आहे...' : 'फोटो निवडा (Upload Photo)'}</span>
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* UPI Scanner Preview & Custom QR */}
-                            <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
-                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.45rem' }}>
-                                UPI स्कॅनर प्रिव्ह्यू (Live Scanner Preview)
-                              </label>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <div style={{
-                                  width: '100px',
-                                  height: '100px',
-                                  padding: '6px',
-                                  background: '#ffffff',
-                                  border: '1.5px solid #cbd5e1',
-                                  borderRadius: '10px',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
-                                }}>
-                                  {trusteePreviewQr ? (
-                                    <img src={trusteePreviewQr} alt="QR Preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                                  ) : (
-                                    <QrCode size={32} color="#94a3b8" />
-                                  )}
-                                </div>
-                                <div style={{ flex: 1 }}>
-                                  <input
-                                    type="file"
-                                    ref={trusteeQrRef}
-                                    accept="image/*"
-                                    onChange={handleTrusteeQrUpload}
-                                    style={{ display: 'none' }}
-                                  />
-                                  <button
-                                    type="button"
-                                    disabled={trusteeQrUploading}
-                                    onClick={() => trusteeQrRef.current?.click()}
-                                    style={{
-                                      width: '100%',
-                                      padding: '0.45rem 0.75rem',
-                                      borderRadius: '6px',
-                                      border: '1px solid var(--border-color)',
-                                      background: '#f8fafc',
-                                      color: 'var(--text-main)',
-                                      fontWeight: 600,
-                                      fontSize: '0.78rem',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center',
-                                      gap: '0.4rem',
-                                      cursor: trusteeQrUploading ? 'not-allowed' : 'pointer',
-                                      marginBottom: '0.35rem'
-                                    }}
-                                  >
-                                    <QrCode size={13} />
-                                    <span>{trusteeQrUploading ? 'अपलोड होत आहे...' : 'स्वतःचा QR फोटो अपलोड करा'}</span>
-                                  </button>
-                                  {editingTrustee.upi_qr_url && (
-                                    <button
-                                      type="button"
-                                      onClick={() => setEditingTrustee({ ...editingTrustee, upi_qr_url: null })}
-                                      style={{
-                                        background: 'none',
-                                        border: 'none',
-                                        color: 'var(--accent-rose)',
-                                        fontSize: '0.75rem',
-                                        cursor: 'pointer',
-                                        padding: 0
-                                      }}
-                                    >
-                                      मूळ डायनॅमिक QR वर परत या (Use Default)
-                                    </button>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-
+                            <input
+                              type="file"
+                              ref={trusteeQrRef}
+                              accept="image/*"
+                              onChange={handleTrusteeQrUpload}
+                              style={{ display: 'none' }}
+                            />
+                            <button
+                              type="button"
+                              disabled={trusteeQrUploading}
+                              onClick={() => trusteeQrRef.current?.click()}
+                              style={{
+                                padding: '0.5rem 1rem',
+                                borderRadius: '6px',
+                                border: '1px solid var(--border-color)',
+                                background: '#f8fafc',
+                                color: 'var(--text-main)',
+                                fontWeight: 600,
+                                fontSize: '0.82rem',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '0.4rem',
+                                cursor: trusteeQrUploading ? 'not-allowed' : 'pointer'
+                              }}
+                            >
+                              <QrCode size={14} />
+                              <span>{trusteeQrUploading ? 'Uploading...' : 'Upload Scanner'}</span>
+                            </button>
+                            {editingTrustee.upi_qr_url && (
+                              <button
+                                type="button"
+                                onClick={() => setEditingTrustee({ ...editingTrustee, upi_qr_url: null })}
+                                style={{
+                                  background: 'none',
+                                  border: 'none',
+                                  color: 'var(--accent-rose)',
+                                  fontSize: '0.75rem',
+                                  cursor: 'pointer',
+                                  padding: 0
+                                }}
+                              >
+                                मूळ डायनॅमिक QR वर परत या (Use Default)
+                              </button>
+                            )}
                           </div>
                         </div>
 
@@ -2566,7 +2497,7 @@ export default function AdminModal({
                             }}
                           >
                             <Save size={16} />
-                            <span>{trusteeSaving ? 'सेव्ह होत आहे...' : 'विश्वस्त सेव्ह करा (Save Trustee)'}</span>
+                            <span>{trusteeSaving ? 'Saving...' : 'Save Trustee'}</span>
                           </button>
                         </div>
                       </form>
@@ -2667,25 +2598,19 @@ export default function AdminModal({
                                 </div>
                               </div>
 
-                              {/* Phone & UPI Preview Pills */}
+                              {/* Phone Preview Pill */}
                               <div style={{
                                 background: '#f8fafc',
                                 borderRadius: '8px',
-                                padding: '0.75rem',
+                                padding: '0.65rem 0.85rem',
                                 marginBottom: '1rem',
                                 display: 'flex',
-                                flexDirection: 'column',
-                                gap: '0.4rem',
-                                fontSize: '0.82rem'
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                fontSize: '0.85rem'
                               }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                  <Phone size={14} color="var(--primary)" />
-                                  <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{item.phone || '1234567890'}</span>
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                  <QrCode size={14} color="#059669" />
-                                  <span style={{ fontFamily: 'monospace', color: 'var(--text-muted)', fontSize: '0.78rem' }}>{item.upi_id || 'payalfoundation@ybl'}</span>
-                                </div>
+                                <Phone size={14} color="var(--primary)" />
+                                <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{item.phone || '1234567890'}</span>
                               </div>
 
                               {/* Card Action Buttons */}
