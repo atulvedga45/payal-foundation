@@ -638,9 +638,9 @@ export default function AdminModal({
       } else {
         const payload = {
           name: editingTrustee.name,
-          role: editingTrustee.role,
-          role_mr: editingTrustee.role_mr,
-          photo_url: editingTrustee.photo_url,
+          role: editingTrustee.role || 'Trust Member',
+          role_mr: editingTrustee.role_mr || 'विश्वस्त सदस्य',
+          photo_url: editingTrustee.photo_url || '/sonya.jpg',
           phone: editingTrustee.phone || '1234567890',
           upi_id: editingTrustee.upi_id || 'payalfoundation@ybl',
           upi_qr_url: editingTrustee.upi_qr_url || null,
@@ -2387,34 +2387,6 @@ export default function AdminModal({
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '0.75rem', marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
                               <div>
                                 <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
-                                  Role / Designation (English) *
-                                </label>
-                                <input
-                                  type="text"
-                                  value={editingTrustee.role}
-                                  onChange={(e) => setEditingTrustee({ ...editingTrustee, role: e.target.value })}
-                                  placeholder="President / Secretary / Trustee"
-                                  required
-                                  style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
-                                />
-                              </div>
-                              <div>
-                                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
-                                  पद / हुद्दा (मराठी)
-                                </label>
-                                <input
-                                  type="text"
-                                  value={editingTrustee.role_mr || ''}
-                                  onChange={(e) => setEditingTrustee({ ...editingTrustee, role_mr: e.target.value })}
-                                  placeholder="अध्यक्ष / सचिव / विश्वस्त सदस्य"
-                                  style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
-                                />
-                              </div>
-                            </div>
-
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '0.75rem', marginBottom: '1rem', width: '100%', boxSizing: 'border-box' }}>
-                              <div>
-                                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
                                   मोबाईल नंबर (Mobile Number) *
                                 </label>
                                 <input
@@ -2437,19 +2409,6 @@ export default function AdminModal({
                                   style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
                                 />
                               </div>
-                            </div>
-
-                            <div style={{ marginBottom: '1rem' }}>
-                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.35rem' }}>
-                                UPI ID (स्कॅनरसाठी)
-                              </label>
-                              <input
-                                type="text"
-                                value={editingTrustee.upi_id || 'payalfoundation@ybl'}
-                                onChange={(e) => setEditingTrustee({ ...editingTrustee, upi_id: e.target.value })}
-                                placeholder="payalfoundation@ybl"
-                                style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
-                              />
                             </div>
                           </div>
 
@@ -2502,44 +2461,13 @@ export default function AdminModal({
                                       alignItems: 'center',
                                       justifyContent: 'center',
                                       gap: '0.4rem',
-                                      cursor: trusteeUploading ? 'not-allowed' : 'pointer',
-                                      marginBottom: '0.4rem'
+                                      cursor: trusteeUploading ? 'not-allowed' : 'pointer'
                                     }}
                                   >
                                     <Upload size={14} />
                                     <span>{trusteeUploading ? 'अपलोड होत आहे...' : 'फोटो निवडा (Upload Photo)'}</span>
                                   </button>
-                                  <input
-                                    type="text"
-                                    value={editingTrustee.photo_url || ''}
-                                    onChange={(e) => setEditingTrustee({ ...editingTrustee, photo_url: e.target.value })}
-                                    placeholder="/sonya.jpg"
-                                    style={{ width: '100%', padding: '0.45rem 0.75rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.8rem', fontFamily: 'monospace' }}
-                                  />
                                 </div>
-                              </div>
-
-                              {/* Presets */}
-                              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                                {PRESET_TRUSTEE_PHOTOS.map((p, idx) => (
-                                  <button
-                                    type="button"
-                                    key={idx}
-                                    onClick={() => setEditingTrustee({ ...editingTrustee, photo_url: p.path })}
-                                    style={{
-                                      fontSize: '0.75rem',
-                                      padding: '0.25rem 0.55rem',
-                                      borderRadius: '9999px',
-                                      border: editingTrustee.photo_url === p.path ? '1.5px solid var(--primary)' : '1px solid var(--border-color)',
-                                      background: editingTrustee.photo_url === p.path ? 'var(--primary-light)' : '#f8fafc',
-                                      color: editingTrustee.photo_url === p.path ? 'var(--primary)' : 'var(--text-main)',
-                                      cursor: 'pointer',
-                                      fontWeight: 600
-                                    }}
-                                  >
-                                    {p.label}
-                                  </button>
-                                ))}
                               </div>
                             </div>
 
@@ -2622,23 +2550,8 @@ export default function AdminModal({
                           </div>
                         </div>
 
-                        {/* Save / Cancel buttons */}
+                        {/* Save button */}
                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.85rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)' }}>
-                          <button
-                            type="button"
-                            onClick={() => setEditingTrustee(null)}
-                            style={{
-                              padding: '0.65rem 1.25rem',
-                              borderRadius: '6px',
-                              border: '1px solid var(--border-color)',
-                              background: '#f8fafc',
-                              color: 'var(--text-main)',
-                              fontWeight: 600,
-                              cursor: 'pointer'
-                            }}
-                          >
-                            रद्द करा (Cancel)
-                          </button>
                           <button
                             type="submit"
                             disabled={trusteeSaving}
@@ -2663,12 +2576,9 @@ export default function AdminModal({
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
                         <div>
-                          <h4 style={{ fontSize: '1.15rem', fontWeight: 800, margin: '0 0 0.25rem 0', color: 'var(--text-main)' }}>
+                          <h4 style={{ fontSize: '1.15rem', fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>
                             विश्वस्त मंडळ व्यवस्थापन (Trustees Management)
                           </h4>
-                          <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                            प्रत्येक कार्डमधील नाव, पद, मोबाईल नंबर (उदा. 1234567890), फोटो आणि UPI स्कॅनर येथे बदला किंवा नवीन जोडा.
-                          </p>
                         </div>
                         <button
                           type="button"
@@ -2754,18 +2664,6 @@ export default function AdminModal({
                                     </h5>
                                     <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600 }}>#{item.order || idx + 1}</span>
                                   </div>
-                                  <div style={{
-                                    display: 'inline-block',
-                                    background: '#e0f2fe',
-                                    color: '#0284c7',
-                                    fontSize: '0.75rem',
-                                    fontWeight: 700,
-                                    padding: '0.15rem 0.6rem',
-                                    borderRadius: '9999px',
-                                    marginBottom: '0.35rem'
-                                  }}>
-                                    {item.role_mr || item.role}
-                                  </div>
                                 </div>
                               </div>
 
@@ -2797,10 +2695,12 @@ export default function AdminModal({
                                   onClick={() => setEditingTrustee({ ...item })}
                                   className="btn btn-outline"
                                   style={{
+                                    flex: 1,
                                     padding: '0.45rem 0.95rem',
                                     fontSize: '0.82rem',
                                     display: 'flex',
                                     alignItems: 'center',
+                                    justifyContent: 'center',
                                     gap: '0.35rem'
                                   }}
                                 >
