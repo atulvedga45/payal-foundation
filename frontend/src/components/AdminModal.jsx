@@ -51,6 +51,49 @@ const PRESET_TRUSTEE_PHOTOS = [
   { label: 'समाजसेवक', path: '/relief_planning.jpeg' }
 ];
 
+const TRUSTEE_CARD_THEMES = [
+  {
+    background: 'linear-gradient(135deg, rgba(238, 242, 255, 0.85) 0%, rgba(224, 231, 255, 0.6) 100%)',
+    border: '1.5px solid rgba(165, 180, 252, 0.6)',
+    boxShadow: '0 8px 24px rgba(99, 102, 241, 0.08)'
+  },
+  {
+    background: 'linear-gradient(135deg, rgba(254, 243, 199, 0.85) 0%, rgba(253, 230, 138, 0.6) 100%)',
+    border: '1.5px solid rgba(252, 211, 77, 0.6)',
+    boxShadow: '0 8px 24px rgba(245, 158, 11, 0.08)'
+  },
+  {
+    background: 'linear-gradient(135deg, rgba(220, 252, 231, 0.85) 0%, rgba(187, 247, 208, 0.6) 100%)',
+    border: '1.5px solid rgba(134, 239, 172, 0.6)',
+    boxShadow: '0 8px 24px rgba(16, 185, 129, 0.08)'
+  },
+  {
+    background: 'linear-gradient(135deg, rgba(254, 226, 226, 0.85) 0%, rgba(254, 202, 202, 0.6) 100%)',
+    border: '1.5px solid rgba(252, 165, 165, 0.6)',
+    boxShadow: '0 8px 24px rgba(239, 68, 68, 0.08)'
+  },
+  {
+    background: 'linear-gradient(135deg, rgba(243, 232, 255, 0.85) 0%, rgba(233, 213, 255, 0.6) 100%)',
+    border: '1.5px solid rgba(216, 180, 254, 0.6)',
+    boxShadow: '0 8px 24px rgba(168, 85, 247, 0.08)'
+  },
+  {
+    background: 'linear-gradient(135deg, rgba(224, 242, 254, 0.85) 0%, rgba(186, 230, 253, 0.6) 100%)',
+    border: '1.5px solid rgba(125, 211, 252, 0.6)',
+    boxShadow: '0 8px 24px rgba(14, 165, 233, 0.08)'
+  },
+  {
+    background: 'linear-gradient(135deg, rgba(255, 237, 213, 0.85) 0%, rgba(254, 215, 170, 0.6) 100%)',
+    border: '1.5px solid rgba(253, 186, 116, 0.6)',
+    boxShadow: '0 8px 24px rgba(249, 115, 22, 0.08)'
+  },
+  {
+    background: 'linear-gradient(135deg, rgba(204, 251, 241, 0.85) 0%, rgba(153, 246, 228, 0.6) 100%)',
+    border: '1.5px solid rgba(94, 234, 212, 0.6)',
+    boxShadow: '0 8px 24px rgba(20, 184, 166, 0.08)'
+  }
+];
+
 const PRESET_GALLERY_CATEGORIES = [
   { mr: 'आरोग्य व रुग्णसेवा', en: 'Healthcare & Medical' },
   { mr: 'सामाजिक कार्य', en: 'Social Service' },
@@ -2325,20 +2368,20 @@ export default function AdminModal({
                       boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)'
                     }}>
                       <form onSubmit={handleSaveTrustee} style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
-                        {/* Profile Photo (at Top) */}
-                        <div style={{ marginBottom: '1.25rem', width: '100%', boxSizing: 'border-box' }}>
-                          <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.5rem' }}>
+                        {/* Profile Photo (at Top & Centered) */}
+                        <div style={{ marginBottom: '1.5rem', width: '100%', boxSizing: 'border-box' }}>
+                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.65rem', textAlign: 'center' }}>
                             विश्वस्त फोटो (Profile Photo)
                           </label>
-                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.55rem' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.65rem' }}>
                             <div style={{
-                              width: '84px',
-                              height: '84px',
+                              width: '88px',
+                              height: '88px',
                               borderRadius: '50%',
                               overflow: 'hidden',
                               border: '2.5px solid var(--primary)',
                               backgroundColor: '#f1f5f9',
-                              boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                              boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                             }}>
                               <img
                                 src={editingTrustee.photo_url || '/sonya.jpg'}
@@ -2354,28 +2397,48 @@ export default function AdminModal({
                               onChange={handleTrusteePhotoUpload}
                               style={{ display: 'none' }}
                             />
-                            <button
-                              type="button"
-                              disabled={trusteeUploading}
-                              onClick={() => trusteePhotoRef.current?.click()}
-                              style={{
-                                padding: '0.5rem 1rem',
-                                borderRadius: '6px',
-                                border: '1.5px solid var(--primary)',
-                                background: 'var(--primary-light)',
-                                color: 'var(--primary)',
-                                fontWeight: 700,
-                                fontSize: '0.82rem',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '0.4rem',
-                                cursor: trusteeUploading ? 'not-allowed' : 'pointer'
-                              }}
-                            >
-                              <Upload size={14} />
-                              <span>{trusteeUploading ? 'Uploading...' : 'Upload Photo'}</span>
-                            </button>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <button
+                                type="button"
+                                disabled={trusteeUploading}
+                                onClick={() => trusteePhotoRef.current?.click()}
+                                style={{
+                                  padding: '0.52rem 1.15rem',
+                                  borderRadius: '6px',
+                                  border: '1.5px solid var(--primary)',
+                                  background: 'var(--primary-light)',
+                                  color: 'var(--primary)',
+                                  fontWeight: 700,
+                                  fontSize: '0.84rem',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  gap: '0.45rem',
+                                  cursor: trusteeUploading ? 'not-allowed' : 'pointer'
+                                }}
+                              >
+                                <Upload size={14} />
+                                <span>{trusteeUploading ? 'Uploading...' : 'Upload Photo'}</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setEditingTrustee(prev => ({ ...prev, photo_url: '/sonya.jpg' }))}
+                                style={{
+                                  padding: '0.52rem 0.65rem',
+                                  borderRadius: '6px',
+                                  border: '1.5px solid #fecaca',
+                                  background: '#fee2e2',
+                                  color: '#b91c1c',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  cursor: 'pointer'
+                                }}
+                                title="फोटो हटवा (Delete Photo)"
+                              >
+                                <Trash2 size={15} />
+                              </button>
+                            </div>
                           </div>
                         </div>
 
@@ -2409,12 +2472,12 @@ export default function AdminModal({
                           />
                         </div>
 
-                        {/* UPI Scanner */}
+                        {/* UPI Scanner (Centered) */}
                         <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1.25rem', marginBottom: '1.25rem', width: '100%', boxSizing: 'border-box' }}>
-                          <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.5rem' }}>
+                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.65rem', textAlign: 'center' }}>
                             UPI Scanner
                           </label>
-                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.55rem' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.65rem' }}>
                             <div style={{
                               width: '110px',
                               height: '110px',
@@ -2440,28 +2503,49 @@ export default function AdminModal({
                               onChange={handleTrusteeQrUpload}
                               style={{ display: 'none' }}
                             />
-                            <button
-                              type="button"
-                              disabled={trusteeQrUploading}
-                              onClick={() => trusteeQrRef.current?.click()}
-                              style={{
-                                padding: '0.5rem 1rem',
-                                borderRadius: '6px',
-                                border: '1px solid var(--border-color)',
-                                background: '#f8fafc',
-                                color: 'var(--text-main)',
-                                fontWeight: 600,
-                                fontSize: '0.82rem',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '0.4rem',
-                                cursor: trusteeQrUploading ? 'not-allowed' : 'pointer'
-                              }}
-                            >
-                              <QrCode size={14} />
-                              <span>{trusteeQrUploading ? 'Uploading...' : 'Upload Scanner'}</span>
-                            </button>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <button
+                                type="button"
+                                disabled={trusteeQrUploading}
+                                onClick={() => trusteeQrRef.current?.click()}
+                                style={{
+                                  padding: '0.52rem 1.15rem',
+                                  borderRadius: '6px',
+                                  border: '1.5px solid #16a34a',
+                                  background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
+                                  color: '#ffffff',
+                                  fontWeight: 700,
+                                  fontSize: '0.84rem',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  gap: '0.45rem',
+                                  cursor: trusteeQrUploading ? 'not-allowed' : 'pointer',
+                                  boxShadow: '0 2px 6px rgba(22, 163, 74, 0.25)'
+                                }}
+                              >
+                                <QrCode size={14} />
+                                <span>{trusteeQrUploading ? 'Uploading...' : 'Upload Scanner'}</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setEditingTrustee(prev => ({ ...prev, upi_qr_url: null }))}
+                                style={{
+                                  padding: '0.52rem 0.65rem',
+                                  borderRadius: '6px',
+                                  border: '1.5px solid #fecaca',
+                                  background: '#fee2e2',
+                                  color: '#b91c1c',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  cursor: 'pointer'
+                                }}
+                                title="स्कॅनर हटवा (Delete Scanner)"
+                              >
+                                <Trash2 size={15} />
+                              </button>
+                            </div>
                             {editingTrustee.upi_qr_url && (
                               <button
                                 type="button"
@@ -2481,17 +2565,20 @@ export default function AdminModal({
                           </div>
                         </div>
 
-                        {/* Save button */}
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.85rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)' }}>
+                        {/* Save button (Full width & square edges) */}
+                        <div style={{ paddingTop: '1.25rem', borderTop: '1px solid var(--border-color)', marginTop: '1.5rem', width: '100%' }}>
                           <button
                             type="submit"
                             disabled={trusteeSaving}
                             className="btn btn-primary"
                             style={{
-                              padding: '0.65rem 1.75rem',
+                              width: '100%',
+                              padding: '0.75rem 1.5rem',
                               fontWeight: 700,
+                              borderRadius: '6px',
                               display: 'flex',
                               alignItems: 'center',
+                              justifyContent: 'center',
                               gap: '0.5rem',
                               cursor: trusteeSaving ? 'not-allowed' : 'pointer'
                             }}
@@ -2554,105 +2641,111 @@ export default function AdminModal({
                           maxWidth: '100%',
                           boxSizing: 'border-box'
                         }}>
-                          {localTrustees.map((item, idx) => (
-                            <div
-                              key={item.id || idx}
-                              style={{
-                                border: '1px solid var(--border-color)',
-                                borderRadius: 'var(--radius-md)',
-                                overflow: 'hidden',
-                                backgroundColor: '#ffffff',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
-                                padding: '1.25rem',
-                                width: '100%',
-                                maxWidth: '100%',
-                                boxSizing: 'border-box'
-                              }}
-                            >
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                                <div style={{
-                                  width: '64px',
-                                  height: '64px',
-                                  borderRadius: '50%',
+                          {localTrustees.map((item, idx) => {
+                            const theme = TRUSTEE_CARD_THEMES[idx % TRUSTEE_CARD_THEMES.length];
+                            return (
+                              <div
+                                key={item.id || idx}
+                                style={{
+                                  background: theme.background,
+                                  border: theme.border,
+                                  boxShadow: theme.boxShadow,
+                                  backdropFilter: 'blur(16px)',
+                                  WebkitBackdropFilter: 'blur(16px)',
+                                  borderRadius: 'var(--radius-md)',
                                   overflow: 'hidden',
-                                  border: '2.5px solid var(--primary)',
-                                  backgroundColor: '#f1f5f9',
-                                  flexShrink: 0
-                                }}>
-                                  <img
-                                    src={item.photo_url || '/sonya.jpg'}
-                                    alt={item.name}
-                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                    onError={(e) => { e.target.src = '/sonya.jpg'; }}
-                                  />
-                                </div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  padding: '1.25rem',
+                                  width: '100%',
+                                  maxWidth: '100%',
+                                  boxSizing: 'border-box',
+                                  transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+                                }}
+                              >
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                                  <div style={{
+                                    width: '64px',
+                                    height: '64px',
+                                    borderRadius: '50%',
+                                    overflow: 'hidden',
+                                    border: '2.5px solid var(--primary)',
+                                    backgroundColor: '#f1f5f9',
+                                    flexShrink: 0
+                                  }}>
+                                    <img
+                                      src={item.photo_url || '/sonya.jpg'}
+                                      alt={item.name}
+                                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                      onError={(e) => { e.target.src = '/sonya.jpg'; }}
+                                    />
+                                  </div>
+                                  <div style={{ flex: 1, minWidth: 0 }}>
                                     <h5 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                       {item.name}
                                     </h5>
-                                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600 }}>#{item.order || idx + 1}</span>
                                   </div>
                                 </div>
-                              </div>
 
-                              {/* Phone Preview Pill */}
-                              <div style={{
-                                background: '#f8fafc',
-                                borderRadius: '8px',
-                                padding: '0.65rem 0.85rem',
-                                marginBottom: '1rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.5rem',
-                                fontSize: '0.85rem'
-                              }}>
-                                <Phone size={14} color="var(--primary)" />
-                                <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{item.phone || '1234567890'}</span>
-                              </div>
+                                {/* Phone Preview Pill */}
+                                <div style={{
+                                  background: 'rgba(255, 255, 255, 0.72)',
+                                  border: '1px solid rgba(255, 255, 255, 0.85)',
+                                  backdropFilter: 'blur(8px)',
+                                  borderRadius: '8px',
+                                  padding: '0.65rem 0.85rem',
+                                  marginBottom: '1rem',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '0.5rem',
+                                  fontSize: '0.85rem'
+                                }}>
+                                  <Phone size={14} color="var(--primary)" />
+                                  <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{item.phone || '1234567890'}</span>
+                                </div>
 
-                              {/* Card Action Buttons */}
-                              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.6rem', marginTop: 'auto', width: '100%', boxSizing: 'border-box' }}>
-                                <button
-                                  type="button"
-                                  onClick={() => setEditingTrustee({ ...item })}
-                                  className="btn btn-outline"
-                                  style={{
-                                    flex: 1,
-                                    padding: '0.45rem 0.95rem',
-                                    fontSize: '0.82rem',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '0.35rem'
-                                  }}
-                                >
-                                  <Edit3 size={14} />
-                                  <span>संपादित करा</span>
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteTrustee(item.id)}
-                                  style={{
-                                    padding: '0.45rem 0.75rem',
-                                    borderRadius: '6px',
-                                    border: '1px solid #fecaca',
-                                    background: '#fee2e2',
-                                    color: '#b91c1c',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                  }}
-                                  title="विश्वस्त हटवा (Delete)"
-                                >
-                                  <Trash2 size={14} />
-                                </button>
+                                {/* Card Action Buttons */}
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.6rem', marginTop: 'auto', width: '100%', boxSizing: 'border-box' }}>
+                                  <button
+                                    type="button"
+                                    onClick={() => setEditingTrustee({ ...item })}
+                                    className="btn btn-outline"
+                                    style={{
+                                      flex: 1,
+                                      padding: '0.45rem 0.95rem',
+                                      fontSize: '0.82rem',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      gap: '0.35rem',
+                                      backgroundColor: 'rgba(255, 255, 255, 0.8)'
+                                    }}
+                                  >
+                                    <Edit3 size={14} />
+                                    <span>संपादित करा</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteTrustee(item.id)}
+                                    style={{
+                                      padding: '0.45rem 0.75rem',
+                                      borderRadius: '6px',
+                                      border: '1px solid #fecaca',
+                                      background: '#fee2e2',
+                                      color: '#b91c1c',
+                                      cursor: 'pointer',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center'
+                                    }}
+                                    title="विश्वस्त हटवा (Delete)"
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
                     </div>
