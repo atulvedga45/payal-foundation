@@ -338,10 +338,28 @@ export default function AdminModal({
     e.preventDefault();
     setStatsSaving(true);
     setStatsSuccess('');
+
+    // Clamp Counter 1 to 1% - 100%
+    const digits1 = String(statsForm.stat1_number || '').replace(/\D/g, '');
+    let num1 = parseInt(digits1, 10);
+    if (isNaN(num1) || num1 < 1) num1 = 1;
+    if (num1 > 100) num1 = 100;
+
+    const payload = {
+      ...statsForm,
+      stat1_number: `${num1}%`,
+      stat1_label: 'Community Dedicated',
+      stat1_label_mr: 'समाजास समर्पित',
+      stat2_label: 'Active Social Workers',
+      stat2_label_mr: 'सक्रिय समाजसेवक',
+      stat3_label: 'Families Impacted',
+      stat3_label_mr: 'मदत पोहोचलेली कुटुंबे'
+    };
+
     try {
-      const updated = await updateHomeStats(token, statsForm);
+      const updated = await updateHomeStats(token, payload);
       if (onUpdateHomeStats) {
-        onUpdateHomeStats(updated || statsForm);
+        onUpdateHomeStats(updated || payload);
       }
       setStatsSuccess('होम पेज आकडेवारी यशस्वीरीत्या सेव्ह केली गेली! (Saved!)');
       setTimeout(() => {
@@ -351,7 +369,7 @@ export default function AdminModal({
     } catch (err) {
       console.error(err);
       if (onUpdateHomeStats) {
-        onUpdateHomeStats(statsForm);
+        onUpdateHomeStats(payload);
       }
       setStatsSuccess('बदल सेव्ह झाले.');
       setTimeout(() => {
@@ -1483,11 +1501,13 @@ export default function AdminModal({
                     }}>
                       {/* Card 1: Community Dedicated */}
                       <div style={{
-                        border: '1.5px solid #bfdbfe',
+                        border: '1.5px solid rgba(56, 189, 248, 0.45)',
                         borderRadius: 'var(--radius-md)',
                         padding: '1.25rem',
-                        backgroundColor: '#f8fafc',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                        background: 'linear-gradient(135deg, rgba(224, 242, 254, 0.75) 0%, rgba(186, 230, 253, 0.45) 100%)',
+                        backdropFilter: 'blur(14px)',
+                        WebkitBackdropFilter: 'blur(14px)',
+                        boxShadow: '0 8px 24px -4px rgba(11, 98, 164, 0.12)'
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1rem' }}>
                           <div style={{
@@ -1509,60 +1529,93 @@ export default function AdminModal({
                         </div>
 
                         <div style={{ marginBottom: '0.85rem' }}>
-                          <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, marginBottom: '0.3rem', color: 'var(--text-main)' }}>
-                            Value / Number (उदा. 100% किंवा 500+)
+                          <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.78rem', fontWeight: 700, marginBottom: '0.3rem', color: 'var(--text-main)' }}>
+                            <span>Value / Number</span>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--primary)', fontWeight: 600 }}>1% ते 100% पर्यंतच</span>
                           </label>
                           <input
                             type="text"
                             value={statsForm.stat1_number}
-                            onChange={(e) => setStatsForm({ ...statsForm, stat1_number: e.target.value })}
+                            placeholder="उदा. 50%"
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              const digits = val.replace(/\D/g, '');
+                              if (!digits) {
+                                setStatsForm({ ...statsForm, stat1_number: val });
+                                return;
+                              }
+                              const num = parseInt(digits, 10);
+                              if (num > 100) {
+                                setStatsForm({ ...statsForm, stat1_number: '100%' });
+                                return;
+                              }
+                              setStatsForm({ ...statsForm, stat1_number: val });
+                            }}
+                            onBlur={() => {
+                              const digits = String(statsForm.stat1_number || '').replace(/\D/g, '');
+                              let num = parseInt(digits, 10);
+                              if (isNaN(num) || num < 1) num = 1;
+                              if (num > 100) num = 100;
+                              setStatsForm({ ...statsForm, stat1_number: `${num}%` });
+                            }}
                             required
                             style={{
                               width: '100%',
                               padding: '0.6rem 0.85rem',
                               borderRadius: '6px',
-                              border: '1px solid var(--border-color)',
+                              border: '1.5px solid rgba(56, 189, 248, 0.5)',
                               fontSize: '0.92rem',
                               fontWeight: 700,
-                              color: 'var(--primary)'
+                              color: 'var(--primary)',
+                              backgroundColor: '#ffffff'
                             }}
                           />
                         </div>
 
                         <div style={{ marginBottom: '0.85rem' }}>
-                          <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, marginBottom: '0.3rem', color: 'var(--text-muted)' }}>
-                            Label (English)
+                          <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.78rem', fontWeight: 600, marginBottom: '0.3rem', color: 'var(--text-muted)' }}>
+                            <span>Label (English)</span>
+                            <span style={{ fontSize: '0.68rem', color: '#64748b' }}>🔒 Default (कायमस्वरूपी)</span>
                           </label>
                           <input
                             type="text"
-                            value={statsForm.stat1_label}
-                            onChange={(e) => setStatsForm({ ...statsForm, stat1_label: e.target.value })}
-                            required
+                            value="Community Dedicated"
+                            readOnly
+                            disabled
                             style={{
                               width: '100%',
                               padding: '0.55rem 0.85rem',
                               borderRadius: '6px',
-                              border: '1px solid var(--border-color)',
-                              fontSize: '0.88rem'
+                              border: '1px solid rgba(203, 213, 225, 0.8)',
+                              fontSize: '0.88rem',
+                              backgroundColor: 'rgba(241, 245, 249, 0.85)',
+                              color: '#64748b',
+                              cursor: 'not-allowed',
+                              fontWeight: 600
                             }}
                           />
                         </div>
 
                         <div>
-                          <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, marginBottom: '0.3rem', color: 'var(--text-muted)' }}>
-                            Label (मराठी)
+                          <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.78rem', fontWeight: 600, marginBottom: '0.3rem', color: 'var(--text-muted)' }}>
+                            <span>Label (मराठी)</span>
+                            <span style={{ fontSize: '0.68rem', color: '#64748b' }}>🔒 Default (कायमस्वरूपी)</span>
                           </label>
                           <input
                             type="text"
-                            value={statsForm.stat1_label_mr}
-                            onChange={(e) => setStatsForm({ ...statsForm, stat1_label_mr: e.target.value })}
-                            required
+                            value="समाजास समर्पित"
+                            readOnly
+                            disabled
                             style={{
                               width: '100%',
                               padding: '0.55rem 0.85rem',
                               borderRadius: '6px',
-                              border: '1px solid var(--border-color)',
-                              fontSize: '0.88rem'
+                              border: '1px solid rgba(203, 213, 225, 0.8)',
+                              fontSize: '0.88rem',
+                              backgroundColor: 'rgba(241, 245, 249, 0.85)',
+                              color: '#64748b',
+                              cursor: 'not-allowed',
+                              fontWeight: 600
                             }}
                           />
                         </div>
@@ -1570,11 +1623,13 @@ export default function AdminModal({
 
                       {/* Card 2: Active Social Workers */}
                       <div style={{
-                        border: '1.5px solid #fed7aa',
+                        border: '1.5px solid rgba(245, 158, 11, 0.45)',
                         borderRadius: 'var(--radius-md)',
                         padding: '1.25rem',
-                        backgroundColor: '#f8fafc',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                        background: 'linear-gradient(135deg, rgba(254, 243, 199, 0.75) 0%, rgba(253, 230, 138, 0.45) 100%)',
+                        backdropFilter: 'blur(14px)',
+                        WebkitBackdropFilter: 'blur(14px)',
+                        boxShadow: '0 8px 24px -4px rgba(245, 158, 11, 0.12)'
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1rem' }}>
                           <div style={{
@@ -1597,7 +1652,7 @@ export default function AdminModal({
 
                         <div style={{ marginBottom: '0.85rem' }}>
                           <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, marginBottom: '0.3rem', color: 'var(--text-main)' }}>
-                            Value / Number (उदा. 50+ किंवा 100+)
+                            Value / Number
                           </label>
                           <input
                             type="text"
@@ -1608,48 +1663,59 @@ export default function AdminModal({
                               width: '100%',
                               padding: '0.6rem 0.85rem',
                               borderRadius: '6px',
-                              border: '1px solid var(--border-color)',
+                              border: '1.5px solid rgba(245, 158, 11, 0.5)',
                               fontSize: '0.92rem',
                               fontWeight: 700,
-                              color: '#b45309'
+                              color: '#b45309',
+                              backgroundColor: '#ffffff'
                             }}
                           />
                         </div>
 
                         <div style={{ marginBottom: '0.85rem' }}>
-                          <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, marginBottom: '0.3rem', color: 'var(--text-muted)' }}>
-                            Label (English)
+                          <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.78rem', fontWeight: 600, marginBottom: '0.3rem', color: 'var(--text-muted)' }}>
+                            <span>Label (English)</span>
+                            <span style={{ fontSize: '0.68rem', color: '#64748b' }}>🔒 Default (कायमस्वरूपी)</span>
                           </label>
                           <input
                             type="text"
-                            value={statsForm.stat2_label}
-                            onChange={(e) => setStatsForm({ ...statsForm, stat2_label: e.target.value })}
-                            required
+                            value="Active Social Workers"
+                            readOnly
+                            disabled
                             style={{
                               width: '100%',
                               padding: '0.55rem 0.85rem',
                               borderRadius: '6px',
-                              border: '1px solid var(--border-color)',
-                              fontSize: '0.88rem'
+                              border: '1px solid rgba(203, 213, 225, 0.8)',
+                              fontSize: '0.88rem',
+                              backgroundColor: 'rgba(241, 245, 249, 0.85)',
+                              color: '#64748b',
+                              cursor: 'not-allowed',
+                              fontWeight: 600
                             }}
                           />
                         </div>
 
                         <div>
-                          <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, marginBottom: '0.3rem', color: 'var(--text-muted)' }}>
-                            Label (मराठी)
+                          <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.78rem', fontWeight: 600, marginBottom: '0.3rem', color: 'var(--text-muted)' }}>
+                            <span>Label (मराठी)</span>
+                            <span style={{ fontSize: '0.68rem', color: '#64748b' }}>🔒 Default (कायमस्वरूपी)</span>
                           </label>
                           <input
                             type="text"
-                            value={statsForm.stat2_label_mr}
-                            onChange={(e) => setStatsForm({ ...statsForm, stat2_label_mr: e.target.value })}
-                            required
+                            value="सक्रिय समाजसेवक"
+                            readOnly
+                            disabled
                             style={{
                               width: '100%',
                               padding: '0.55rem 0.85rem',
                               borderRadius: '6px',
-                              border: '1px solid var(--border-color)',
-                              fontSize: '0.88rem'
+                              border: '1px solid rgba(203, 213, 225, 0.8)',
+                              fontSize: '0.88rem',
+                              backgroundColor: 'rgba(241, 245, 249, 0.85)',
+                              color: '#64748b',
+                              cursor: 'not-allowed',
+                              fontWeight: 600
                             }}
                           />
                         </div>
@@ -1657,11 +1723,13 @@ export default function AdminModal({
 
                       {/* Card 3: Families Impacted */}
                       <div style={{
-                        border: '1.5px solid #bbf7d0',
+                        border: '1.5px solid rgba(34, 197, 94, 0.45)',
                         borderRadius: 'var(--radius-md)',
                         padding: '1.25rem',
-                        backgroundColor: '#f8fafc',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                        background: 'linear-gradient(135deg, rgba(220, 252, 231, 0.75) 0%, rgba(187, 247, 208, 0.45) 100%)',
+                        backdropFilter: 'blur(14px)',
+                        WebkitBackdropFilter: 'blur(14px)',
+                        boxShadow: '0 8px 24px -4px rgba(22, 163, 74, 0.12)'
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1rem' }}>
                           <div style={{
@@ -1684,7 +1752,7 @@ export default function AdminModal({
 
                         <div style={{ marginBottom: '0.85rem' }}>
                           <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, marginBottom: '0.3rem', color: 'var(--text-main)' }}>
-                            Value / Number (उदा. 10,000+ किंवा 25,000+)
+                            Value / Number
                           </label>
                           <input
                             type="text"
@@ -1695,48 +1763,59 @@ export default function AdminModal({
                               width: '100%',
                               padding: '0.6rem 0.85rem',
                               borderRadius: '6px',
-                              border: '1px solid var(--border-color)',
+                              border: '1.5px solid rgba(34, 197, 94, 0.5)',
                               fontSize: '0.92rem',
                               fontWeight: 700,
-                              color: '#15803d'
+                              color: '#15803d',
+                              backgroundColor: '#ffffff'
                             }}
                           />
                         </div>
 
                         <div style={{ marginBottom: '0.85rem' }}>
-                          <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, marginBottom: '0.3rem', color: 'var(--text-muted)' }}>
-                            Label (English)
+                          <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.78rem', fontWeight: 600, marginBottom: '0.3rem', color: 'var(--text-muted)' }}>
+                            <span>Label (English)</span>
+                            <span style={{ fontSize: '0.68rem', color: '#64748b' }}>🔒 Default (कायमस्वरूपी)</span>
                           </label>
                           <input
                             type="text"
-                            value={statsForm.stat3_label}
-                            onChange={(e) => setStatsForm({ ...statsForm, stat3_label: e.target.value })}
-                            required
+                            value="Families Impacted"
+                            readOnly
+                            disabled
                             style={{
                               width: '100%',
                               padding: '0.55rem 0.85rem',
                               borderRadius: '6px',
-                              border: '1px solid var(--border-color)',
-                              fontSize: '0.88rem'
+                              border: '1px solid rgba(203, 213, 225, 0.8)',
+                              fontSize: '0.88rem',
+                              backgroundColor: 'rgba(241, 245, 249, 0.85)',
+                              color: '#64748b',
+                              cursor: 'not-allowed',
+                              fontWeight: 600
                             }}
                           />
                         </div>
 
                         <div>
-                          <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, marginBottom: '0.3rem', color: 'var(--text-muted)' }}>
-                            Label (मराठी)
+                          <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.78rem', fontWeight: 600, marginBottom: '0.3rem', color: 'var(--text-muted)' }}>
+                            <span>Label (मराठी)</span>
+                            <span style={{ fontSize: '0.68rem', color: '#64748b' }}>🔒 Default (कायमस्वरूपी)</span>
                           </label>
                           <input
                             type="text"
-                            value={statsForm.stat3_label_mr}
-                            onChange={(e) => setStatsForm({ ...statsForm, stat3_label_mr: e.target.value })}
-                            required
+                            value="मदत पोहोचलेली कुटुंबे"
+                            readOnly
+                            disabled
                             style={{
                               width: '100%',
                               padding: '0.55rem 0.85rem',
                               borderRadius: '6px',
-                              border: '1px solid var(--border-color)',
-                              fontSize: '0.88rem'
+                              border: '1px solid rgba(203, 213, 225, 0.8)',
+                              fontSize: '0.88rem',
+                              backgroundColor: 'rgba(241, 245, 249, 0.85)',
+                              color: '#64748b',
+                              cursor: 'not-allowed',
+                              fontWeight: 600
                             }}
                           />
                         </div>

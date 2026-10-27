@@ -96,14 +96,20 @@ function AnimatedCounter({ value }) {
 }
 
 export default function Hero({ t, lang = 'mr', homeStats = null }) {
-  const stat1Number = homeStats?.stat1_number || t.hero.stat1Number;
-  const stat1Label = (lang === 'mr' ? homeStats?.stat1_label_mr : homeStats?.stat1_label) || homeStats?.stat1_label || t.hero.stat1Label;
+  // Ensure stat1 (percentage) never exceeds 100%
+  const rawStat1 = homeStats?.stat1_number || t.hero.stat1Number;
+  const stat1Digits = String(rawStat1).replace(/\D/g, '');
+  const stat1Num = parseInt(stat1Digits, 10);
+  const stat1Number = !isNaN(stat1Num) && stat1Num > 100 ? '100%' : rawStat1;
+
+  // Enforce locked default labels
+  const stat1Label = lang === 'mr' ? 'समाजास समर्पित' : 'Community Dedicated';
 
   const stat2Number = homeStats?.stat2_number || t.hero.stat2Number;
-  const stat2Label = (lang === 'mr' ? homeStats?.stat2_label_mr : homeStats?.stat2_label) || homeStats?.stat2_label || t.hero.stat2Label;
+  const stat2Label = lang === 'mr' ? 'सक्रिय समाजसेवक' : 'Active Social Workers';
 
   const stat3Number = homeStats?.stat3_number || t.hero.stat3Number;
-  const stat3Label = (lang === 'mr' ? homeStats?.stat3_label_mr : homeStats?.stat3_label) || homeStats?.stat3_label || t.hero.stat3Label;
+  const stat3Label = lang === 'mr' ? 'मदत पोहोचलेली कुटुंबे' : 'Families Impacted';
 
   return (
     <section id="home" style={{
@@ -398,7 +404,12 @@ export default function Hero({ t, lang = 'mr', homeStats = null }) {
               display: 'flex',
               alignItems: 'center',
               gap: '1.15rem',
-              textAlign: 'left'
+              textAlign: 'left',
+              background: 'linear-gradient(135deg, rgba(224, 242, 254, 0.78) 0%, rgba(186, 230, 253, 0.45) 100%)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+              border: '1.5px solid rgba(56, 189, 248, 0.35)',
+              boxShadow: '0 8px 24px -4px rgba(11, 98, 164, 0.12)'
             }}>
               <div className="micro-float" style={{
                 background: 'linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%)',
@@ -430,7 +441,12 @@ export default function Hero({ t, lang = 'mr', homeStats = null }) {
               display: 'flex',
               alignItems: 'center',
               gap: '1.15rem',
-              textAlign: 'left'
+              textAlign: 'left',
+              background: 'linear-gradient(135deg, rgba(254, 243, 199, 0.78) 0%, rgba(253, 230, 138, 0.45) 100%)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+              border: '1.5px solid rgba(245, 158, 11, 0.35)',
+              boxShadow: '0 8px 24px -4px rgba(245, 158, 11, 0.12)'
             }}>
               <div className="micro-float" style={{
                 background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
@@ -462,7 +478,12 @@ export default function Hero({ t, lang = 'mr', homeStats = null }) {
               display: 'flex',
               alignItems: 'center',
               gap: '1.15rem',
-              textAlign: 'left'
+              textAlign: 'left',
+              background: 'linear-gradient(135deg, rgba(220, 252, 231, 0.78) 0%, rgba(187, 247, 208, 0.45) 100%)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+              border: '1.5px solid rgba(34, 197, 94, 0.35)',
+              boxShadow: '0 8px 24px -4px rgba(22, 163, 74, 0.12)'
             }}>
               <div className="micro-float" style={{
                 background: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)',
