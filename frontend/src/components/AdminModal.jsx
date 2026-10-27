@@ -321,6 +321,10 @@ export default function AdminModal({
       setTrusteePreviewQr(editingTrustee.upi_qr_url);
       return;
     }
+    if (editingTrustee.id === 'new') {
+      setTrusteePreviewQr('');
+      return;
+    }
     const upi = editingTrustee.upi_id || 'payalfoundation@ybl';
     const payeeName = editingTrustee.name || 'Payal Foundation Trustee';
     QRCode.toDataURL(`upi://pay?pa=${encodeURIComponent(upi)}&pn=${encodeURIComponent(payeeName)}&cu=INR`, {
@@ -330,7 +334,7 @@ export default function AdminModal({
     })
       .then(url => setTrusteePreviewQr(url))
       .catch(() => {});
-  }, [editingTrustee?.upi_id, editingTrustee?.name, editingTrustee?.upi_qr_url]);
+  }, [editingTrustee?.upi_id, editingTrustee?.name, editingTrustee?.upi_qr_url, editingTrustee?.id]);
 
   // Gallery State
   const [localGallery, setLocalGallery] = useState(gallery);
@@ -2374,21 +2378,34 @@ export default function AdminModal({
                             विश्वस्त फोटो (Profile Photo)
                           </label>
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.65rem' }}>
-                            <div style={{
-                              width: '88px',
-                              height: '88px',
-                              borderRadius: '50%',
-                              overflow: 'hidden',
-                              border: '2.5px solid var(--primary)',
-                              backgroundColor: '#f1f5f9',
-                              boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                            }}>
-                              <img
-                                src={editingTrustee.photo_url || '/sonya.jpg'}
-                                alt="Trustee Preview"
-                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                onError={(e) => { e.target.src = '/sonya.jpg'; }}
-                              />
+                            <div
+                              onClick={() => trusteePhotoRef.current?.click()}
+                              style={{
+                                width: '88px',
+                                height: '88px',
+                                borderRadius: '50%',
+                                overflow: 'hidden',
+                                border: editingTrustee.photo_url ? '2.5px solid var(--primary)' : '2px dashed #64748b',
+                                backgroundColor: '#f1f5f9',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease'
+                              }}
+                              title="फोटो निवडा / बदला (Upload Photo)"
+                            >
+                              {editingTrustee.photo_url ? (
+                                <img
+                                  src={editingTrustee.photo_url}
+                                  alt="Trustee Preview"
+                                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                  onError={(e) => { e.target.src = '/sonya.jpg'; }}
+                                />
+                              ) : (
+                                <Plus size={36} color="#64748b" strokeWidth={2.5} />
+                              )}
                             </div>
                             <input
                               type="file"
@@ -2422,7 +2439,7 @@ export default function AdminModal({
                               </button>
                               <button
                                 type="button"
-                                onClick={() => setEditingTrustee(prev => ({ ...prev, photo_url: '/sonya.jpg' }))}
+                                onClick={() => setEditingTrustee(prev => ({ ...prev, photo_url: '' }))}
                                 style={{
                                   padding: '0.52rem 0.65rem',
                                   borderRadius: '6px',
@@ -2449,7 +2466,7 @@ export default function AdminModal({
                           </label>
                           <input
                             type="text"
-                            value={editingTrustee.name}
+                            value={editingTrustee.name || ''}
                             onChange={(e) => setEditingTrustee({ ...editingTrustee, name: e.target.value })}
                             placeholder="उदा. Sonya Oghe किंवा Zakir Hussain"
                             required
@@ -2464,9 +2481,9 @@ export default function AdminModal({
                           </label>
                           <input
                             type="text"
-                            value={editingTrustee.phone || '1234567890'}
+                            value={editingTrustee.phone || ''}
                             onChange={(e) => setEditingTrustee({ ...editingTrustee, phone: e.target.value })}
-                            placeholder="1234567890"
+                            placeholder="उदा. 8766573113"
                             required
                             style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.9rem' }}
                           />
@@ -2478,22 +2495,28 @@ export default function AdminModal({
                             UPI Scanner
                           </label>
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.65rem' }}>
-                            <div style={{
-                              width: '110px',
-                              height: '110px',
-                              padding: '6px',
-                              background: '#ffffff',
-                              border: '1.5px solid #cbd5e1',
-                              borderRadius: '10px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
-                            }}>
-                              {trusteePreviewQr ? (
-                                <img src={trusteePreviewQr} alt="QR Preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                            <div
+                              onClick={() => trusteeQrRef.current?.click()}
+                              style={{
+                                width: '110px',
+                                height: '110px',
+                                padding: '6px',
+                                background: '#ffffff',
+                                border: (editingTrustee.upi_qr_url || (editingTrustee.id !== 'new' && trusteePreviewQr)) ? '1.5px solid #cbd5e1' : '2px dashed #64748b',
+                                borderRadius: '10px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease'
+                              }}
+                              title="स्कॅनर फोटो निवडा / बदला (Upload Scanner)"
+                            >
+                              {editingTrustee.upi_qr_url || (editingTrustee.id !== 'new' && trusteePreviewQr) ? (
+                                <img src={editingTrustee.upi_qr_url || trusteePreviewQr} alt="QR Preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                               ) : (
-                                <QrCode size={36} color="#94a3b8" />
+                                <Plus size={38} color="#64748b" strokeWidth={2.5} />
                               )}
                             </div>
                             <input
@@ -2529,7 +2552,10 @@ export default function AdminModal({
                               </button>
                               <button
                                 type="button"
-                                onClick={() => setEditingTrustee(prev => ({ ...prev, upi_qr_url: null }))}
+                                onClick={() => {
+                                  setEditingTrustee(prev => ({ ...prev, upi_qr_url: null }));
+                                  setTrusteePreviewQr('');
+                                }}
                                 style={{
                                   padding: '0.52rem 0.65rem',
                                   borderRadius: '6px',
@@ -2549,7 +2575,10 @@ export default function AdminModal({
                             {editingTrustee.upi_qr_url && (
                               <button
                                 type="button"
-                                onClick={() => setEditingTrustee({ ...editingTrustee, upi_qr_url: null })}
+                                onClick={() => {
+                                  setEditingTrustee({ ...editingTrustee, upi_qr_url: null });
+                                  setTrusteePreviewQr('');
+                                }}
                                 style={{
                                   background: 'none',
                                   border: 'none',
@@ -2592,40 +2621,45 @@ export default function AdminModal({
                   ) : (
                     /* Trustees List View */
                     <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-                        <div>
-                          <h4 style={{ fontSize: '1.15rem', fontWeight: 800, margin: 0, color: 'var(--text-main)' }}>
+                      <div style={{ marginBottom: '1.25rem' }}>
+                        <div style={{ marginBottom: '0.85rem' }}>
+                          <h4 style={{ fontSize: '1.15rem', fontWeight: 800, margin: '0 0 0.65rem 0', color: 'var(--text-main)' }}>
                             विश्वस्त मंडळ व्यवस्थापन (Trustees Management)
                           </h4>
+                          {/* Black line between text and add card button */}
+                          <div style={{ width: '100%', height: '1.5px', backgroundColor: '#0f172a', borderRadius: '1px' }} />
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEditingTrustee({
-                              id: 'new',
-                              name: '',
-                              role: 'Trust Member',
-                              role_mr: 'विश्वस्त सदस्य (Trust Member)',
-                              photo_url: '/sonya.jpg',
-                              phone: '1234567890',
-                              upi_id: 'payalfoundation@ybl',
-                              upi_qr_url: '',
-                              order: localTrustees.length + 1
-                            });
-                          }}
-                          className="btn btn-primary"
-                          style={{
-                            padding: '0.55rem 1.25rem',
-                            fontSize: '0.88rem',
-                            fontWeight: 700,
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.45rem'
-                          }}
-                        >
-                          <Plus size={16} />
-                          <span>नवीन विश्वस्त जोडा (Add Trustee)</span>
-                        </button>
+                        <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTrusteePreviewQr('');
+                              setEditingTrustee({
+                                id: 'new',
+                                name: '',
+                                role: 'Trust Member',
+                                role_mr: 'विश्वस्त सदस्य (Trust Member)',
+                                photo_url: '',
+                                phone: '',
+                                upi_id: '',
+                                upi_qr_url: '',
+                                order: localTrustees.length + 1
+                              });
+                            }}
+                            className="btn btn-primary"
+                            style={{
+                              padding: '0.55rem 1.25rem',
+                              fontSize: '0.88rem',
+                              fontWeight: 700,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.45rem'
+                            }}
+                          >
+                            <Plus size={16} />
+                            <span>नवीन विश्वस्त जोडा (Add Trustee)</span>
+                          </button>
+                        </div>
                       </div>
 
                       {localTrustees.length === 0 ? (
@@ -2709,16 +2743,21 @@ export default function AdminModal({
                                   <button
                                     type="button"
                                     onClick={() => setEditingTrustee({ ...item })}
-                                    className="btn btn-outline"
                                     style={{
                                       flex: 1,
-                                      padding: '0.45rem 0.95rem',
+                                      padding: '0.52rem 0.95rem',
                                       fontSize: '0.82rem',
+                                      borderRadius: '6px',
+                                      border: '1.5px solid #16a34a',
+                                      background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
+                                      color: '#ffffff',
+                                      fontWeight: 700,
                                       display: 'flex',
                                       alignItems: 'center',
                                       justifyContent: 'center',
-                                      gap: '0.35rem',
-                                      backgroundColor: 'rgba(255, 255, 255, 0.8)'
+                                      gap: '0.4rem',
+                                      cursor: 'pointer',
+                                      boxShadow: '0 2px 6px rgba(22, 163, 74, 0.25)'
                                     }}
                                   >
                                     <Edit3 size={14} />
