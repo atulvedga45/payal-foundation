@@ -80,11 +80,17 @@ def update_trustee(db: Session, trustee_id: int, trustee_data: schemas.TrusteeUp
     data = trustee_data.model_dump(exclude_unset=True) if hasattr(trustee_data, "model_dump") else trustee_data.dict(exclude_unset=True)
     if "photo_url" in data and data["photo_url"]:
         data["photo_url"] = save_base64_image(data["photo_url"])
+    elif "photo_url" in data and not data["photo_url"]:
+        data["photo_url"] = None
     if "upi_qr_url" in data and data["upi_qr_url"]:
         data["upi_qr_url"] = save_base64_image(data["upi_qr_url"])
+    elif "upi_qr_url" in data and not data["upi_qr_url"]:
+        data["upi_qr_url"] = None
     for field, val in data.items():
         if val is not None:
             setattr(db_obj, field, val)
+        elif field in ["photo_url", "upi_qr_url"]:
+            setattr(db_obj, field, None)
     db.commit()
     db.refresh(db_obj)
     return db_obj

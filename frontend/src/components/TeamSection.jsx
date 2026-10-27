@@ -278,13 +278,24 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
               {/* Header with Photo/Logo & Name */}
               <div className="trustee-modal-profile">
                 <div className="modal-avatar-container">
-                  <img
-                    src={getImageUrl(selectedTrustee.photo_url) || '/sonya.jpg'}
-                    alt={selectedTrustee.name || 'Trustee'}
-                    className="modal-avatar-img"
-                    onError={(e) => {
-                      e.target.src = '/sonya.jpg';
-                    }}
+                  {selectedTrustee.photo_url ? (
+                    <img
+                      src={getImageUrl(selectedTrustee.photo_url)}
+                      alt={selectedTrustee.name || 'Trustee'}
+                      className="modal-avatar-img"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        const fallbackIcon = e.target.parentElement.querySelector('.modal-fallback-icon');
+                        if (fallbackIcon) fallbackIcon.style.display = 'block';
+                      }}
+                    />
+                  ) : null}
+                  <UserCheck
+                    size={36}
+                    color="#ffffff"
+                    strokeWidth={2.2}
+                    className="modal-fallback-icon"
+                    style={{ display: selectedTrustee.photo_url ? 'none' : 'block' }}
                   />
                   <div className="modal-avatar-badge">
                     <Shield size={12} color="#ffffff" />

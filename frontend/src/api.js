@@ -376,7 +376,7 @@ export async function updateTrustee(token, id, data) {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "x-admin-key": token
+        "x-admin-key": getAdminKey(token)
       },
       body: JSON.stringify(data)
     });
@@ -394,7 +394,7 @@ export async function createTrustee(token, data) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-admin-key": token
+        "x-admin-key": getAdminKey(token)
       },
       body: JSON.stringify(data)
     });
@@ -411,7 +411,7 @@ export async function deleteTrustee(token, id) {
     const res = await fetch(`${API_BASE}/admin/trustees/${id}`, {
       method: "DELETE",
       headers: {
-        "x-admin-key": token
+        "x-admin-key": getAdminKey(token)
       }
     });
     if (!res.ok) throw new Error("Failed to delete trustee on backend");
@@ -440,7 +440,7 @@ export async function createGalleryItem(token, data) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-admin-key": token
+        "x-admin-key": getAdminKey(token)
       },
       body: JSON.stringify(data)
     });
@@ -458,7 +458,7 @@ export async function updateGalleryItem(token, id, data) {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "x-admin-key": token
+        "x-admin-key": getAdminKey(token)
       },
       body: JSON.stringify(data)
     });
@@ -475,7 +475,7 @@ export async function deleteGalleryItem(token, id) {
     const res = await fetch(`${API_BASE}/admin/gallery/${id}`, {
       method: "DELETE",
       headers: {
-        "x-admin-key": token
+        "x-admin-key": getAdminKey(token)
       }
     });
     if (!res.ok) throw new Error("Failed to delete gallery item on backend");
@@ -492,7 +492,7 @@ export async function updateTrustInfo(token, data) {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "x-admin-key": token
+        "x-admin-key": getAdminKey(token)
       },
       body: JSON.stringify(data)
     });
@@ -511,7 +511,7 @@ export async function uploadImage(token, file) {
     formData.append("file", file);
     const res = await fetch(`${API_BASE}/admin/upload-image`, {
       method: "POST",
-      headers: { "x-admin-key": token },
+      headers: { "x-admin-key": getAdminKey(token) },
       body: formData
     });
     if (!res.ok) throw new Error("Upload failed on server");

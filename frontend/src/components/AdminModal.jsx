@@ -319,22 +319,10 @@ export default function AdminModal({
     }
     if (editingTrustee.upi_qr_url) {
       setTrusteePreviewQr(editingTrustee.upi_qr_url);
-      return;
-    }
-    if (editingTrustee.id === 'new') {
+    } else {
       setTrusteePreviewQr('');
-      return;
     }
-    const upi = editingTrustee.upi_id || 'payalfoundation@ybl';
-    const payeeName = editingTrustee.name || 'Payal Foundation Trustee';
-    QRCode.toDataURL(`upi://pay?pa=${encodeURIComponent(upi)}&pn=${encodeURIComponent(payeeName)}&cu=INR`, {
-      width: 240,
-      margin: 1,
-      color: { dark: '#0f172a', light: '#ffffff' }
-    })
-      .then(url => setTrusteePreviewQr(url))
-      .catch(() => {});
-  }, [editingTrustee?.upi_id, editingTrustee?.name, editingTrustee?.upi_qr_url, editingTrustee?.id]);
+  }, [editingTrustee?.upi_qr_url]);
 
   // Gallery State
   const [localGallery, setLocalGallery] = useState(gallery);
@@ -625,18 +613,22 @@ export default function AdminModal({
     const file = e.target.files?.[0];
     if (!file) return;
     setTrusteeUploading(true);
-    setTrusteeMsg({ type: '', text: '' });
+    setTrusteeMsg({ type: '', text: 'गॅलरीतून फोटो लोड होत आहे...' });
     try {
-      const url = await uploadInitiativeImage(token, file);
-      if (url) {
-        setEditingTrustee(prev => ({ ...prev, photo_url: url }));
-        setTrusteeMsg({ type: 'success', text: 'विश्वस्त फोटो यशस्वीरीत्या अपलोड झाला!' });
+      const dataUrl = await compressImageToDataUrl(file, 800, 800, 0.8);
+      if (dataUrl) {
+        setEditingTrustee(prev => ({ ...prev, photo_url: dataUrl }));
+        setTrusteeMsg({ type: 'success', text: '✅ फोटो निवडला! बदल लागू करण्यासाठी खाली "Save Trustee" बटण दाबा.' });
+      } else {
+        const rawDataUrl = await fileToDataUrl(file);
+        setEditingTrustee(prev => ({ ...prev, photo_url: rawDataUrl }));
       }
     } catch (err) {
-      console.error(err);
-      setTrusteeMsg({ type: 'error', text: 'फोटो अपलोड करताना त्रुटी आली.' });
+      console.error('Trustee photo error:', err);
+      setTrusteeMsg({ type: 'error', text: 'फोटो लोड करताना अडचण आली. कृपया पुन्हा प्रयत्न करा.' });
     } finally {
       setTrusteeUploading(false);
+      if (trusteePhotoRef.current) trusteePhotoRef.current.value = '';
     }
   };
 
@@ -644,18 +636,22 @@ export default function AdminModal({
     const file = e.target.files?.[0];
     if (!file) return;
     setTrusteeQrUploading(true);
-    setTrusteeMsg({ type: '', text: '' });
+    setTrusteeMsg({ type: '', text: 'गॅलरीतून स्कॅनर लोड होत आहे...' });
     try {
-      const url = await uploadInitiativeImage(token, file);
-      if (url) {
-        setEditingTrustee(prev => ({ ...prev, upi_qr_url: url }));
-        setTrusteeMsg({ type: 'success', text: 'UPI स्कॅनर फोटो यशस्वीरीत्या अपलोड झाला!' });
+      const dataUrl = await compressImageToDataUrl(file, 800, 800, 0.85);
+      if (dataUrl) {
+        setEditingTrustee(prev => ({ ...prev, upi_qr_url: dataUrl }));
+        setTrusteeMsg({ type: 'success', text: '✅ UPI स्कॅनर निवडला! बदल लागू करण्यासाठी खाली "Save Trustee" बटण दाबा.' });
+      } else {
+        const rawDataUrl = await fileToDataUrl(file);
+        setEditingTrustee(prev => ({ ...prev, upi_qr_url: rawDataUrl }));
       }
     } catch (err) {
-      console.error(err);
-      setTrusteeMsg({ type: 'error', text: 'स्कॅनर फोटो अपलोड करताना त्रुटी आली.' });
+      console.error('Trustee QR error:', err);
+      setTrusteeMsg({ type: 'error', text: 'स्कॅनर फोटो लोड करताना अडचण आली.' });
     } finally {
       setTrusteeQrUploading(false);
+      if (trusteeQrRef.current) trusteeQrRef.current.value = '';
     }
   };
 
@@ -666,41 +662,68 @@ export default function AdminModal({
       return;
     }
     setTrusteeSaving(true);
-    setTrusteeMsg({ type: '', text: '' });
+    setTrusteeMsg({ type: '', text: 'विश्वस्त माहिती सेव्ह होत आहे...' });
     try {
+      const isNew = editingTrustee.id === 'new';
+      const cleanName = (editingTrustee.name || '').trim();
+      const cleanPhone = (editingTrustee.phone || '').trim();
+      const cleanPhoto = editingTrustee.photo_url ? editingTrustee.photo_url.trim() : null;
+      const cleanQr = editingTrustee.upi_qr_url ? editingTrustee.upi_qr_url.trim() : null;
+
+      const payload = {
+        name: cleanName,
+        role: editingTrustee.role || 'Trust Member',
+        role_mr: editingTrustee.role_mr || 'विश्वस्त सदस्य',
+        photo_url: cleanPhoto,
+        phone: cleanPhone || '1234567890',
+        upi_id: editingTrustee.upi_id || 'payalfoundation@ybl',
+        upi_qr_url: cleanQr,
+        order: Number(editingTrustee.order) || (isNew ? localTrustees.length + 1 : 0)
+      };
+
+      // 1. Optimistic local update so UI reflects immediately
       let updatedList = [];
-      if (editingTrustee.id === 'new') {
-        const payload = {
-          name: editingTrustee.name,
-          role: editingTrustee.role || 'Trust Member',
-          role_mr: editingTrustee.role_mr || 'विश्वस्त सदस्य (Trust Member)',
-          photo_url: editingTrustee.photo_url || '/sonya.jpg',
-          phone: editingTrustee.phone || '1234567890',
-          upi_id: editingTrustee.upi_id || 'payalfoundation@ybl',
-          upi_qr_url: editingTrustee.upi_qr_url || null,
-          order: Number(editingTrustee.order) || localTrustees.length + 1
-        };
-        const created = await createTrustee(token, payload);
-        updatedList = [...localTrustees, created];
+      const tempId = isNew ? Date.now() : editingTrustee.id;
+      if (isNew) {
+        updatedList = [...localTrustees, { ...payload, id: tempId }];
       } else {
-        const payload = {
-          name: editingTrustee.name,
-          role: editingTrustee.role || 'Trust Member',
-          role_mr: editingTrustee.role_mr || 'विश्वस्त सदस्य',
-          photo_url: editingTrustee.photo_url || '/sonya.jpg',
-          phone: editingTrustee.phone || '1234567890',
-          upi_id: editingTrustee.upi_id || 'payalfoundation@ybl',
-          upi_qr_url: editingTrustee.upi_qr_url || null,
-          order: Number(editingTrustee.order) || 0
-        };
-        const saved = await updateTrustee(token, editingTrustee.id, payload);
-        updatedList = localTrustees.map(item => item.id === editingTrustee.id ? (saved || { ...item, ...payload }) : item);
+        updatedList = localTrustees.map(item => item.id === editingTrustee.id ? { ...item, ...payload } : item);
       }
       setLocalTrustees(updatedList);
       if (onUpdateTrustees) onUpdateTrustees(updatedList);
-      localStorage.setItem('payal_trustees', JSON.stringify(updatedList));
+      try {
+        localStorage.setItem('payal_trustees', JSON.stringify(updatedList));
+      } catch (_) {}
+
+      // 2. Sync to Backend so all devices see the update
+      try {
+        if (isNew) {
+          const created = await createTrustee(token, payload);
+          if (created && created.id) {
+            const syncedList = updatedList.map(item => item.id === tempId ? created : item);
+            setLocalTrustees(syncedList);
+            if (onUpdateTrustees) onUpdateTrustees(syncedList);
+            try {
+              localStorage.setItem('payal_trustees', JSON.stringify(syncedList));
+            } catch (_) {}
+          }
+        } else {
+          const saved = await updateTrustee(token, editingTrustee.id, payload);
+          if (saved) {
+            const syncedList = updatedList.map(item => item.id === editingTrustee.id ? { ...item, ...saved } : item);
+            setLocalTrustees(syncedList);
+            if (onUpdateTrustees) onUpdateTrustees(syncedList);
+            try {
+              localStorage.setItem('payal_trustees', JSON.stringify(syncedList));
+            } catch (_) {}
+          }
+        }
+      } catch (backendErr) {
+        console.warn('Backend trustee sync warning:', backendErr);
+      }
+
       setEditingTrustee(null);
-      setTrusteeMsg({ type: 'success', text: 'विश्वस्त माहिती यशस्वीरीत्या सेव्ह झाली! (Trustee saved successfully!)' });
+      setTrusteeMsg({ type: 'success', text: '✅ विश्वस्त माहिती यशस्वीरीत्या सेव्ह झाली! (Trustee saved successfully!)' });
       setTimeout(() => setTrusteeMsg({ type: '', text: '' }), 4000);
     } catch (err) {
       console.error(err);
@@ -2394,14 +2417,14 @@ export default function AdminModal({
                                 cursor: 'pointer',
                                 transition: 'all 0.2s ease'
                               }}
-                              title="फोटो निवडा / बदला (Upload Photo)"
+                              title={editingTrustee.photo_url ? "फोटो बदला (Change Photo)" : "फोटो निवडा (Upload Photo)"}
                             >
                               {editingTrustee.photo_url ? (
                                 <img
                                   src={editingTrustee.photo_url}
                                   alt="Trustee Preview"
                                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                  onError={(e) => { e.target.src = '/sonya.jpg'; }}
+                                  onError={(e) => { e.target.style.display = 'none'; }}
                                 />
                               ) : (
                                 <Plus size={36} color="#64748b" strokeWidth={2.5} />
@@ -2435,11 +2458,14 @@ export default function AdminModal({
                                 }}
                               >
                                 <Upload size={14} />
-                                <span>{trusteeUploading ? 'Uploading...' : 'Upload Photo'}</span>
+                                <span>{trusteeUploading ? 'Uploading...' : (editingTrustee.photo_url ? 'Change Photo' : 'Upload Photo')}</span>
                               </button>
                               <button
                                 type="button"
-                                onClick={() => setEditingTrustee(prev => ({ ...prev, photo_url: '' }))}
+                                onClick={() => {
+                                  setEditingTrustee(prev => ({ ...prev, photo_url: '' }));
+                                  setTrusteeMsg({ type: 'success', text: 'फोटो काढला. बदल सेव्ह करण्यासाठी खाली "Save Trustee" वर क्लिक करा.' });
+                                }}
                                 style={{
                                   padding: '0.52rem 0.65rem',
                                   borderRadius: '6px',
@@ -2502,7 +2528,7 @@ export default function AdminModal({
                                 height: '110px',
                                 padding: '6px',
                                 background: '#ffffff',
-                                border: (editingTrustee.upi_qr_url || (editingTrustee.id !== 'new' && trusteePreviewQr)) ? '1.5px solid #cbd5e1' : '2px dashed #64748b',
+                                border: editingTrustee.upi_qr_url ? '1.5px solid #cbd5e1' : '2px dashed #64748b',
                                 borderRadius: '10px',
                                 display: 'flex',
                                 alignItems: 'center',
@@ -2511,10 +2537,10 @@ export default function AdminModal({
                                 cursor: 'pointer',
                                 transition: 'all 0.2s ease'
                               }}
-                              title="स्कॅनर फोटो निवडा / बदला (Upload Scanner)"
+                              title={editingTrustee.upi_qr_url ? "स्कॅनर बदला (Change Scanner)" : "स्कॅनर निवडा (Add Scanner)"}
                             >
-                              {editingTrustee.upi_qr_url || (editingTrustee.id !== 'new' && trusteePreviewQr) ? (
-                                <img src={editingTrustee.upi_qr_url || trusteePreviewQr} alt="QR Preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                              {editingTrustee.upi_qr_url ? (
+                                <img src={editingTrustee.upi_qr_url} alt="QR Preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                               ) : (
                                 <Plus size={38} color="#64748b" strokeWidth={2.5} />
                               )}
@@ -2548,13 +2574,14 @@ export default function AdminModal({
                                 }}
                               >
                                 <QrCode size={14} />
-                                <span>{trusteeQrUploading ? 'Uploading...' : 'Upload Scanner'}</span>
+                                <span>{trusteeQrUploading ? 'Uploading...' : (editingTrustee.upi_qr_url ? 'Change Scanner' : 'Add Scanner')}</span>
                               </button>
                               <button
                                 type="button"
                                 onClick={() => {
-                                  setEditingTrustee(prev => ({ ...prev, upi_qr_url: null }));
+                                  setEditingTrustee(prev => ({ ...prev, upi_qr_url: '' }));
                                   setTrusteePreviewQr('');
+                                  setTrusteeMsg({ type: 'success', text: 'स्कॅनर काढला. बदल सेव्ह करण्यासाठी खाली "Save Trustee" वर क्लिक करा.' });
                                 }}
                                 style={{
                                   padding: '0.52rem 0.65rem',
@@ -2572,25 +2599,6 @@ export default function AdminModal({
                                 <Trash2 size={15} />
                               </button>
                             </div>
-                            {editingTrustee.upi_qr_url && (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setEditingTrustee({ ...editingTrustee, upi_qr_url: null });
-                                  setTrusteePreviewQr('');
-                                }}
-                                style={{
-                                  background: 'none',
-                                  border: 'none',
-                                  color: 'var(--accent-rose)',
-                                  fontSize: '0.75rem',
-                                  cursor: 'pointer',
-                                  padding: 0
-                                }}
-                              >
-                                मूळ डायनॅमिक QR वर परत या (Use Default)
-                              </button>
-                            )}
                           </div>
                         </div>
 
