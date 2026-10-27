@@ -1058,4 +1058,26 @@ body.drawer-open .floating-action-btn {
   width: 100%;
 }
 
+/* 11. Admin Initiatives Fixed 3-Column Grid on PC */
+.admin-initiatives-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (min-width: 600px) {
+  .admin-initiatives-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 860px) {
+  .admin-initiatives-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+
 

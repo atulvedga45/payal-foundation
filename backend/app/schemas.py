@@ -92,13 +92,13 @@ class InitiativeSchema(BaseModel):
 class InitiativeCreate(BaseModel):
     title: str
     title_mr: Optional[str] = None
-    description: str
+    description: Optional[str] = ""
     description_mr: Optional[str] = None
-    category: str = "Social Welfare"
+    category: Optional[str] = "Social Welfare"
     icon: Optional[str] = "Heart"
     image_url: Optional[str] = None
-    target_amount: float = 0.0
-    raised_amount: float = 0.0
+    target_amount: Optional[float] = 0.0
+    raised_amount: Optional[float] = 0.0
 
 class InitiativeUpdate(BaseModel):
     title: Optional[str] = None

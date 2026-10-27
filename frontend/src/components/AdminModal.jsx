@@ -476,54 +476,72 @@ export default function AdminModal({
     }
     setInitSaving(true);
     setInitMsg({ type: '', text: 'उपक्रम सेव्ह होत आहे...' });
+
     try {
       const finalImageUrl = editingInit.image_url || '/food_distribution.jpg';
+      const safeDesc = (editingInit.description_mr || editingInit.description || initiativeTitle).trim();
+      const isNew = editingInit.id === 'new';
+      const tempId = isNew ? (Date.now()) : editingInit.id;
+      const currentDate = new Date().toISOString();
 
-      let updatedList = [];
       const payload = {
-        ...editingInit,
         title: initiativeTitle,
         title_mr: initiativeTitle,
-        description: editingInit.description_mr || editingInit.description || '',
-        description_mr: editingInit.description_mr || editingInit.description || '',
+        description: safeDesc,
+        description_mr: safeDesc,
+        category: editingInit.category || 'Social Welfare',
+        icon: editingInit.icon || 'Heart',
         image_url: finalImageUrl,
         target_amount: Number(editingInit.target_amount) || 0,
         raised_amount: Number(editingInit.raised_amount) || 0
       };
 
-      if (editingInit.id === 'new') {
-        const currentDate = new Date().toISOString();
-        const created = await createInitiative(token, payload);
-        const itemWithDate = {
-          ...created,
-          date: currentDate
-        };
-        try {
-          const dates = JSON.parse(localStorage.getItem('payal_initiative_dates') || '{}');
-          dates[created.id] = currentDate;
-          localStorage.setItem('payal_initiative_dates', JSON.stringify(dates));
-        } catch (_) {}
-        updatedList = [itemWithDate, ...localInitiatives];
+      // 1. FAST OPTIMISTIC LOCAL SAVE (Instant UI Update)
+      const localItem = {
+        ...payload,
+        id: tempId,
+        date: currentDate
+      };
+
+      let updatedList = [];
+      if (isNew) {
+        updatedList = [localItem, ...localInitiatives];
       } else {
-        const saved = await updateInitiative(token, editingInit.id, payload);
-        const savedItem = saved || payload;
-        try {
-          const dates = JSON.parse(localStorage.getItem('payal_initiative_dates') || '{}');
-          if (!dates[editingInit.id]) {
-            dates[editingInit.id] = new Date().toISOString();
-            localStorage.setItem('payal_initiative_dates', JSON.stringify(dates));
-          }
-        } catch (_) {}
-        updatedList = localInitiatives.map((item) => item.id === editingInit.id ? { ...item, ...savedItem } : item);
+        updatedList = localInitiatives.map((item) => item.id === editingInit.id ? { ...item, ...payload } : item);
       }
+
       setLocalInitiatives(updatedList);
       try {
         localStorage.setItem('payal_initiatives', JSON.stringify(updatedList));
+        const dates = JSON.parse(localStorage.getItem('payal_initiative_dates') || '{}');
+        dates[tempId] = currentDate;
+        localStorage.setItem('payal_initiative_dates', JSON.stringify(dates));
       } catch (_) {}
+
       if (onUpdateInitiatives) onUpdateInitiatives(updatedList);
+
+      // 2. Sync to Backend in background
+      try {
+        if (isNew) {
+          const created = await createInitiative(token, payload);
+          if (created && created.id) {
+            const syncedList = updatedList.map(item => item.id === tempId ? { ...item, id: created.id } : item);
+            setLocalInitiatives(syncedList);
+            try {
+              localStorage.setItem('payal_initiatives', JSON.stringify(syncedList));
+            } catch (_) {}
+            if (onUpdateInitiatives) onUpdateInitiatives(syncedList);
+          }
+        } else {
+          await updateInitiative(token, editingInit.id, payload);
+        }
+      } catch (backendErr) {
+        console.warn("Backend sync failed, saved locally in browser storage:", backendErr);
+      }
+
       setEditingInit(null);
       setActiveTab('initiatives');
-      setInitMsg({ type: 'success', text: 'उपक्रम यशस्वीरीत्या सेव्ह झाला!' });
+      setInitMsg({ type: 'success', text: '✅ उपक्रम यशस्वीरीत्या सेव्ह झाला!' });
       setTimeout(() => setInitMsg({ type: '', text: '' }), 4000);
     } catch (err) {
       console.error(err);
@@ -537,19 +555,21 @@ export default function AdminModal({
     if (!window.confirm('हा उपक्रम खरोखर हटवायचा आहे का? (Are you sure you want to delete this initiative?)')) {
       return;
     }
+    // FAST INSTANT DELETE (Immediate UI removal)
+    const updatedList = localInitiatives.filter((item) => item.id !== id);
+    setLocalInitiatives(updatedList);
+    try {
+      localStorage.setItem('payal_initiatives', JSON.stringify(updatedList));
+    } catch (_) {}
+    if (onUpdateInitiatives) onUpdateInitiatives(updatedList);
+    setInitMsg({ type: 'success', text: '✅ उपक्रम यशस्वीरीत्या हटवला गेला!' });
+    setTimeout(() => setInitMsg({ type: '', text: '' }), 3000);
+
+    // Call backend delete in background
     try {
       await deleteInitiative(token, id);
-      const updatedList = localInitiatives.filter((item) => item.id !== id);
-      setLocalInitiatives(updatedList);
-      try {
-        localStorage.setItem('payal_initiatives', JSON.stringify(updatedList));
-      } catch (_) {}
-      if (onUpdateInitiatives) onUpdateInitiatives(updatedList);
-      setInitMsg({ type: 'success', text: 'उपक्रम यशस्वीरीत्या हटवला गेला! (Initiative deleted!)' });
-      setTimeout(() => setInitMsg({ type: '', text: '' }), 4000);
     } catch (err) {
-      console.error(err);
-      setInitMsg({ type: 'error', text: 'उपक्रम हटवताना त्रुटी आली.' });
+      console.warn("Backend delete sync failed, local delete completed:", err);
     }
   };
 
@@ -2163,14 +2183,7 @@ export default function AdminModal({
                           कोणताही उपक्रम आढळला नाही. नवीन उपक्रम जोडण्यासाठी वरील बटणावर क्लिक करा.
                         </div>
                       ) : (
-                        <div style={{
-                          display: 'grid',
-                          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))',
-                          gap: '1.25rem',
-                          width: '100%',
-                          maxWidth: '100%',
-                          boxSizing: 'border-box'
-                        }}>
+                        <div className="admin-initiatives-grid">
                           {(Array.isArray(localInitiatives) ? localInitiatives : []).map((item) => (
                             <div
                               key={item.id}

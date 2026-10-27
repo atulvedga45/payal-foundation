@@ -41,7 +41,7 @@ class Initiative(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(255), nullable=False)
     title_mr = Column(String(255), nullable=True)
-    description = Column(Text, nullable=False)
+    description = Column(Text, nullable=True, default="")
     description_mr = Column(Text, nullable=True)
     category = Column(String(100), default="Social Welfare")
     icon = Column(String(50), default="Heart")
