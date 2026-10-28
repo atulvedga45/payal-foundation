@@ -193,32 +193,18 @@ export default function DonateSection({ t, trustInfo }) {
             {t.donate?.title || 'Payal Foundation Scanner'}
           </h2>
 
-          {/* Special Marathi Quote Banner with Slow Gentle Pulse */}
-          <div className="slow-pulse" style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0.5rem',
-            background: 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%)',
-            border: '2px solid #fdba74',
-            padding: '0.7rem clamp(0.85rem, 3vw, 1.75rem)',
-            borderRadius: '9999px',
-            marginTop: '0.5rem',
-            marginBottom: '0.75rem',
-            maxWidth: '100%'
+          {/* Simple Dark Black and Bold Quote */}
+          <p style={{
+            fontSize: 'clamp(1.05rem, 3.2vw, 1.3rem)',
+            fontWeight: 800,
+            color: '#000000',
+            margin: '0.6rem auto 0.6rem auto',
+            textAlign: 'center',
+            letterSpacing: '0.01em',
+            lineHeight: 1.4
           }}>
-            <Sparkles size={18} color="#ea580c" style={{ flexShrink: 0 }} />
-            <span style={{
-              fontSize: 'clamp(0.92rem, 3.2vw, 1.25rem)',
-              fontWeight: 800,
-              color: '#9a3412',
-              letterSpacing: '0.01em',
-              textAlign: 'center'
-            }}>
-              "तुमची १ रुपयाची मदत पण १ जीवन वाचवू शकते"
-            </span>
-            <Sparkles size={18} color="#ea580c" style={{ flexShrink: 0 }} />
-          </div>
+            "{t.donate?.quote || 'तुमची १ रुपयाची मदत पण १ जीवन वाचवू शकते'}"
+          </p>
 
           <p className="section-subtitle" style={{ maxWidth: '640px', margin: '0.8rem auto 0 auto', fontSize: '1.02rem' }}>
             {t.donate?.subtitle || 'समाजातील गरजू आणि अडचणीत असणाऱ्या बांधवांना मदतीचा हात देण्यासाठी थेट UPI स्कॅनरद्वारे सहकार्य करा.'}
