@@ -91,7 +91,7 @@ export default function CustomCursor() {
       document.removeEventListener('mouseover', handleMouseOver);
       if (rafId.current) cancelAnimationFrame(rafId.current);
     };
-  }, [hidden]);
+  }, []);
 
   if (!enabled) return null;
 
