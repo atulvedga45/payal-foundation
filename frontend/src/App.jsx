@@ -121,7 +121,16 @@ export default function App() {
   const [trustInfo, setTrustInfo] = useState(() => {
     try {
       const cached = localStorage.getItem('payal_trust_info');
-      return cached ? JSON.parse(cached) : null;
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        return {
+          ...parsed,
+          phone: (parsed.phone && !parsed.phone.includes('92252')) ? parsed.phone : '+91 77768 76121',
+          address: (parsed.address && !parsed.address.includes('Aana Sagar') && !parsed.address.includes('Kurla')) ? parsed.address : 'पालघर (Palghar)',
+          email: (parsed.email && !parsed.email.includes('contact@payalfoundation.org')) ? parsed.email : 'payalfoundation212@gmail.com'
+        };
+      }
+      return null;
     } catch {
       return null;
     }
@@ -192,8 +201,14 @@ export default function App() {
       ]);
 
       if (infoData.status === 'fulfilled' && infoData.value) {
-        setTrustInfo(infoData.value);
-        localStorage.setItem('payal_trust_info', JSON.stringify(infoData.value));
+        const cleanInfo = {
+          ...infoData.value,
+          phone: (infoData.value.phone && !infoData.value.phone.includes('92252')) ? infoData.value.phone : '+91 77768 76121',
+          address: (infoData.value.address && !infoData.value.address.includes('Aana Sagar') && !infoData.value.address.includes('Kurla')) ? infoData.value.address : 'पालघर (Palghar)',
+          email: (infoData.value.email && !infoData.value.email.includes('contact@payalfoundation.org')) ? infoData.value.email : 'payalfoundation212@gmail.com'
+        };
+        setTrustInfo(cleanInfo);
+        localStorage.setItem('payal_trust_info', JSON.stringify(cleanInfo));
       }
       if (trusteesData.status === 'fulfilled' && trusteesData.value && trusteesData.value.length > 0) {
         setTrustees(trusteesData.value);
@@ -328,7 +343,7 @@ export default function App() {
             <span>🤝 {lang === 'mr' ? 'पायल फाउंडेशन - समाज सेवा' : 'Payal Foundation - Social Service'}</span>
           </div>
           <div className="ticker-item">
-            <span>📞 {lang === 'mr' ? 'तात्काळ मदतीसाठी थेट संपर्क: +९१ ९२२५२ ४३५५२' : 'Immediate Assistance Helpline: +91 92252 43552'}</span>
+            <span>📞 {lang === 'mr' ? 'तात्काळ मदतीसाठी थेट संपर्क: +९१ ७७७६८ ७६१२१' : 'Immediate Assistance Helpline: +91 77768 76121'}</span>
           </div>
           {/* Duplicate track for seamless infinite marquee loop */}
           <div className="ticker-item">
@@ -341,7 +356,7 @@ export default function App() {
             <span>🤝 {lang === 'mr' ? 'पायल फाउंडेशन - समाज सेवा' : 'Payal Foundation - Social Service'}</span>
           </div>
           <div className="ticker-item">
-            <span>📞 {lang === 'mr' ? 'तात्काळ मदतीसाठी थेट संपर्क: +९१ ९२२५२ ४३५५२' : 'Immediate Assistance Helpline: +91 92252 43552'}</span>
+            <span>📞 {lang === 'mr' ? 'तात्काळ मदतीसाठी थेट संपर्क: +९१ ७७७६८ ७६१२१' : 'Immediate Assistance Helpline: +91 77768 76121'}</span>
           </div>
         </div>
       </div>
@@ -431,7 +446,7 @@ export default function App() {
 
       {/* WhatsApp Quick Connect Floating Button */}
       <a
-        href="https://wa.me/919225243552?text=Namaskar%20Payal%20Foundation%2C%20I%20would%20like%20to%20help%20or%20need%20assistance"
+        href="https://wa.me/917776876121?text=Namaskar%20Payal%20Foundation%2C%20I%20would%20like%20to%20help%20or%20need%20assistance"
         target="_blank"
         rel="noopener noreferrer"
         className={`whatsapp-float-btn ${!showWhatsApp ? 'footer-hidden' : ''}`}

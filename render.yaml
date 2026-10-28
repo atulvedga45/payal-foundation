@@ -17,7 +17,7 @@ services:
       - key: FAST2SMS_API_KEY
         sync: false
       - key: SMS_NOTIFY_NUMBERS
-        value: "9225243552,8766573113"
+        value: "7776876121,8766573113"
       - key: SMTP_HOST
         value: smtp.gmail.com
       - key: SMTP_PORT

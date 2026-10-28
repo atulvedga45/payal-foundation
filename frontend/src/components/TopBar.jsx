@@ -102,8 +102,8 @@ export default function TopBar({
               )
             },
             {
-              name: 'WhatsApp (9225243552)',
-              url: 'https://wa.me/919225243552',
+              name: 'WhatsApp (+91 77768 76121)',
+              url: 'https://wa.me/917776876121',
               hoverBg: '#25D366',
               icon: (
                 <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">

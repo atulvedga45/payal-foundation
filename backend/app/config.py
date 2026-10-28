@@ -13,9 +13,9 @@ CORS_ORIGINS = [
     if origin.strip()
 ]
 
-# Fast2SMS Configuration for 9225243552 & 8766573113
+# Fast2SMS Configuration for 7776876121 & 8766573113
 FAST2SMS_API_KEY = os.getenv("FAST2SMS_API_KEY", "").strip()
-SMS_NOTIFY_NUMBERS = os.getenv("SMS_NOTIFY_NUMBERS", "9225243552,8766573113").strip()
+SMS_NOTIFY_NUMBERS = os.getenv("SMS_NOTIFY_NUMBERS", "7776876121,8766573113").strip()
 
 # Email Notification Configuration (Gmail SMTP)
 SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")

@@ -1,9 +1,9 @@
 export const translations = {
   en: {
     regNo: "Social Service",
-    phone: "+91 92252 43552",
+    phone: "+91 77768 76121",
     email: "payalfoundation212@gmail.com",
-    address: "Palghar",
+    address: "पालघर (Palghar)",
     nav: {
       home: "Home",
       about: "About Us",
@@ -104,10 +104,10 @@ export const translations = {
         },
         whatsapp: {
           name: "WhatsApp",
-          handle: "+91 92252 43552",
+          handle: "+91 77768 76121",
           desc: "Reach out directly for assistance, immediate help, or joining our official seva broadcasts.",
           btnText: "Chat on WhatsApp",
-          url: "https://wa.me/919225243552"
+          url: "https://wa.me/917776876121"
         },
         youtube: {
           name: "YouTube",
@@ -173,7 +173,7 @@ export const translations = {
   },
   mr: {
     regNo: "समाजसेवा",
-    phone: "+91 92252 43552",
+    phone: "+91 77768 76121",
     email: "payalfoundation212@gmail.com",
     address: "पालघर (Palghar)",
     nav: {
@@ -276,10 +276,10 @@ export const translations = {
         },
         whatsapp: {
           name: "WhatsApp",
-          handle: "+91 92252 43552",
+          handle: "+91 77768 76121",
           desc: "थेट मदत मागण्यासाठी, विचारपूस करण्यासाठी किंवा अधिकृत ग्रुपमध्ये सहभागी होण्यासाठी व्हॉट्सॲपवर संपर्क करा.",
           btnText: "WhatsApp वर चॅट करा",
-          url: "https://wa.me/919225243552"
+          url: "https://wa.me/917776876121"
         },
         youtube: {
           name: "YouTube",

@@ -64,13 +64,13 @@ export default function SocialMediaSection({ t, lang }) {
     {
       id: 'whatsapp',
       name: t.social?.platforms?.whatsapp?.name || 'WhatsApp',
-      handle: '+91 92252 43552',
+      handle: '+91 77768 76121',
       tag: lang === 'mr' ? 'थेट मदत व सेवा' : 'Direct Helpline & Chat',
       desc: lang === 'mr' ? 'थेट मदत मागण्यासाठी किंवा सेवाकार्यात सहभागी होण्यासाठी व्हॉट्सॲपवर संपर्क करा.' : 'Reach out directly for assistance, immediate help, or joining our official seva broadcasts.',
       btnText: t.social?.platforms?.whatsapp?.btnText || 'Chat on WhatsApp',
-      url: 'https://wa.me/919225243552',
-      stats: '9225243552',
-      stats_mr: '९२२५२४३५५२',
+      url: 'https://wa.me/917776876121',
+      stats: '+91 77768 76121',
+      stats_mr: '+९१ ७७७६८ ७६१२१',
       gradient: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
       accentColor: '#25D366',
       glowColor: 'rgba(37, 211, 102, 0.35)',
@@ -405,7 +405,7 @@ export default function SocialMediaSection({ t, lang }) {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
             <a
-              href="https://wa.me/919225243552?text=Namaskar%20Payal%20Foundation%2C%20I%20want%20to%20join%20your%20community"
+              href="https://wa.me/917776876121?text=Namaskar%20Payal%20Foundation%2C%20I%20want%20to%20join%20your%20community"
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-accent btn-sm btn-glow-pulse btn-shine"

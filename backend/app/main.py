@@ -50,6 +50,24 @@ async def lifespan(app: FastAPI):
     db = SessionLocal()
     try:
         seed_initial_data(db)
+        # Ensure TrustInfo has updated phone, email, and address
+        try:
+            info = db.query(models.TrustInfo).first()
+            if info:
+                updated = False
+                if not info.phone or "92252" in info.phone:
+                    info.phone = "+91 77768 76121"
+                    updated = True
+                if not info.email or "contact@payalfoundation.org" in info.email:
+                    info.email = "payalfoundation212@gmail.com"
+                    updated = True
+                if not info.address or "Aana Sagar" in info.address or "Kurla" in info.address:
+                    info.address = "पालघर (Palghar)"
+                    updated = True
+                if updated:
+                    db.commit()
+        except Exception as e:
+            print("TrustInfo migration warning:", e)
         # Check and replace any broken /uploads/ references wiped by ephemeral container restarts
         try:
             initiatives = db.query(models.Initiative).all()
@@ -111,7 +129,7 @@ def health_check():
 def test_email_endpoint():
     res = send_contact_email_notification(
         name="Diagnostic Test",
-        phone="9225243552",
+        phone="7776876121",
         message="Checking email connectivity on Render"
     )
     return res

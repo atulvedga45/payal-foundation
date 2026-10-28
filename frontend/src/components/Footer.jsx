@@ -28,8 +28,8 @@ export default function Footer({ t, onOpenAdmin, trustInfo }) {
       )
     },
     {
-      name: 'WhatsApp (9225243552)',
-      url: 'https://wa.me/919225243552',
+      name: 'WhatsApp (+91 77768 76121)',
+      url: 'https://wa.me/917776876121',
       color: '#25D366',
       bgGradient: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
       icon: (
@@ -181,18 +181,18 @@ export default function Footer({ t, onOpenAdmin, trustInfo }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', color: '#94a3b8', fontSize: '0.88rem' }}>
               <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center' }}>
                 <MapPin size={18} style={{ color: 'var(--accent-saffron)', flexShrink: 0 }} />
-                <span>{trustInfo?.address || 'Palghar'}</span>
+                <span>{trustInfo?.address && !trustInfo.address.includes('Kurla') && !trustInfo.address.includes('Aana Sagar') ? trustInfo.address : 'पालघर (Palghar)'}</span>
               </div>
               <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center' }}>
                 <Phone size={18} style={{ color: 'var(--accent-green)', flexShrink: 0 }} />
-                <a href={`tel:${(trustInfo?.phone || t.phone).replace(/\s+/g, '')}`} style={{ color: '#ffffff', textDecoration: 'none', fontWeight: 600 }}>
-                  {trustInfo?.phone || t.phone}
+                <a href={`tel:${(trustInfo?.phone && !trustInfo.phone.includes('92252') ? trustInfo.phone : '+91 77768 76121').replace(/\s+/g, '')}`} style={{ color: '#ffffff', textDecoration: 'none', fontWeight: 600 }}>
+                  {trustInfo?.phone && !trustInfo.phone.includes('92252') ? trustInfo.phone : '+91 77768 76121'}
                 </a>
               </div>
               <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center' }}>
                 <Mail size={18} style={{ color: 'var(--primary-light)', flexShrink: 0 }} />
-                <a href={`mailto:${trustInfo?.email || t.email}`} style={{ color: '#ffffff', textDecoration: 'none' }}>
-                  {trustInfo?.email || t.email}
+                <a href={`mailto:${trustInfo?.email && !trustInfo.email.includes('contact@payalfoundation.org') ? trustInfo.email : 'payalfoundation212@gmail.com'}`} style={{ color: '#ffffff', textDecoration: 'none' }}>
+                  {trustInfo?.email && !trustInfo.email.includes('contact@payalfoundation.org') ? trustInfo.email : 'payalfoundation212@gmail.com'}
                 </a>
               </div>
             </div>

@@ -9,12 +9,12 @@ logger = logging.getLogger(__name__)
 def send_contact_sms_notification(name: str, phone: str, address: str = "", message: str = "") -> dict:
     """
     Sends an SMS alert via Fast2SMS to the designated trustee / volunteer numbers:
-    9225243552 and 8766573113.
+    7776876121 and 8766573113.
     """
     if not FAST2SMS_API_KEY:
         logger.warning(
             "FAST2SMS_API_KEY is not set in backend/.env. SMS dispatch skipped. "
-            "To send automatic SMS to 9225243552 & 8766573113, please obtain a free key from fast2sms.com "
+            "To send automatic SMS to 7776876121 & 8766573113, please obtain a free key from fast2sms.com "
             "and add FAST2SMS_API_KEY=your_key in backend/.env."
         )
         return {
