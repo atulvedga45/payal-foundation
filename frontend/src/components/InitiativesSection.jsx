@@ -531,7 +531,8 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
           width: 100%;
           max-width: 540px;
           max-height: 94vh;
-          overflow: hidden;
+          overflow-y: auto;
+          overflow-x: hidden;
           box-shadow: 0 32px 80px -8px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.1);
           animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -612,6 +613,9 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
 
         .initiative-modal-content {
           padding: 1.5rem 1.75rem 2rem;
+          box-sizing: border-box;
+          width: 100%;
+          max-width: 100%;
         }
 
         .initiative-modal-date {
@@ -633,6 +637,8 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
           color: var(--text-main);
           line-height: 1.3;
           margin-bottom: 0.9rem;
+          word-break: break-word;
+          overflow-wrap: anywhere;
         }
 
         [data-theme="dark"] .initiative-modal-title { color: #f1f5f9; }
@@ -642,6 +648,11 @@ export default function InitiativesSection({ t, initiatives, onSelectCause, lang
           color: var(--text-muted);
           line-height: 1.7;
           margin-bottom: 1.5rem;
+          word-break: break-word;
+          overflow-wrap: anywhere;
+          white-space: pre-wrap;
+          box-sizing: border-box;
+          padding-right: 0.5rem;
         }
 
         /* Stats Row */

@@ -1008,19 +1008,21 @@ export default function AdminModal({
               </div>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#ffffff',
-              cursor: 'pointer',
-              opacity: 0.8,
-              transition: 'opacity 0.2s'
-            }}
-          >
-            <X size={22} />
-          </button>
+          {(!token || activeTab === 'welcome') && (
+            <button
+              onClick={onClose}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#ffffff',
+                cursor: 'pointer',
+                opacity: 0.8,
+                transition: 'opacity 0.2s'
+              }}
+            >
+              <X size={22} />
+            </button>
+          )}
         </div>
 
         {/* Body */}
@@ -1100,7 +1102,7 @@ export default function AdminModal({
                   backgroundColor: 'var(--light-bg)',
                   borderBottom: '1px solid var(--border-color)',
                   display: 'flex',
-                  justifyContent: 'space-between',
+                  justifyContent: isProfileView ? 'space-between' : 'flex-end',
                   alignItems: 'center',
                   flexWrap: 'nowrap',
                   gap: '0.5rem',
@@ -1312,6 +1314,7 @@ export default function AdminModal({
                       type="button"
                       onClick={handleGoBack}
                       style={{
+                        marginLeft: 'auto',
                         padding: '0.45rem 1.15rem',
                         borderRadius: 'var(--radius-full)',
                         border: '1.5px solid #16a34a',
@@ -2282,11 +2285,8 @@ export default function AdminModal({
 
                               {/* Card Info */}
                               <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', flexGrow: 1, minWidth: 0, boxSizing: 'border-box' }}>
-                                <div style={{ fontWeight: 800, fontSize: '0.98rem', color: 'var(--text-main)', marginBottom: '0.25rem', wordBreak: 'break-word' }}>
+                                <div style={{ fontWeight: 800, fontSize: '0.98rem', color: 'var(--text-main)', marginBottom: '0.75rem', wordBreak: 'break-word' }}>
                                   {item.title_mr || item.title}
-                                </div>
-                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.65rem', wordBreak: 'break-word' }}>
-                                  {item.title}
                                 </div>
 
                                 <div style={{
