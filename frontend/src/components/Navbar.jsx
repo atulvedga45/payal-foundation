@@ -37,7 +37,7 @@ export default function Navbar({ t, isAdminUnlocked = false, onOpenAdmin }) {
         style={{
           position: 'sticky',
           top: 0,
-          zIndex: 100,
+          zIndex: 1000,
           backgroundColor: 'var(--navbar-bg)',
           backdropFilter: 'blur(10px)',
           boxShadow: '0 2px 15px rgba(0, 0, 0, 0.06)',
