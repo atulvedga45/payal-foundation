@@ -329,7 +329,13 @@ export default function Hero({ t, lang = 'mr', homeStats = null }) {
             maxWidth: '760px',
             margin: '0 auto 2.5rem auto'
           }}>
-            {t.hero.subtitle}
+            {typeof t.hero.subtitle === 'string' && t.hero.subtitle.includes('**') ? (
+              t.hero.subtitle.split('**').map((chunk, i) =>
+                i % 2 === 1 ? <strong key={i} style={{ color: 'var(--text-main)', fontWeight: 700 }}>{chunk}</strong> : chunk
+              )
+            ) : (
+              t.hero.subtitle
+            )}
           </p>
 
           {/* Action Buttons with Glowing Pulse & Shine */}

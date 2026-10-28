@@ -154,7 +154,13 @@ export default function Footer({ t, onOpenAdmin, trustInfo }) {
             </div>
             
             <p style={{ color: '#94a3b8', fontSize: '0.88rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
-              {t.footer.aboutText}
+              {typeof t.footer.aboutText === 'string' && t.footer.aboutText.includes('**') ? (
+                t.footer.aboutText.split('**').map((chunk, i) =>
+                  i % 2 === 1 ? <strong key={i} style={{ color: '#ffffff', fontWeight: 700 }}>{chunk}</strong> : chunk
+                )
+              ) : (
+                t.footer.aboutText
+              )}
             </p>
           </div>
 

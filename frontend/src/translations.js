@@ -19,7 +19,7 @@ export const translations = {
       badge: "Community Initiative in Palghar",
       titleStart: "Empowering Communities,",
       titleHighlight: "Serving Humanity",
-      subtitle: "Payal Foundation and Social Service is a community-focused initiative serving people across Palghar. Led by Sonya, the initiative works to support those in need and help improve lives through social welfare, community assistance, healthcare support, and youth empowerment.",
+      subtitle: "**Payal Foundation and Social Service** is a social service initiative working to support needy and underprivileged people across Palghar. Under the leadership of Sonya, through contributions received from citizens, the organization provides medical assistance, social support, and youth empowerment. Upholding humanity, service, and community welfare, reaching every individual in need is our foremost mission.",
       btnGetInvolved: "Our Initiatives",
       btnDonateNow: "Support / Donate",
       stat1Number: "100%",
@@ -164,7 +164,7 @@ export const translations = {
       validationMessage: "Please write your message"
     },
     footer: {
-      aboutText: "Payal Foundation and Social Service is a registered non-profit organization dedicated to youth empowerment, community social welfare, and humanitarian relief in Palghar.",
+      aboutText: "Payal Foundation and Social Service is a social welfare initiative dedicated to helping the poor, needy, and underprivileged. Supported by public contributions, the organization strives to provide every possible assistance and bring a ray of hope into people's lives.",
       quickLinks: "Quick Navigation",
       legalInfo: "Legal & Governance",
       rights: "All Rights Reserved.",
@@ -191,7 +191,7 @@ export const translations = {
       badge: "पालघरमधील समाजोपयोगी जनकल्याण संस्था",
       titleStart: "सक्षम समाज,",
       titleHighlight: "समृद्ध भविष्य आणि सेवा",
-      subtitle: "पायल फाउंडेशन अँड सोशल सर्विस ही पालघरमधील नागरिकांसाठी कार्यरत असलेली समाजोपयोगी संस्था आहे. सोन्या (Sonya) यांच्या नेतृत्वाखाली ही संस्था गरजू लोकांना आधार देणे, समाजकल्याण, आरोग्य सहाय्य आणि युवा सक्षमीकरणाच्या माध्यमातून लोकांचे जीवन अधिक समृद्ध करण्यासाठी अविरत कार्यरत आहे.",
+      subtitle: "**पायल फाउंडेशन अँड सोशल सर्विस** ही पालघरमधील गरजू आणि वंचित नागरिकांच्या मदतीसाठी कार्यरत असलेली सामाजिक सेवा संस्था आहे. सोन्या (Sonya) यांच्या नेतृत्वाखाली, लोकांकडून मिळणाऱ्या देणग्यांच्या माध्यमातून संस्था गरजू व्यक्तींना आरोग्य सहाय्य, सामाजिक मदत आणि युवा सक्षमीकरणासाठी सहकार्य करते. माणुसकी, सेवाभाव आणि समाजहिताची भावना जपत, प्रत्येक गरजू व्यक्तीपर्यंत मदतीचा हात पोहोचवणे हेच आमचे ध्येय आहे.",
       btnGetInvolved: "आमचे उपक्रम",
       btnDonateNow: "देणगी देऊन सहकार्य करा",
       stat1Number: "१००%",
@@ -336,7 +336,7 @@ export const translations = {
       validationMessage: "कृपया आपला संदेश लिहा"
     },
     footer: {
-      aboutText: "पायल फाउंडेशन अँड सोशल सर्विस ही युवा सक्षमीकरण, गरिबांचे पुनर्वसन आणि लोककल्याणासाठी कार्यरत असलेली पालघरमधील मान्यताप्राप्त संस्था आहे.",
+      aboutText: "पायल फाउंडेशन अँड सोशल सर्विस ही गरजू, गरीब आणि वंचित लोकांना मदत करण्यासाठी कार्यरत असलेली सामाजिक सेवा संस्था आहे. लोकांकडून मिळणाऱ्या देणग्यांच्या माध्यमातून संस्था गरजू व्यक्तींना शक्य ती मदत करून त्यांच्या जीवनात आशेचा नवा किरण निर्माण करण्याचा प्रयत्न करते.",
       quickLinks: "महत्वाच्या लिंक्स",
       legalInfo: "कायदेशीर माहिती",
       rights: "सर्व हक्क राखीव.",
