@@ -64,7 +64,7 @@ export default function TopBar({
         boxShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
         transition: 'all 0.3s ease',
         position: 'relative',
-        zIndex: 105
+        zIndex: isOpen ? 1200 : 105
       }}
     >
       <div 
@@ -399,7 +399,7 @@ export default function TopBar({
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '0.6rem',
-                zIndex: 1100,
+                zIndex: 1250,
                 animation: 'topbarDropdownSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
               }}
             >

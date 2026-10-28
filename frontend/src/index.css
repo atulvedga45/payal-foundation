@@ -130,7 +130,11 @@ body.modal-open .scroll-to-top-btn {
 @media (max-width: 768px) {
   .top-bar {
     position: relative;
-    z-index: 105;
+    z-index: 1100 !important;
+  }
+
+  .topbar-mobile-dropdown {
+    z-index: 1200 !important;
   }
 
   .topbar-container {

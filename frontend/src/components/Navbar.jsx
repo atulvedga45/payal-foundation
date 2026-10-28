@@ -243,7 +243,7 @@ export default function Navbar({ t, isAdminUnlocked = false, onOpenAdmin }) {
               position: 'fixed',
               inset: 0,
               background: 'rgba(0, 0, 0, 0.45)',
-              zIndex: 998,
+              zIndex: 1500,
               backdropFilter: 'blur(3px)',
               animation: 'fadeInOverlay 0.25s ease'
             }}
@@ -258,7 +258,7 @@ export default function Navbar({ t, isAdminUnlocked = false, onOpenAdmin }) {
               height: '100dvh',
               width: 'min(80vw, 300px)',
               background: '#ffffff',
-              zIndex: 999,
+              zIndex: 1501,
               display: 'flex',
               flexDirection: 'column',
               boxShadow: '-8px 0 32px rgba(0, 0, 0, 0.18)',
