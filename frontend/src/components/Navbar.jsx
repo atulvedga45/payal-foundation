@@ -88,7 +88,7 @@ export default function Navbar({ t, isAdminUnlocked = false, onOpenAdmin }) {
                 lineHeight: 1.2,
                 wordBreak: 'break-word'
               }}>
-                Payal Foundation
+                Payal Foundation & Social Service
               </div>
             </div>
           </a>
@@ -116,42 +116,6 @@ export default function Navbar({ t, isAdminUnlocked = false, onOpenAdmin }) {
                 {link.label}
               </a>
             ))}
-
-            {/* Admin Portal Button in Navbar (Visible when unlocked via Develop By) */}
-            {isAdminUnlocked && (
-              <button
-                type="button"
-                onClick={onOpenAdmin}
-                className="btn-admin-nav"
-                style={{
-                  padding: '0.48rem 1.05rem',
-                  fontSize: '0.88rem',
-                  fontWeight: 700,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  borderRadius: '9999px',
-                  background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
-                  color: '#ffffff',
-                  border: '1px solid rgba(255, 255, 255, 0.4)',
-                  boxShadow: '0 3px 10px rgba(2, 132, 199, 0.35)',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(2, 132, 199, 0.5)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'none';
-                  e.currentTarget.style.boxShadow = '0 3px 10px rgba(2, 132, 199, 0.35)';
-                }}
-                title="Admin Portal"
-              >
-                <ShieldCheck size={16} style={{ color: '#fbbf24' }} />
-                <span>{t.nav.admin}</span>
-              </button>
-            )}
 
             {/* Donate CTA button */}
             <a
@@ -293,9 +257,9 @@ export default function Navbar({ t, isAdminUnlocked = false, onOpenAdmin }) {
                   fontWeight: 800,
                   color: 'var(--primary)',
                   lineHeight: 1.25,
-                  maxWidth: '160px'
+                  maxWidth: '220px'
                 }}>
-                  Payal Foundation
+                  Payal Foundation & Social Service
                 </span>
               </div>
 

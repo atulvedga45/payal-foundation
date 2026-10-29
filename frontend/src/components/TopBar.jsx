@@ -327,20 +327,35 @@ export default function TopBar({
                 type="button"
                 onClick={handleLockAdmin}
                 style={{
-                  background: 'rgba(239, 68, 68, 0.2)',
-                  border: '1px solid rgba(239, 68, 68, 0.4)',
-                  color: '#fca5a5',
-                  padding: '0.32rem 0.45rem',
-                  borderRadius: '9999px',
+                  background: 'rgba(239, 68, 68, 0.22)',
+                  border: '1px solid rgba(239, 68, 68, 0.45)',
+                  color: '#fecaca',
+                  fontSize: '0.76rem',
+                  fontWeight: 600,
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
+                  gap: '0.35rem',
+                  padding: '0.32rem 0.75rem',
+                  borderRadius: '9999px',
+                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
+                  backdropFilter: 'blur(4px)',
                   transition: 'all 0.2s ease'
                 }}
-                title="Admin लॉक करा (Lock Admin)"
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(239, 68, 68, 0.35)';
+                  e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.65)';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(239, 68, 68, 0.22)';
+                  e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.45)';
+                  e.currentTarget.style.transform = 'none';
+                }}
+                title="Lock Admin"
               >
-                <Lock size={12} />
+                <Lock size={12} style={{ color: '#fca5a5' }} />
+                <span>Lock Admin</span>
               </button>
             </div>
           )}
