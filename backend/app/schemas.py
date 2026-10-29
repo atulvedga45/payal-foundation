@@ -254,3 +254,22 @@ class GalleryItemUpdate(BaseModel):
     category: Optional[str] = None
     category_mr: Optional[str] = None
     order: Optional[int] = None
+
+# Visitors
+class VisitorCreate(BaseModel):
+    full_name: str
+    device_id: Optional[str] = None
+
+class VisitorSchema(BaseModel):
+    id: int
+    full_name: str
+    first_name: Optional[str] = None
+    created_at: datetime
+    visitor_number: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
+class VisitorStatsResponse(BaseModel):
+    total_count: int
+    visitors: List[VisitorSchema]

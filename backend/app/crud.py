@@ -285,3 +285,63 @@ def delete_gallery_item(db: Session, item_id: int):
     db.delete(db_obj)
     db.commit()
     return True
+
+# Visitor Operations
+def record_visitor(db: Session, full_name: str, device_id: str = None):
+    clean_full = full_name.strip()
+    parts = clean_full.split()
+    first_name = parts[0] if parts else clean_full
+
+    visitor = None
+    if device_id:
+        visitor = db.query(models.Visitor).filter(models.Visitor.device_id == device_id).first()
+
+    if visitor:
+        visitor.full_name = clean_full
+        visitor.first_name = first_name
+        db.commit()
+        db.refresh(visitor)
+    else:
+        visitor = models.Visitor(
+            full_name=clean_full,
+            first_name=first_name,
+            device_id=device_id
+        )
+        db.add(visitor)
+        db.commit()
+        db.refresh(visitor)
+
+    total_count = db.query(models.Visitor).count()
+    return {
+        "id": visitor.id,
+        "full_name": visitor.full_name,
+        "first_name": visitor.first_name,
+        "created_at": visitor.created_at,
+        "visitor_number": visitor.id,
+        "total_count": total_count
+    }
+
+def get_visitors_list(db: Session, limit: int = 500):
+    total_count = db.query(models.Visitor).count()
+    visitors = db.query(models.Visitor).order_by(models.Visitor.id.desc()).limit(limit).all()
+    out = []
+    for v in visitors:
+        out.append({
+            "id": v.id,
+            "full_name": v.full_name,
+            "first_name": v.first_name,
+            "created_at": v.created_at,
+            "visitor_number": v.id
+        })
+    return {
+        "total_count": total_count,
+        "visitors": out
+    }
+
+def delete_visitor(db: Session, visitor_id: int):
+    visitor = db.query(models.Visitor).filter(models.Visitor.id == visitor_id).first()
+    if not visitor:
+        return False
+    db.delete(visitor)
+    db.commit()
+    return True

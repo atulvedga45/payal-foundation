@@ -2,11 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { KeyRound, Lock, Eye, EyeOff, X, CheckCircle2, AlertCircle, Code2, ShieldCheck } from 'lucide-react';
 
-export default function DeveloperPinModal({ isOpen, onClose, onSuccess, lang = 'mr' }) {
+export default function DeveloperPinModal({ isOpen, onClose, onSuccess, onOpenVisitorLog, lang = 'mr' }) {
   const [pin, setPin] = useState('');
   const [showPin, setShowPin] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [successType, setSuccessType] = useState('admin');
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -47,23 +48,38 @@ export default function DeveloperPinModal({ isOpen, onClose, onSuccess, lang = '
     if (e) e.preventDefault();
     const cleanPin = pin.trim();
 
-    // Support 04703 and its 6-digit variations (040703, 047030, 004703)
+    // Visitor Secret PINs to view visitor names & count data
+    const visitorLogPins = ['7776', '2121', '8888', '1113', '9999', '04703v'];
+    if (visitorLogPins.includes(cleanPin)) {
+      setError('');
+      setSuccess(true);
+      setSuccessType('visitor');
+      setTimeout(() => {
+        onClose();
+        if (onOpenVisitorLog) onOpenVisitorLog(cleanPin);
+      }, 550);
+      return;
+    }
+
+    // Support 04703 and its 6-digit variations (040703, 047030, 004703) for Admin
     const validPins = ['04703', '040703', '047030', '004703'];
     if (validPins.includes(cleanPin)) {
       setError('');
       setSuccess(true);
+      setSuccessType('admin');
       setTimeout(() => {
         onSuccess();
       }, 600);
-    } else {
-      setError(
-        lang === 'mr'
-          ? 'चुकीचा पिन! कृपया बरोबर पिन कोड प्रविष्ट करा.'
-          : 'Incorrect PIN! Please enter the valid PIN code.'
-      );
-      setPin('');
-      if (inputRef.current) inputRef.current.focus();
+      return;
     }
+
+    setError(
+      lang === 'mr'
+        ? 'चुकीचा पिन! कृपया बरोबर पिन कोड प्रविष्ट करा.'
+        : 'Incorrect PIN! Please enter the valid PIN code.'
+    );
+    setPin('');
+    if (inputRef.current) inputRef.current.focus();
   };
 
   return createPortal(
@@ -171,7 +187,9 @@ export default function DeveloperPinModal({ isOpen, onClose, onSuccess, lang = '
             }}
           >
             {success
-              ? (lang === 'mr' ? 'अ‍ॅडमिन पॅनेल अनलॉक झाले!' : 'Admin Panel Unlocked!')
+              ? successType === 'visitor'
+                ? (lang === 'mr' ? 'गुप्त व्हिजिटर यादी उघडत आहे...' : 'Opening Secret Visitor Log...')
+                : (lang === 'mr' ? 'अ‍ॅडमिन पॅनेल अनलॉक झाले!' : 'Admin Panel Unlocked!')
               : 'About Us'}
           </h3>
 
@@ -185,7 +203,9 @@ export default function DeveloperPinModal({ isOpen, onClose, onSuccess, lang = '
             }}
           >
             {success
-              ? (lang === 'mr' ? 'अ‍ॅडमिन पर्याय नेव्हिगेशन बारमध्ये उपलब्ध झाला आहे.' : 'Admin option is now available in the Navbar.')
+              ? successType === 'visitor'
+                ? (lang === 'mr' ? 'व्हिजिटर्सची नावे व आकडेवारी लोड होत आहे.' : 'Loading visitor names and analytics.')
+                : (lang === 'mr' ? 'अ‍ॅडमिन पर्याय नेव्हिगेशन बारमध्ये उपलब्ध झाला आहे.' : 'Admin option is now available in the Navbar.')
               : (lang === 'mr'
                   ? 'कृपया पिन कोड प्रविष्ट करा'
                   : 'Please enter PIN code')}

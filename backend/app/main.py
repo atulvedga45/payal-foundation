@@ -90,6 +90,9 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# Ensure tables exist at startup
+Base.metadata.create_all(bind=engine)
+
 # Mount uploads static folder
 app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
 
@@ -362,3 +365,39 @@ async def upload_image_endpoint(
         shutil.copyfileobj(file.file, buffer)
     # Return relative path - frontend will prepend backend base URL if needed
     return {"url": f"/uploads/{clean_name}", "filename": clean_name}
+
+# Visitor Tracking & Secret Log Endpoints
+VISITOR_SECRET_PINS = ["7776", "2121", "8888", "1113", "04703", "040703", "sonya-payal@palghar@1741", "admin123"]
+
+def verify_visitor_access(x_visitor_pin: str = Header(None), x_admin_key: str = Header(None)):
+    pin = x_visitor_pin or x_admin_key
+    if not pin or str(pin).strip() not in VISITOR_SECRET_PINS:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid visitor access key or PIN"
+        )
+    return True
+
+@app.post("/api/visitors")
+def record_visitor_endpoint(payload: schemas.VisitorCreate, db: Session = Depends(get_db)):
+    if not payload.full_name or len(payload.full_name.strip()) < 3:
+        raise HTTPException(status_code=400, detail="Full name is required")
+    return crud.record_visitor(db, payload.full_name, payload.device_id)
+
+@app.get("/api/visitors/secret-log")
+def get_secret_visitors_endpoint(
+    db: Session = Depends(get_db),
+    authorized: bool = Depends(verify_visitor_access)
+):
+    return crud.get_visitors_list(db)
+
+@app.delete("/api/visitors/{visitor_id}")
+def delete_visitor_endpoint(
+    visitor_id: int,
+    db: Session = Depends(get_db),
+    authorized: bool = Depends(verify_visitor_access)
+):
+    success = crud.delete_visitor(db, visitor_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Visitor not found")
+    return {"success": True, "message": "Visitor removed successfully"}

@@ -120,3 +120,12 @@ class GalleryItem(Base):
     category = Column(String(100), default="Social Service")
     category_mr = Column(String(100), nullable=True)
     order = Column(Integer, default=0)
+
+class Visitor(Base):
+    __tablename__ = "visitors"
+
+    id = Column(Integer, primary_key=True, index=True)
+    full_name = Column(String(255), nullable=False)
+    first_name = Column(String(100), nullable=True)
+    device_id = Column(String(100), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)

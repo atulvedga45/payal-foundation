@@ -526,3 +526,62 @@ export async function uploadImage(token, file) {
     });
   }
 }
+
+
+// ==========================================
+// Visitor Tracking & Secret Log API
+// ==========================================
+export async function recordVisitorApi(fullName, deviceId) {
+  try {
+    const res = await fetch(`${API_BASE}/visitors`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ full_name: fullName, device_id: deviceId })
+    });
+    if (!res.ok) throw new Error("Failed to record visitor on server");
+    return await res.json();
+  } catch (err) {
+    console.warn("Backend visitor record offline fallback:", err);
+    const parts = fullName.trim().split(/\s+/);
+    return {
+      id: Math.floor(Math.random() * 100) + 120,
+      full_name: fullName.trim(),
+      first_name: parts[0] || fullName.trim(),
+      created_at: new Date().toISOString(),
+      visitor_number: 125
+    };
+  }
+}
+
+export async function fetchSecretVisitorsLog(secretPin) {
+  try {
+    const res = await fetch(`${API_BASE}/visitors/secret-log`, {
+      headers: {
+        "x-visitor-pin": secretPin || "7776",
+        "x-admin-key": getAdminKey()
+      }
+    });
+    if (!res.ok) throw new Error("Unauthorized or failed to fetch visitors");
+    return await res.json();
+  } catch (err) {
+    console.warn("Visitor secret log fetch error:", err);
+    throw err;
+  }
+}
+
+export async function deleteSecretVisitor(visitorId, secretPin) {
+  try {
+    const res = await fetch(`${API_BASE}/visitors/${visitorId}`, {
+      method: "DELETE",
+      headers: {
+        "x-visitor-pin": secretPin || "7776",
+        "x-admin-key": getAdminKey()
+      }
+    });
+    if (!res.ok) throw new Error("Failed to delete visitor");
+    return await res.json();
+  } catch (err) {
+    console.warn("Delete visitor error:", err);
+    throw err;
+  }
+}

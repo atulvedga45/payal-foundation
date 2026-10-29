@@ -14,6 +14,9 @@ import DonateSection from './components/DonateSection';
 import ContactSection from './components/ContactSection';
 import AdminModal from './components/AdminModal';
 import DeveloperPinModal from './components/DeveloperPinModal';
+import WelcomeVisitorModal from './components/WelcomeVisitorModal';
+import VisitorAppreciationModal from './components/VisitorAppreciationModal';
+import SecretVisitorLogModal from './components/SecretVisitorLogModal';
 import Footer from './components/Footer';
 import FloatingBubbles from './components/FloatingBubbles';
 import SplashScreen from './components/SplashScreen';
@@ -178,6 +181,31 @@ export default function App() {
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('samajseva_theme') || 'light';
   });
+
+  // Visitor Tracking & Appreciation States
+  const [visitorProfile, setVisitorProfile] = useState(() => {
+    try {
+      const cached = localStorage.getItem('payal_visitor_profile');
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [welcomeModalOpen, setWelcomeModalOpen] = useState(false);
+  const [visitorCardOpen, setVisitorCardOpen] = useState(false);
+  const [secretVisitorLogOpen, setSecretVisitorLogOpen] = useState(false);
+  const [visitorSecretPin, setVisitorSecretPin] = useState('7776');
+
+  // Trigger welcome modal on first visit once splash is dismissed or after small delay
+  useEffect(() => {
+    const cached = localStorage.getItem('payal_visitor_profile');
+    if (!cached) {
+      const timer = setTimeout(() => {
+        setWelcomeModalOpen(true);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   const handleSplashFinish = useCallback(() => setShowSplash(false), []);
 
@@ -373,6 +401,9 @@ export default function App() {
           isAdminUnlocked={isAdminUnlocked}
           onOpenAdmin={() => setAdminOpen(true)}
           isPinModalOpen={isPinModalOpen}
+          visitorProfile={visitorProfile}
+          onOpenVisitorCard={() => setVisitorCardOpen(true)}
+          onOpenWelcomeModal={() => setWelcomeModalOpen(true)}
         />
       )}
 
@@ -458,6 +489,39 @@ export default function App() {
           sessionStorage.setItem('admin_unlocked', 'true');
           setIsPinModalOpen(false);
         }}
+        onOpenVisitorLog={(pin) => {
+          setVisitorSecretPin(pin || '7776');
+          setIsPinModalOpen(false);
+          setSecretVisitorLogOpen(true);
+        }}
+        lang={lang}
+      />
+
+      {/* First-time Welcome & Full Name Registration Modal */}
+      <WelcomeVisitorModal
+        isOpen={welcomeModalOpen}
+        onClose={() => setWelcomeModalOpen(false)}
+        onRegistered={(profile) => {
+          setVisitorProfile(profile);
+          setVisitorCardOpen(true);
+        }}
+        lang={lang}
+      />
+
+      {/* Visitor Appreciation Modal (Opens when clicking name in Navbar) */}
+      <VisitorAppreciationModal
+        isOpen={visitorCardOpen}
+        onClose={() => setVisitorCardOpen(false)}
+        visitorProfile={visitorProfile}
+        onUpdateProfile={(updated) => setVisitorProfile(updated)}
+        lang={lang}
+      />
+
+      {/* Secret Visitor Log & Count Modal (Unlocked with secret PIN 7776/2121/8888 in About lock screen) */}
+      <SecretVisitorLogModal
+        isOpen={secretVisitorLogOpen}
+        onClose={() => setSecretVisitorLogOpen(false)}
+        secretPin={visitorSecretPin}
         lang={lang}
       />
 
