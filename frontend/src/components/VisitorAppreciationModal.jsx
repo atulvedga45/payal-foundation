@@ -1,79 +1,25 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { createPortal } from 'react-dom';
-import { Award, Sparkles, Heart, Share2, Edit3, X, Check, ShieldCheck } from 'lucide-react';
-import { recordVisitorApi } from '../api';
+import { Sparkles, X, ShieldCheck } from 'lucide-react';
 
-export default function VisitorAppreciationModal({ isOpen, onClose, visitorProfile, onUpdateProfile, lang = 'mr' }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [newName, setNewName] = useState(visitorProfile?.fullName || '');
-  const [editError, setEditError] = useState('');
-  const [editLoading, setEditLoading] = useState(false);
-
+export default function VisitorAppreciationModal({ isOpen, onClose, visitorProfile, lang = 'mr' }) {
   if (!isOpen || !visitorProfile) return null;
 
   const { fullName, firstName, visitorNumber = 1 } = visitorProfile;
-
-  const handleShareWhatsApp = () => {
-    const text = encodeURIComponent(
-      `🚩 नमस्कार! मी पायल फाउंडेशनच्या पालघर समाजकार्य उपक्रमांना पाठिंबा दिला आहे.\n` +
-      `मी संस्थेचा #${visitorNumber} वा सन्माननीय व्हिजिटर ठरलो आहे.\n` +
-      `तुम्हीही भेट द्या आणि समाजकार्याला हातभार लावा: https://payal-foundation.vercel.app`
-    );
-    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
-  };
-
-  const handleSaveNewName = async (e) => {
-    if (e) e.preventDefault();
-    const clean = newName.trim();
-    const words = clean.split(/\s+/).filter(Boolean);
-    if (words.length < 2 || words[0].length < 2 || words[1].length < 2) {
-      setEditError('कृपया पूर्ण नाव (पहिले नाव व आडनाव) प्रविष्ट करा.');
-      return;
-    }
-
-    setEditLoading(true);
-    setEditError('');
-
-    try {
-      const deviceId = localStorage.getItem('payal_visitor_device_id');
-      await recordVisitorApi(clean, deviceId);
-      const updated = {
-        ...visitorProfile,
-        fullName: clean,
-        firstName: words[0]
-      };
-      localStorage.setItem('payal_visitor_profile', JSON.stringify(updated));
-      if (onUpdateProfile) onUpdateProfile(updated);
-      setIsEditing(false);
-    } catch (err) {
-      console.warn('Update failed:', err);
-      const wordsArr = clean.split(/\s+/);
-      const updated = {
-        ...visitorProfile,
-        fullName: clean,
-        firstName: wordsArr[0]
-      };
-      localStorage.setItem('payal_visitor_profile', JSON.stringify(updated));
-      if (onUpdateProfile) onUpdateProfile(updated);
-      setIsEditing(false);
-    } finally {
-      setEditLoading(false);
-    }
-  };
 
   return createPortal(
     <div
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: 'rgba(5, 12, 28, 0.82)',
+        backgroundColor: 'rgba(5, 12, 28, 0.85)',
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
         zIndex: 99999,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '1.25rem',
+        padding: '0.75rem',
         animation: 'fadeInCard 0.25s ease-out'
       }}
       onClick={(e) => {
@@ -85,21 +31,24 @@ export default function VisitorAppreciationModal({ isOpen, onClose, visitorProfi
         aria-modal="true"
         style={{
           width: '100%',
-          maxWidth: '480px',
+          maxWidth: '430px',
+          maxHeight: '90vh',
           background: 'linear-gradient(165deg, #0e1e38 0%, #071325 100%)',
           border: '1.5px solid rgba(245, 158, 11, 0.45)',
-          borderRadius: '24px',
-          boxShadow: '0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(245, 158, 11, 0.25)',
+          borderRadius: '22px',
+          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.85), 0 0 30px rgba(245, 158, 11, 0.25)',
+          display: 'flex',
+          flexDirection: 'column',
           overflow: 'hidden',
           position: 'relative',
           color: '#ffffff',
           animation: 'cardScaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
         }}
       >
-        {/* Top Gold Foil Bar */}
+        {/* Slim Top Gold Foil Bar */}
         <div
           style={{
-            height: '6px',
+            height: '4px',
             background: 'linear-gradient(90deg, #f59e0b 0%, #fbbf24 35%, #fef08a 50%, #fbbf24 65%, #f59e0b 100%)'
           }}
         />
@@ -110,13 +59,13 @@ export default function VisitorAppreciationModal({ isOpen, onClose, visitorProfi
           onClick={onClose}
           style={{
             position: 'absolute',
-            top: '14px',
-            right: '14px',
+            top: '12px',
+            right: '12px',
             background: 'rgba(255, 255, 255, 0.08)',
             border: 'none',
             color: '#cbd5e1',
-            width: '34px',
-            height: '34px',
+            width: '32px',
+            height: '32px',
             borderRadius: '50%',
             cursor: 'pointer',
             display: 'flex',
@@ -135,26 +84,44 @@ export default function VisitorAppreciationModal({ isOpen, onClose, visitorProfi
           }}
           aria-label="Close"
         >
-          <X size={18} />
+          <X size={17} />
         </button>
 
-        <div style={{ padding: '2rem 1.85rem 1.75rem 1.85rem', textAlign: 'center' }}>
-          {/* Royal Saffron & Gold Badge */}
+        {/* Scrollable Container with compact padding so top & bottom never cut off */}
+        <div
+          style={{
+            padding: '1.4rem 1.4rem 1.25rem 1.4rem',
+            textAlign: 'center',
+            overflowY: 'auto'
+          }}
+        >
+          {/* Circular Badge Photo */}
           <div
             style={{
               width: '68px',
               height: '68px',
-              margin: '0 auto 1.15rem auto',
+              margin: '0 auto 0.85rem auto',
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(217, 119, 6, 0.45) 100%)',
-              border: '2px solid #fbbf24',
+              overflow: 'hidden',
+              border: '2.5px solid #fbbf24',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 8px 24px rgba(245, 158, 11, 0.35)'
+              boxShadow: '0 6px 18px rgba(245, 158, 11, 0.35)',
+              background: '#0e1e38'
             }}
           >
-            <Award size={36} color="#fbbf24" />
+            <img
+              src="/visitor_badge_photo.jpg"
+              alt="Payal Foundation"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                display: 'block'
+              }}
+              onError={(e) => { e.target.src = '/sonya.jpg'; }}
+            />
           </div>
 
           {/* Card Label */}
@@ -162,177 +129,86 @@ export default function VisitorAppreciationModal({ isOpen, onClose, visitorProfi
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '0.45rem',
-              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.08) 100%)',
+              gap: '0.4rem',
+              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.18) 0%, rgba(245, 158, 11, 0.08) 100%)',
               border: '1px solid rgba(245, 158, 11, 0.4)',
-              padding: '0.3rem 0.85rem',
+              padding: '0.25rem 0.75rem',
               borderRadius: '9999px',
-              fontSize: '0.78rem',
+              fontSize: '0.74rem',
               fontWeight: 800,
               color: '#fbbf24',
-              letterSpacing: '0.04em',
-              marginBottom: '0.85rem'
+              letterSpacing: '0.03em',
+              marginBottom: '0.65rem'
             }}
           >
-            <Sparkles size={14} />
+            <Sparkles size={13} />
             <span>पायल फाउंडेशन — सन्माननीय हितचिंतक</span>
           </div>
 
-          {/* User Full Name & Edit Toggle */}
-          {!isEditing ? (
-            <div style={{ marginBottom: '0.75rem' }}>
-              <h2
-                style={{
-                  fontSize: '1.65rem',
-                  fontWeight: 900,
-                  margin: '0 0 0.25rem 0',
-                  color: '#ffffff',
-                  letterSpacing: '-0.02em',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.5rem',
-                  flexWrap: 'wrap'
-                }}
-              >
-                <span>{fullName}</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setNewName(fullName);
-                    setIsEditing(true);
-                  }}
-                  title="नाव बदला (Edit Name)"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.08)',
-                    border: 'none',
-                    color: '#94a3b8',
-                    padding: '4px',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'all 0.2s ease'
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = '#38bdf8')}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
-                >
-                  <Edit3 size={15} />
-                </button>
-              </h2>
+          {/* User Full Name (Clean without pencil icon) */}
+          <div style={{ marginBottom: '0.55rem' }}>
+            <h2
+              style={{
+                fontSize: '1.45rem',
+                fontWeight: 900,
+                margin: '0 0 0.25rem 0',
+                color: '#ffffff',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.25
+              }}
+            >
+              {fullName}
+            </h2>
 
-              {/* Visitor Number Badge */}
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.35rem',
-                  background: 'rgba(56, 189, 248, 0.15)',
-                  border: '1px solid rgba(56, 189, 248, 0.35)',
-                  borderRadius: '9999px',
-                  padding: '0.2rem 0.75rem',
-                  fontSize: '0.78rem',
-                  fontWeight: 700,
-                  color: '#38bdf8'
-                }}
-              >
-                <ShieldCheck size={13} />
-                <span>सन्माननीय व्हिजिटर क्र. #{visitorNumber}</span>
-              </div>
+            {/* Visitor Number Badge */}
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                background: 'rgba(56, 189, 248, 0.12)',
+                border: '1px solid rgba(56, 189, 248, 0.35)',
+                borderRadius: '9999px',
+                padding: '0.18rem 0.65rem',
+                fontSize: '0.74rem',
+                fontWeight: 700,
+                color: '#38bdf8'
+              }}
+            >
+              <ShieldCheck size={12} />
+              <span>सन्माननीय व्हिजिटर क्र. #{visitorNumber}</span>
             </div>
-          ) : (
-            <form onSubmit={handleSaveNewName} style={{ marginBottom: '1.25rem' }}>
-              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-                <input
-                  type="text"
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  placeholder="पूर्ण नाव टाका..."
-                  style={{
-                    padding: '0.55rem 0.85rem',
-                    borderRadius: '10px',
-                    background: 'rgba(15, 23, 42, 0.85)',
-                    border: '1.5px solid #38bdf8',
-                    color: '#ffffff',
-                    fontSize: '0.95rem',
-                    fontWeight: 600,
-                    outline: 'none',
-                    width: '70%'
-                  }}
-                />
-                <button
-                  type="submit"
-                  disabled={editLoading}
-                  style={{
-                    padding: '0.55rem 0.85rem',
-                    background: '#16a34a',
-                    border: 'none',
-                    borderRadius: '10px',
-                    color: '#ffffff',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.25rem'
-                  }}
-                >
-                  <Check size={16} />
-                  <span>सेव्ह</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsEditing(false)}
-                  style={{
-                    padding: '0.55rem 0.75rem',
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    border: 'none',
-                    borderRadius: '10px',
-                    color: '#94a3b8',
-                    cursor: 'pointer'
-                  }}
-                >
-                  रद्द
-                </button>
-              </div>
-              {editError && (
-                <div style={{ color: '#f87171', fontSize: '0.75rem', marginTop: '0.35rem' }}>
-                  {editError}
-                </div>
-              )}
-            </form>
-          )}
+          </div>
 
-          {/* Heartfelt 3-4 Lines Appreciation Letter */}
+          {/* Appreciation Letter with Space between Name and "जी" */}
           <div
             style={{
               background: 'rgba(15, 23, 42, 0.65)',
               border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '16px',
-              padding: '1.25rem 1.35rem',
-              margin: '1.15rem 0 1.5rem 0',
+              borderRadius: '14px',
+              padding: '1rem 1.15rem',
+              margin: '0.85rem 0 1.15rem 0',
               textAlign: 'left',
-              lineHeight: 1.65,
-              fontSize: '0.92rem',
-              color: '#e2e8f0',
-              position: 'relative'
+              lineHeight: 1.6,
+              fontSize: '0.88rem',
+              color: '#e2e8f0'
             }}
           >
-            <p style={{ margin: '0 0 0.65rem 0', fontWeight: 700, color: '#fef08a' }}>
-              मनःपूर्वक धन्यवाद {firstName}जी! 🙏
+            <p style={{ margin: '0 0 0.5rem 0', fontWeight: 700, color: '#fef08a' }}>
+              मनःपूर्वक धन्यवाद {firstName} जी! 🙏
             </p>
-            <p style={{ margin: '0 0 0.65rem 0' }}>
+            <p style={{ margin: '0 0 0.5rem 0' }}>
               पालघरमधील गरजू रुग्णांना वैद्यकीय मदत आणि समाजोपयोगी उपक्रमांमध्ये आपण दाखवलेला हा स्नेह व सदिच्छा आमच्यासाठी अत्यंत मोलाची आहे.
             </p>
-            <p style={{ margin: '0 0 0.65rem 0' }}>
+            <p style={{ margin: '0 0 0.5rem 0' }}>
               आपल्यासारख्या समाजप्रेमी नागरिकांच्या पाठिंब्यामुळेच आम्हाला सेवेची नवी ऊर्जा मिळते. माणुसकीच्या या पवित्र कार्यात आपले आशीर्वाद व अशीच साथ सदैव लाभो, हीच सदिच्छा!
             </p>
             <div
               style={{
-                marginTop: '0.85rem',
-                paddingTop: '0.65rem',
+                marginTop: '0.65rem',
+                paddingTop: '0.5rem',
                 borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-                fontSize: '0.82rem',
+                fontSize: '0.78rem',
                 fontWeight: 700,
                 color: '#38bdf8',
                 textAlign: 'right'
@@ -342,58 +218,28 @@ export default function VisitorAppreciationModal({ isOpen, onClose, visitorProfi
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '0.65rem', flexDirection: 'column' }}>
-            {/* WhatsApp Share Button */}
-            <button
-              type="button"
-              onClick={handleShareWhatsApp}
-              style={{
-                width: '100%',
-                padding: '0.78rem 1rem',
-                background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-                border: '1px solid rgba(255, 255, 255, 0.25)',
-                borderRadius: '12px',
-                color: '#ffffff',
-                fontSize: '0.92rem',
-                fontWeight: 800,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem',
-                boxShadow: '0 4px 14px rgba(34, 197, 94, 0.4)',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-1px)')}
-              onMouseLeave={(e) => (e.currentTarget.style.transform = 'none')}
-            >
-              <Share2 size={17} />
-              <span>WhatsApp वर स्टेटस ठेवा / शेअर करा</span>
-            </button>
-
-            {/* Close Button */}
-            <button
-              type="button"
-              onClick={onClose}
-              style={{
-                width: '100%',
-                padding: '0.65rem 1rem',
-                background: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                borderRadius: '12px',
-                color: '#cbd5e1',
-                fontSize: '0.86rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)')}
-            >
-              वेबसाईट सुरू ठेवा (Close)
-            </button>
-          </div>
+          {/* Close Action Button */}
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              width: '100%',
+              padding: '0.75rem 1rem',
+              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+              border: '1px solid rgba(255, 255, 255, 0.25)',
+              borderRadius: '12px',
+              color: '#ffffff',
+              fontSize: '0.92rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              boxShadow: '0 4px 14px rgba(245, 158, 11, 0.35)',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-1px)')}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = 'none')}
+          >
+            वेबसाईट सुरू ठेवा (Close)
+          </button>
         </div>
       </div>
 
@@ -403,7 +249,7 @@ export default function VisitorAppreciationModal({ isOpen, onClose, visitorProfi
           to   { opacity: 1; }
         }
         @keyframes cardScaleUp {
-          from { opacity: 0; transform: scale(0.9) translateY(14px); }
+          from { opacity: 0; transform: scale(0.94) translateY(10px); }
           to   { opacity: 1; transform: scale(1) translateY(0); }
         }
       `}</style>

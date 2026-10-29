@@ -361,6 +361,8 @@ export default function App() {
         isPinModalOpen={isPinModalOpen}
         setIsPinModalOpen={setIsPinModalOpen}
         onOpenPinModal={() => setIsPinModalOpen(true)}
+        visitorProfile={visitorProfile}
+        onOpenVisitorCard={() => setVisitorCardOpen(true)}
       />
 
       {/* Dynamic Live Impact Announcement Ticker */}

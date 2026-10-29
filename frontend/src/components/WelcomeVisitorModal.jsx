@@ -113,31 +113,34 @@ export default function WelcomeVisitorModal({ isOpen, onClose, onRegistered, lan
           animation: 'popInScale 0.35s cubic-bezier(0.16, 1, 0.3, 1)'
         }}
       >
-        {/* Top Decorative Glow Ribbon */}
-        <div
-          style={{
-            height: '5px',
-            background: 'linear-gradient(90deg, #f59e0b 0%, #38bdf8 50%, #10b981 100%)'
-          }}
-        />
-
         <div style={{ padding: '2rem 1.75rem 1.85rem 1.75rem', textAlign: 'center' }}>
-          {/* Logo / Badge */}
+          {/* Logo / Badge Photo */}
           <div
             style={{
-              width: '64px',
-              height: '64px',
+              width: '74px',
+              height: '74px',
               margin: '0 auto 1.15rem auto',
-              borderRadius: '20px',
-              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(56, 189, 248, 0.2) 100%)',
-              border: '1.5px solid rgba(245, 158, 11, 0.45)',
+              borderRadius: '50%',
+              overflow: 'hidden',
+              border: '2.5px solid #fbbf24',
+              boxShadow: '0 8px 24px rgba(245, 158, 11, 0.35)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 8px 24px rgba(245, 158, 11, 0.25)'
+              background: '#0d1e38'
             }}
           >
-            <Sparkles size={32} color="#fbbf24" />
+            <img
+              src="/visitor_badge_photo.jpg"
+              alt="Payal Foundation"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                display: 'block'
+              }}
+              onError={(e) => { e.target.src = '/sonya.jpg'; }}
+            />
           </div>
 
           {/* Org Header */}
@@ -200,7 +203,7 @@ export default function WelcomeVisitorModal({ isOpen, onClose, onRegistered, lan
                   letterSpacing: '0.02em'
                 }}
               >
-                {lang === 'mr' ? 'आपले पूर्ण नाव (First & Last Name):' : 'Your Full Name:'}
+                {lang === 'mr' ? 'आपले पूर्ण नाव:' : 'Your Full Name:'}
               </label>
 
               <div style={{ position: 'relative' }}>
@@ -209,7 +212,7 @@ export default function WelcomeVisitorModal({ isOpen, onClose, onRegistered, lan
                   ref={inputRef}
                   type="text"
                   autoComplete="name"
-                  placeholder={lang === 'mr' ? 'उदा. अतुल वेदगा (Atul Vedga)' : 'e.g. Atul Vedga'}
+                  placeholder={lang === 'mr' ? 'उदा. अतुल वेदगा' : 'e.g. Atul Vedga'}
                   value={fullName}
                   onChange={(e) => {
                     setFullName(e.target.value);
@@ -260,15 +263,16 @@ export default function WelcomeVisitorModal({ isOpen, onClose, onRegistered, lan
               ) : (
                 <div
                   style={{
-                    fontSize: '0.74rem',
-                    color: '#94a3b8',
+                    fontSize: '0.75rem',
+                    color: '#fbbf24',
                     marginTop: '0.35rem',
-                    paddingLeft: '0.2rem'
+                    paddingLeft: '0.2rem',
+                    fontWeight: 600
                   }}
                 >
                   {lang === 'mr'
-                    ? '✨ तुमचे नाव वेबसाईट नेव्हबारमध्ये सन्मानपूर्वक दिसेल.'
-                    : '✨ Your name will appear honored in the website navbar.'}
+                    ? '✨ तुमचे नाव पायल फाउंडेशन वेबसाईटमध्ये सन्मानपूर्वक दिसेल.'
+                    : '✨ Your name will appear honored on the Payal Foundation website.'}
                 </div>
               )}
             </div>
@@ -333,3 +337,4 @@ export default function WelcomeVisitorModal({ isOpen, onClose, onRegistered, lan
     document.body
   );
 }
+

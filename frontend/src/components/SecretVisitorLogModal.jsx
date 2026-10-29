@@ -423,3 +423,4 @@ export default function SecretVisitorLogModal({ isOpen, onClose, secretPin = '77
     document.body
   );
 }
+

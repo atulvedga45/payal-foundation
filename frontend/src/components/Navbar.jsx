@@ -127,75 +127,6 @@ export default function Navbar({
               </a>
             ))}
 
-            {/* Visitor Honored Name Badge (Desktop) */}
-            {visitorProfile?.firstName ? (
-              <button
-                type="button"
-                onClick={onOpenVisitorCard}
-                title={`${visitorProfile.fullName} — आपले कौतुक कार्ड पहा`}
-                style={{
-                  background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.22) 100%)',
-                  border: '1.5px solid rgba(245, 158, 11, 0.55)',
-                  color: 'var(--text-main)',
-                  padding: '0.45rem 1rem',
-                  borderRadius: '9999px',
-                  fontWeight: 800,
-                  fontSize: '0.92rem',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  boxShadow: '0 2px 8px rgba(245, 158, 11, 0.25)',
-                  transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px) scale(1.03)';
-                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(245, 158, 11, 0.4)';
-                  e.currentTarget.style.borderColor = '#f59e0b';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'none';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(245, 158, 11, 0.25)';
-                  e.currentTarget.style.borderColor = 'rgba(245, 158, 11, 0.55)';
-                }}
-              >
-                <span style={{ fontSize: '1.05rem' }}>👋</span>
-                <span style={{ fontWeight: 800 }}>{visitorProfile.firstName}</span>
-                <Sparkles size={14} style={{ color: '#d97706' }} />
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={onOpenWelcomeModal}
-                title="स्वागत नोंद करा"
-                style={{
-                  background: 'rgba(2, 132, 199, 0.08)',
-                  border: '1.5px dashed rgba(2, 132, 199, 0.45)',
-                  color: 'var(--primary)',
-                  padding: '0.45rem 0.95rem',
-                  borderRadius: '9999px',
-                  fontWeight: 700,
-                  fontSize: '0.88rem',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.4rem',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(2, 132, 199, 0.15)';
-                  e.currentTarget.style.borderColor = 'var(--primary)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(2, 132, 199, 0.08)';
-                  e.currentTarget.style.borderColor = 'rgba(2, 132, 199, 0.45)';
-                }}
-              >
-                <span>✍️</span>
-                <span>स्वागत नोंद</span>
-              </button>
-            )}
-
             {/* Donate CTA button */}
             <a
               href="#donate"
@@ -216,54 +147,24 @@ export default function Navbar({
             </a>
           </div>
 
-          {/* Mobile Right Controls: Visitor Name + Hamburger */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }} className="mobile-actions-wrapper">
-            {visitorProfile?.firstName && (
-              <button
-                type="button"
-                onClick={onOpenVisitorCard}
-                className="mobile-visitor-pill"
-                title={`${visitorProfile.fullName} — आपले कौतुक कार्ड पहा`}
-                style={{
-                  background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.18) 0%, rgba(217, 119, 6, 0.28) 100%)',
-                  border: '1.5px solid rgba(245, 158, 11, 0.55)',
-                  color: 'var(--text-main)',
-                  padding: '0.35rem 0.75rem',
-                  borderRadius: '9999px',
-                  fontWeight: 800,
-                  fontSize: '0.82rem',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.35rem',
-                  boxShadow: '0 2px 6px rgba(245, 158, 11, 0.25)'
-                }}
-              >
-                <span>👋</span>
-                <span>{visitorProfile.firstName}</span>
-                <Sparkles size={12} color="#d97706" />
-              </button>
-            )}
-
-            {/* Mobile Hamburger Button */}
-            <button
-              onClick={() => setMobileMenuOpen(true)}
-              className="mobile-toggle"
-              style={{
-                background: 'rgba(11, 98, 164, 0.08)',
-                border: '1px solid rgba(11, 98, 164, 0.15)',
-                borderRadius: '10px',
-                cursor: 'pointer',
-                padding: '0.45rem',
-                color: 'var(--primary)',
-                display: 'block',
-                transition: 'all 0.2s ease'
-              }}
-              aria-label="Open Navigation Menu"
-            >
-              <Menu size={24} />
-            </button>
-          </div>
+          {/* Mobile Hamburger Button */}
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className="mobile-toggle"
+            style={{
+              background: 'rgba(11, 98, 164, 0.08)',
+              border: '1px solid rgba(11, 98, 164, 0.15)',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              padding: '0.45rem',
+              color: 'var(--primary)',
+              display: 'block',
+              transition: 'all 0.2s ease'
+            }}
+            aria-label="Open Navigation Menu"
+          >
+            <Menu size={24} />
+          </button>
         </div>
 
         {/* Scoped CSS */}

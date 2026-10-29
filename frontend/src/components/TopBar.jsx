@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Phone, Globe, ShieldCheck, ChevronDown, Code2, Lock } from 'lucide-react';
+import { Phone, Globe, ShieldCheck, ChevronDown, Code2, Lock, Sparkles } from 'lucide-react';
 import DeveloperPinModal from './DeveloperPinModal';
 
 export default function TopBar({
@@ -13,7 +13,9 @@ export default function TopBar({
   setIsAdminUnlocked: externalSetIsAdminUnlocked,
   isPinModalOpen: externalIsPinModalOpen,
   setIsPinModalOpen: externalSetIsPinModalOpen,
-  onOpenPinModal
+  onOpenPinModal,
+  visitorProfile,
+  onOpenVisitorCard
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [internalIsAdminUnlocked, setInternalIsAdminUnlocked] = useState(() => {
@@ -263,6 +265,45 @@ export default function TopBar({
               मराठी
             </button>
           </div>
+
+          {/* Single Visitor Honored Name Tag (Desktop TopBar) */}
+          {visitorProfile?.firstName && (
+            <button
+              type="button"
+              onClick={onOpenVisitorCard}
+              title={`${visitorProfile.fullName} — आपले कौतुक कार्ड पहा`}
+              style={{
+                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(217, 119, 6, 0.35) 100%)',
+                border: '1px solid rgba(245, 158, 11, 0.65)',
+                color: '#fef08a',
+                fontSize: '0.76rem',
+                fontWeight: 800,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                padding: '0.28rem 0.75rem',
+                borderRadius: '9999px',
+                boxShadow: '0 2px 8px rgba(245, 158, 11, 0.25)',
+                transition: 'all 0.2s ease',
+                backdropFilter: 'blur(4px)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-1px) scale(1.02)';
+                e.currentTarget.style.borderColor = '#fbbf24';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.45)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'none';
+                e.currentTarget.style.borderColor = 'rgba(245, 158, 11, 0.65)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(245, 158, 11, 0.25)';
+              }}
+            >
+              <span>👋</span>
+              <span>{visitorProfile.firstName}</span>
+              <Sparkles size={12} color="#fbbf24" />
+            </button>
+          )}
 
           {/* Admin or Develop By Button (Desktop) */}
           {!isAdminUnlocked ? (
