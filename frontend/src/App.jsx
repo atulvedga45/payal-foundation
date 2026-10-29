@@ -13,6 +13,7 @@ import GallerySection from './components/GallerySection';
 import DonateSection from './components/DonateSection';
 import ContactSection from './components/ContactSection';
 import AdminModal from './components/AdminModal';
+import DeveloperPinModal from './components/DeveloperPinModal';
 import Footer from './components/Footer';
 import FloatingBubbles from './components/FloatingBubbles';
 import SplashScreen from './components/SplashScreen';
@@ -169,6 +170,7 @@ export default function App() {
   });
   const [selectedCause, setSelectedCause] = useState('');
   const [adminOpen, setAdminOpen] = useState(false);
+  const [isPinModalOpen, setIsPinModalOpen] = useState(false);
   const [isAdminUnlocked, setIsAdminUnlocked] = useState(() => {
     return sessionStorage.getItem('admin_unlocked') === 'true';
   });
@@ -328,6 +330,9 @@ export default function App() {
         toggleTheme={toggleTheme}
         isAdminUnlocked={isAdminUnlocked}
         setIsAdminUnlocked={setIsAdminUnlocked}
+        isPinModalOpen={isPinModalOpen}
+        setIsPinModalOpen={setIsPinModalOpen}
+        onOpenPinModal={() => setIsPinModalOpen(true)}
       />
 
       {/* Dynamic Live Impact Announcement Ticker */}
@@ -361,12 +366,15 @@ export default function App() {
         </div>
       </div>
 
-      {/* Main Sticky Navbar */}
-      <Navbar
-        t={t}
-        isAdminUnlocked={isAdminUnlocked}
-        onOpenAdmin={() => setAdminOpen(true)}
-      />
+      {/* Main Sticky Navbar (Hidden completely when About lock page is open) */}
+      {!isPinModalOpen && (
+        <Navbar
+          t={t}
+          isAdminUnlocked={isAdminUnlocked}
+          onOpenAdmin={() => setAdminOpen(true)}
+          isPinModalOpen={isPinModalOpen}
+        />
+      )}
 
       {/* Main Content Sections */}
       <main>
@@ -439,6 +447,18 @@ export default function App() {
           setTrustInfo(newInfo);
           localStorage.setItem('payal_trust_info', JSON.stringify(newInfo));
         }}
+      />
+
+      {/* Developer PIN Verification Modal ("About Us" Lock Page) */}
+      <DeveloperPinModal
+        isOpen={isPinModalOpen}
+        onClose={() => setIsPinModalOpen(false)}
+        onSuccess={() => {
+          setIsAdminUnlocked(true);
+          sessionStorage.setItem('admin_unlocked', 'true');
+          setIsPinModalOpen(false);
+        }}
+        lang={lang}
       />
 
       {/* Floating Scroll To Top Button with Circular Progress */}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { KeyRound, Lock, Eye, EyeOff, X, CheckCircle2, AlertCircle, Code2, ShieldCheck } from 'lucide-react';
 
 export default function DeveloperPinModal({ isOpen, onClose, onSuccess, lang = 'mr' }) {
@@ -10,6 +11,8 @@ export default function DeveloperPinModal({ isOpen, onClose, onSuccess, lang = '
 
   useEffect(() => {
     if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.classList.add('pin-modal-open');
       setPin('');
       setError('');
       setSuccess(false);
@@ -18,7 +21,14 @@ export default function DeveloperPinModal({ isOpen, onClose, onSuccess, lang = '
         if (inputRef.current) inputRef.current.focus();
       }, 80);
       return () => clearTimeout(timer);
+    } else {
+      document.body.style.overflow = '';
+      document.body.classList.remove('pin-modal-open');
     }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.classList.remove('pin-modal-open');
+    };
   }, [isOpen]);
 
   useEffect(() => {
@@ -56,7 +66,7 @@ export default function DeveloperPinModal({ isOpen, onClose, onSuccess, lang = '
     }
   };
 
-  return (
+  return createPortal(
     <div
       style={{
         position: 'fixed',
@@ -337,6 +347,7 @@ export default function DeveloperPinModal({ isOpen, onClose, onSuccess, lang = '
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

@@ -479,6 +479,19 @@ body.drawer-open .floating-action-btn {
   pointer-events: none !important;
 }
 
+/* Hide navbar and floating buttons when About lock modal or admin modal is open */
+body.pin-modal-open .main-navbar,
+body.pin-modal-open nav.main-navbar,
+body.modal-open .main-navbar,
+body.modal-open nav.main-navbar,
+body.pin-modal-open .whatsapp-float-btn,
+body.pin-modal-open .scroll-to-top-btn {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
 /* ============================================================
    Impact Image Slider Section (Home Page Glimpses 3s Auto-Scroll)
    ============================================================ */

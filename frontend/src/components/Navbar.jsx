@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, HeartHandshake, Home, Info, Layers, Users, Image, Phone, ShieldCheck } from 'lucide-react';
 
-export default function Navbar({ t, isAdminUnlocked = false, onOpenAdmin }) {
+export default function Navbar({ t, isAdminUnlocked = false, onOpenAdmin, isPinModalOpen = false }) {
+  if (isPinModalOpen) return null;
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [

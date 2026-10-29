@@ -10,7 +10,10 @@ export default function TopBar({
   theme,
   toggleTheme,
   isAdminUnlocked: externalIsAdminUnlocked,
-  setIsAdminUnlocked: externalSetIsAdminUnlocked
+  setIsAdminUnlocked: externalSetIsAdminUnlocked,
+  isPinModalOpen: externalIsPinModalOpen,
+  setIsPinModalOpen: externalSetIsPinModalOpen,
+  onOpenPinModal
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [internalIsAdminUnlocked, setInternalIsAdminUnlocked] = useState(() => {
@@ -19,8 +22,18 @@ export default function TopBar({
   const isAdminUnlocked = externalIsAdminUnlocked !== undefined ? externalIsAdminUnlocked : internalIsAdminUnlocked;
   const setIsAdminUnlocked = externalSetIsAdminUnlocked || setInternalIsAdminUnlocked;
 
-  const [isPinModalOpen, setIsPinModalOpen] = useState(false);
+  const [internalIsPinModalOpen, setInternalIsPinModalOpen] = useState(false);
+  const isPinModalOpen = externalIsPinModalOpen !== undefined ? externalIsPinModalOpen : internalIsPinModalOpen;
+  const setIsPinModalOpen = externalSetIsPinModalOpen || setInternalIsPinModalOpen;
   const dropdownRef = useRef(null);
+
+  const handleOpenPin = () => {
+    if (onOpenPinModal) {
+      onOpenPinModal();
+    } else {
+      setIsPinModalOpen(true);
+    }
+  };
 
   const handlePinSuccess = () => {
     setIsAdminUnlocked(true);
@@ -255,7 +268,7 @@ export default function TopBar({
           {!isAdminUnlocked ? (
             <button
               type="button"
-              onClick={() => setIsPinModalOpen(true)}
+              onClick={handleOpenPin}
               style={{
                 background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%)',
                 border: '1px solid rgba(255, 255, 255, 0.25)',
@@ -506,7 +519,7 @@ export default function TopBar({
                   type="button"
                   onClick={() => {
                     setIsOpen(false);
-                    setIsPinModalOpen(true);
+                    handleOpenPin();
                   }}
                   style={{
                     background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.08) 100%)',
@@ -593,13 +606,15 @@ export default function TopBar({
         </div>
       </div>
 
-      {/* Developer PIN Verification Modal */}
-      <DeveloperPinModal
-        isOpen={isPinModalOpen}
-        onClose={() => setIsPinModalOpen(false)}
-        onSuccess={handlePinSuccess}
-        lang={lang}
-      />
+      {/* Developer PIN Verification Modal (rendered locally only if not controlled by parent) */}
+      {externalIsPinModalOpen === undefined && !onOpenPinModal && (
+        <DeveloperPinModal
+          isOpen={isPinModalOpen}
+          onClose={() => setIsPinModalOpen(false)}
+          onSuccess={handlePinSuccess}
+          lang={lang}
+        />
+      )}
     </div>
   );
 }
