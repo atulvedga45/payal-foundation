@@ -88,7 +88,7 @@ export default function Navbar({ t, isAdminUnlocked = false, onOpenAdmin }) {
                 lineHeight: 1.2,
                 wordBreak: 'break-word'
               }}>
-                Payal Foundation and Social Service
+                Payal Foundation
               </div>
             </div>
           </a>
@@ -289,13 +289,13 @@ export default function Navbar({ t, isAdminUnlocked = false, onOpenAdmin }) {
                   onError={(e) => { e.target.src = '/payal_logo.jpg'; }}
                 />
                 <span style={{
-                  fontSize: '0.85rem',
+                  fontSize: '0.92rem',
                   fontWeight: 800,
                   color: 'var(--primary)',
                   lineHeight: 1.25,
                   maxWidth: '160px'
                 }}>
-                  Payal Foundation and Social Service
+                  Payal Foundation
                 </span>
               </div>
 

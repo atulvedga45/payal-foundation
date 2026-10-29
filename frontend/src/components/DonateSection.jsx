@@ -193,11 +193,11 @@ export default function DonateSection({ t, trustInfo }) {
             {t.donate?.title || 'Payal Foundation Scanner'}
           </h2>
 
-          {/* Simple Dark Black and Bold Quote */}
+          {/* Vibrant Red Bold Quote */}
           <p style={{
             fontSize: 'clamp(1.05rem, 3.2vw, 1.3rem)',
             fontWeight: 800,
-            color: '#000000',
+            color: '#dc2626',
             margin: '0.6rem auto 0.6rem auto',
             textAlign: 'center',
             letterSpacing: '0.01em',

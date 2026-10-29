@@ -397,15 +397,15 @@ export default function Hero({ t, lang = 'mr', homeStats = null }) {
             </a>
           </div>
 
-          {/* Metric Stats Banner with Glassmorphic Tilt Cards */}
-          <div className="reveal stagger-5" style={{
+          {/* Metric Stats Banner with Glassmorphic Tilt Cards - Staggered Scroll Reveal */}
+          <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
             gap: '1.35rem',
             marginTop: '1.5rem'
           }}>
             {/* Stat 1 */}
-            <div className="glass-panel tilt-card" style={{
+            <div className="glass-panel tilt-card hero-stat-card reveal stagger-1" style={{
               padding: '1.65rem',
               display: 'flex',
               alignItems: 'center',
@@ -442,7 +442,7 @@ export default function Hero({ t, lang = 'mr', homeStats = null }) {
             </div>
 
             {/* Stat 2 */}
-            <div className="glass-panel tilt-card" style={{
+            <div className="glass-panel tilt-card hero-stat-card reveal stagger-2" style={{
               padding: '1.65rem',
               display: 'flex',
               alignItems: 'center',
@@ -479,7 +479,7 @@ export default function Hero({ t, lang = 'mr', homeStats = null }) {
             </div>
 
             {/* Stat 3 */}
-            <div className="glass-panel tilt-card" style={{
+            <div className="glass-panel tilt-card hero-stat-card reveal stagger-3" style={{
               padding: '1.65rem',
               display: 'flex',
               alignItems: 'center',

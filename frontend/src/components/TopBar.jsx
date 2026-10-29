@@ -515,7 +515,7 @@ export default function TopBar({
                   <span>About Us</span>
                 </button>
               ) : (
-                <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
                   <button
                     type="button"
                     onClick={() => {
@@ -523,7 +523,7 @@ export default function TopBar({
                       onOpenAdmin();
                     }}
                     style={{
-                      flex: 1,
+                      width: '100%',
                       background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.08) 100%)',
                       border: '1px solid rgba(255, 255, 255, 0.25)',
                       color: '#ffffff',
@@ -548,22 +548,28 @@ export default function TopBar({
                     type="button"
                     onClick={() => {
                       handleLockAdmin();
+                      setIsOpen(false);
                     }}
                     style={{
-                      background: 'rgba(239, 68, 68, 0.2)',
-                      border: '1px solid rgba(239, 68, 68, 0.4)',
+                      width: '100%',
+                      background: 'rgba(239, 68, 68, 0.22)',
+                      border: '1px solid rgba(239, 68, 68, 0.45)',
                       color: '#fca5a5',
-                      padding: '0.45rem 0.65rem',
+                      padding: '0.42rem 0.75rem',
                       borderRadius: '9999px',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      gap: '0.45rem',
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
                       transition: 'all 0.2s ease'
                     }}
-                    title="Admin लॉक करा (Lock Admin)"
+                    title="Lock Admin"
                   >
-                    <Lock size={13} />
+                    <Lock size={13} style={{ color: '#ef4444' }} />
+                    <span>Lock Admin</span>
                   </button>
                 </div>
               )}
