@@ -24,7 +24,8 @@ export default function FloatingBubbles() {
       'rgba(99, 102, 241, VAL)',  // indigo
     ];
 
-    const BUBBLE_COUNT = 18;
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+    const BUBBLE_COUNT = isMobile ? 6 : 10;
     let bubbles = [];
 
     function randomBetween(a, b) {
@@ -35,22 +36,22 @@ export default function FloatingBubbles() {
       const colorTemplate = COLORS[Math.floor(Math.random() * COLORS.length)];
       return {
         x: randomBetween(0, W),
-        y: forceVisible ? randomBetween(0, H) : randomBetween(-H * 0.3, H * 1.3),
-        r: randomBetween(60, 200),           // radius
-        opacity: randomBetween(0.04, 0.13),  // very soft
+        y: forceVisible ? randomBetween(0, H) : randomBetween(-H * 0.2, H * 1.2),
+        r: randomBetween(50, 150),           // radius
+        opacity: randomBetween(0.04, 0.12),  // very soft
         opacityDir: Math.random() > 0.5 ? 1 : -1,
-        opacitySpeed: randomBetween(0.0003, 0.0008),
-        opacityMin: randomBetween(0.03, 0.07),
-        opacityMax: randomBetween(0.09, 0.15),
-        vx: randomBetween(-0.12, 0.12),      // very slow drift
-        vy: randomBetween(-0.18, -0.06),     // float upward slowly
+        opacitySpeed: randomBetween(0.0003, 0.0007),
+        opacityMin: randomBetween(0.03, 0.06),
+        opacityMax: randomBetween(0.08, 0.13),
+        vx: randomBetween(-0.1, 0.1),        // very slow drift
+        vy: randomBetween(-0.15, -0.05),     // float upward slowly
         colorTemplate,
       };
     }
 
     function resize() {
       W = canvas.width  = window.innerWidth;
-      H = canvas.height = document.documentElement.scrollHeight;
+      H = canvas.height = window.innerHeight;
     }
 
     function init() {
@@ -103,16 +104,11 @@ export default function FloatingBubbles() {
     init();
     loop();
 
-    // Resize canvas when window or content changes
-    const resizeObs = new ResizeObserver(() => {
-      resize();
-    });
-    resizeObs.observe(document.body);
-    window.addEventListener('resize', resize);
+    // Efficient window resize listener
+    window.addEventListener('resize', resize, { passive: true });
 
     return () => {
       cancelAnimationFrame(animId);
-      resizeObs.disconnect();
       window.removeEventListener('resize', resize);
     };
   }, []);
@@ -128,8 +124,8 @@ export default function FloatingBubbles() {
         height: '100%',
         pointerEvents: 'none',
         zIndex: 0,
-        filter: 'blur(38px)',    // soft blur applied globally
-        opacity: 1,
+        filter: 'blur(22px)',
+        opacity: 0.9,
       }}
     />
   );

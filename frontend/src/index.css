@@ -317,14 +317,14 @@ body.modal-open .scroll-to-top-btn {
 }
 
 /* =========================================================
-   SCROLL REVEAL & ENTRANCE ANIMATIONS (SLOW MOTION & SILKY SMOOTH)
+   SCROLL REVEAL & ENTRANCE ANIMATIONS (FAST, ULTRA-RESPONSIVE & SILKY SMOOTH)
    ========================================================= */
 
-/* Reveal base: fade up smoothly and gracefully */
+/* Reveal base: fade up smoothly and quickly */
 .reveal {
   opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(14px);
+  transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1), transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
@@ -336,8 +336,8 @@ body.modal-open .scroll-to-top-btn {
 /* Reveal from left smoothly */
 .reveal-left {
   opacity: 0;
-  transform: translateX(-35px);
-  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateX(-18px);
+  transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1), transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
@@ -349,8 +349,8 @@ body.modal-open .scroll-to-top-btn {
 /* Reveal from right smoothly */
 .reveal-right {
   opacity: 0;
-  transform: translateX(35px);
-  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateX(18px);
+  transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1), transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
@@ -362,8 +362,8 @@ body.modal-open .scroll-to-top-btn {
 /* Reveal scale up smoothly */
 .reveal-scale {
   opacity: 0;
-  transform: scale(0.92);
-  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: scale(0.96);
+  transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1), transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
@@ -373,20 +373,20 @@ body.modal-open .scroll-to-top-btn {
 }
 
 /* Snappy Stagger Delays */
-.stagger-1 { transition-delay: 0.08s; }
-.stagger-2 { transition-delay: 0.16s; }
-.stagger-3 { transition-delay: 0.24s; }
-.stagger-4 { transition-delay: 0.32s; }
-.stagger-5 { transition-delay: 0.40s; }
-.stagger-6 { transition-delay: 0.48s; }
+.stagger-1 { transition-delay: 0.03s; }
+.stagger-2 { transition-delay: 0.06s; }
+.stagger-3 { transition-delay: 0.09s; }
+.stagger-4 { transition-delay: 0.12s; }
+.stagger-5 { transition-delay: 0.15s; }
+.stagger-6 { transition-delay: 0.18s; }
 
-/* Smooth Slow Entrance for Hero Stat Cards */
+/* Fast, Snappy Entrance for Hero Stat Cards */
 .hero-stat-card {
-  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease, border-color 0.35s ease !important;
+  transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease !important;
 }
-.hero-stat-card.stagger-1 { transition-delay: 0.12s !important; }
-.hero-stat-card.stagger-2 { transition-delay: 0.28s !important; }
-.hero-stat-card.stagger-3 { transition-delay: 0.44s !important; }
+.hero-stat-card.stagger-1 { transition-delay: 0.02s !important; }
+.hero-stat-card.stagger-2 { transition-delay: 0.05s !important; }
+.hero-stat-card.stagger-3 { transition-delay: 0.08s !important; }
 
 /* =========================================================
    SLOW MOTION AMBIENT MOVEMENTS ("HALU HALU HALCHAL")

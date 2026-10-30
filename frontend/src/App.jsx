@@ -319,7 +319,7 @@ export default function App() {
     loadData();
   }, []);
 
-  // Global Scroll Reveal Observer
+  // Global Scroll Reveal Observer: Fast, responsive and smooth
   useEffect(() => {
     const observerCallback = (entries, observer) => {
       entries.forEach((entry) => {
@@ -332,28 +332,41 @@ export default function App() {
 
     const observer = new IntersectionObserver(observerCallback, {
       root: null,
-      rootMargin: '0px 0px -40px 0px',
-      threshold: 0.08,
+      rootMargin: '0px 0px 100px 0px', // Trigger ahead of time so cards are already in place
+      threshold: 0.01,
     });
 
     const elements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
-    elements.forEach((el) => observer.observe(el));
+    elements.forEach((el) => {
+      // If element is already in the viewport (e.g. Hero cards), reveal immediately
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight + 100) {
+        el.classList.add('in-view');
+      } else {
+        observer.observe(el);
+      }
+    });
 
     // Also observe dynamically when trustees or initiatives change
     const timeout = setTimeout(() => {
       const refreshed = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
       refreshed.forEach((el) => {
         if (!el.classList.contains('in-view')) {
-          observer.observe(el);
+          const rect = el.getBoundingClientRect();
+          if (rect.top < window.innerHeight + 100) {
+            el.classList.add('in-view');
+          } else {
+            observer.observe(el);
+          }
         }
       });
-    }, 250);
+    }, 100);
 
     return () => {
       observer.disconnect();
       clearTimeout(timeout);
     };
-  }, [trustees, initiatives, lang]);
+  }, [trustees, initiatives, lang, showSplash]);
 
   // WhatsApp floating button: hidden on Home page, visible on other sections, hidden at footer
   const [showWhatsApp, setShowWhatsApp] = useState(false);

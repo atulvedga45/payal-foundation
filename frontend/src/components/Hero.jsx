@@ -48,7 +48,7 @@ function AnimatedCounter({ value }) {
       if (animatedRef.current) return;
       animatedRef.current = true;
 
-      const duration = 2000; // 2 seconds for rich, noticeable count-up
+      const duration = 450; // fast & energetic count-up (0.45s instead of 2.0s)
       const startTime = performance.now();
 
       const step = (now) => {
@@ -265,6 +265,13 @@ export default function Hero({ t, lang = 'mr', homeStats = null }) {
         @keyframes dotFade {
           0%   { opacity: 0.35; }
           100% { opacity: 0.65; }
+        }
+      `}</style>
+      <style>{`
+        @media (max-width: 768px) {
+          .pro-wave-1, .pro-wave-2 { animation: none !important; }
+          .pro-orb { animation: none !important; filter: blur(24px) !important; }
+          .slow-glow-orb-1, .slow-glow-orb-2 { display: none !important; }
         }
       `}</style>
       {/* Decorative Animated Slow Glowing Blur Spheres */}
