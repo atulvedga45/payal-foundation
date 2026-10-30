@@ -204,10 +204,7 @@ export default function App() {
     const cached = localStorage.getItem('payal_visitor_profile');
 
     if (!deviceId && !cached) {
-      const timer = setTimeout(() => {
-        setWelcomeModalOpen(true);
-      }, 1800);
-      return () => clearTimeout(timer);
+      return;
     }
 
     try {
@@ -230,13 +227,28 @@ export default function App() {
           localStorage.removeItem('payal_visitor_profile');
           setVisitorProfile(null);
           setVisitorCardOpen(false);
-          setWelcomeModalOpen(true);
+          setTimeout(() => {
+            setWelcomeModalOpen(true);
+          }, 2500);
         }
       }
     } catch (err) {
       console.warn('Visitor sync check error:', err);
     }
   }, []);
+
+  // Show Welcome Modal 2-3 seconds AFTER the website opens (after splash finishes and website is visible)
+  useEffect(() => {
+    if (!showSplash) {
+      const cached = localStorage.getItem('payal_visitor_profile');
+      if (!cached) {
+        const timer = setTimeout(() => {
+          setWelcomeModalOpen(true);
+        }, 2500);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [showSplash]);
 
   useEffect(() => {
     syncVisitorStatus();

@@ -32,8 +32,8 @@ export default function WelcomeVisitorModal({ isOpen, onClose, onRegistered, lan
     if (words.length < 2 || words[0].length < 2 || words[1].length < 2) {
       setError(
         lang === 'mr'
-          ? 'कृपया आपले नाव आणि आडनाव (पूर्ण नाव) प्रविष्ट करा. (उदा. अतुल वेदगा)'
-          : 'Please enter your full name (First & Last name, e.g. Atul Vedga).'
+          ? 'कृपया आपले नाव आणि आडनाव (पूर्ण नाव) प्रविष्ट करा. (उदा. Parvesh Oghe)'
+          : 'Please enter your full name (First & Last name, e.g. Parvesh Oghe).'
       );
       if (inputRef.current) inputRef.current.focus();
       return;
@@ -50,7 +50,12 @@ export default function WelcomeVisitorModal({ isOpen, onClose, onRegistered, lan
         localStorage.setItem('payal_visitor_device_id', deviceId);
       }
 
-      const res = await recordVisitorApi(cleanName, deviceId);
+      // 2-3 second loading state before transitioning to the appreciation card
+      const [res] = await Promise.all([
+        recordVisitorApi(cleanName, deviceId),
+        new Promise((resolve) => setTimeout(resolve, 2200))
+      ]);
+
       const visitorProfile = {
         id: res.id,
         fullName: cleanName,
@@ -65,6 +70,7 @@ export default function WelcomeVisitorModal({ isOpen, onClose, onRegistered, lan
       onClose();
     } catch (err) {
       console.error('Failed to register visitor:', err);
+      await new Promise((resolve) => setTimeout(resolve, 2200));
       // Fallback local save even if server is momentarily unreachable
       const wordsArr = cleanName.split(/\s+/);
       const fallbackProfile = {
@@ -213,7 +219,7 @@ export default function WelcomeVisitorModal({ isOpen, onClose, onRegistered, lan
                   ref={inputRef}
                   type="text"
                   autoComplete="name"
-                  placeholder={lang === 'mr' ? 'उदा. अतुल वेदगा' : 'e.g. Atul Vedga'}
+                  placeholder="Parvesh Oghe"
                   value={fullName}
                   onChange={(e) => {
                     setFullName(e.target.value);
@@ -297,7 +303,7 @@ export default function WelcomeVisitorModal({ isOpen, onClose, onRegistered, lan
                 gap: '0.55rem',
                 boxShadow: '0 6px 20px rgba(245, 158, 11, 0.45)',
                 transition: 'all 0.2s ease',
-                opacity: loading ? 0.75 : 1
+                opacity: loading ? 0.8 : 1
               }}
               onMouseEnter={(e) => {
                 if (!loading) {
@@ -311,11 +317,23 @@ export default function WelcomeVisitorModal({ isOpen, onClose, onRegistered, lan
               }}
             >
               {loading ? (
-                <span>नोंदणी होत आहे...</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+                  <div
+                    style={{
+                      width: '18px',
+                      height: '18px',
+                      border: '2.5px solid rgba(255, 255, 255, 0.35)',
+                      borderTop: '2.5px solid #ffffff',
+                      borderRadius: '50%',
+                      animation: 'spinLoader 0.75s linear infinite'
+                    }}
+                  />
+                  <span>नोंदणी होत आहे...</span>
+                </div>
               ) : (
                 <>
                   <HeartHandshake size={20} />
-                  <span>{lang === 'mr' ? 'नोंद करा व वेबसाईट पहा' : 'Allow & Continue'}</span>
+                  <span>{lang === 'mr' ? 'नोंद करा व सहकार्य करा' : 'Register & Support'}</span>
                   <ArrowRight size={18} />
                 </>
               )}
@@ -332,6 +350,10 @@ export default function WelcomeVisitorModal({ isOpen, onClose, onRegistered, lan
         @keyframes popInScale {
           from { opacity: 0; transform: scale(0.92) translateY(12px); }
           to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes spinLoader {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
         }
       `}</style>
     </div>,

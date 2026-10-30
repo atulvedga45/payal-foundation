@@ -1,6 +1,6 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
-import { Sparkles, X, ShieldCheck } from 'lucide-react';
+import { Sparkles, ShieldCheck } from 'lucide-react';
 
 export default function VisitorAppreciationModal({ isOpen, onClose, visitorProfile, lang = 'mr' }) {
   if (!isOpen || !visitorProfile) return null;
@@ -52,40 +52,6 @@ export default function VisitorAppreciationModal({ isOpen, onClose, visitorProfi
             background: 'linear-gradient(90deg, #f59e0b 0%, #fbbf24 35%, #fef08a 50%, #fbbf24 65%, #f59e0b 100%)'
           }}
         />
-
-        {/* Close Button */}
-        <button
-          type="button"
-          onClick={onClose}
-          style={{
-            position: 'absolute',
-            top: '12px',
-            right: '12px',
-            background: 'rgba(255, 255, 255, 0.08)',
-            border: 'none',
-            color: '#cbd5e1',
-            width: '32px',
-            height: '32px',
-            borderRadius: '50%',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'all 0.2s ease',
-            zIndex: 5
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(239, 68, 68, 0.25)';
-            e.currentTarget.style.color = '#ef4444';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
-            e.currentTarget.style.color = '#cbd5e1';
-          }}
-          aria-label="Close"
-        >
-          <X size={17} />
-        </button>
 
         {/* Scrollable Container with compact padding so top & bottom never cut off */}
         <div
@@ -238,7 +204,7 @@ export default function VisitorAppreciationModal({ isOpen, onClose, visitorProfi
             onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-1px)')}
             onMouseLeave={(e) => (e.currentTarget.style.transform = 'none')}
           >
-            वेबसाईट सुरू ठेवा (Close)
+            Close
           </button>
         </div>
       </div>
