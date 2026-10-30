@@ -229,7 +229,7 @@ export default function App() {
           setVisitorCardOpen(false);
           setTimeout(() => {
             setWelcomeModalOpen(true);
-          }, 2500);
+          }, 4500);
         }
       }
     } catch (err) {
@@ -237,14 +237,14 @@ export default function App() {
     }
   }, []);
 
-  // Show Welcome Modal 2-3 seconds AFTER the website opens (after splash finishes and website is visible)
+  // Show Welcome Modal 4-5 seconds AFTER the website opens (after splash finishes and website is visible)
   useEffect(() => {
     if (!showSplash) {
       const cached = localStorage.getItem('payal_visitor_profile');
       if (!cached) {
         const timer = setTimeout(() => {
           setWelcomeModalOpen(true);
-        }, 2500);
+        }, 4500);
         return () => clearTimeout(timer);
       }
     }

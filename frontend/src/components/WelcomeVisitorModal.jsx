@@ -50,10 +50,10 @@ export default function WelcomeVisitorModal({ isOpen, onClose, onRegistered, lan
         localStorage.setItem('payal_visitor_device_id', deviceId);
       }
 
-      // 2-3 second loading state before transitioning to the appreciation card
+      // 4-5 second loading state before transitioning to the appreciation card
       const [res] = await Promise.all([
         recordVisitorApi(cleanName, deviceId),
-        new Promise((resolve) => setTimeout(resolve, 2200))
+        new Promise((resolve) => setTimeout(resolve, 4500))
       ]);
 
       const visitorProfile = {
@@ -70,7 +70,7 @@ export default function WelcomeVisitorModal({ isOpen, onClose, onRegistered, lan
       onClose();
     } catch (err) {
       console.error('Failed to register visitor:', err);
-      await new Promise((resolve) => setTimeout(resolve, 2200));
+      await new Promise((resolve) => setTimeout(resolve, 4500));
       // Fallback local save even if server is momentarily unreachable
       const wordsArr = cleanName.split(/\s+/);
       const fallbackProfile = {
