@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Users, Search, Trash2, RefreshCw, X, ShieldCheck, Calendar, Sparkles } from 'lucide-react';
+import { Users, Search, Trash2, RefreshCw, X, Calendar, Sparkles } from 'lucide-react';
 import { fetchSecretVisitorsLog, deleteSecretVisitor } from '../api';
 
-export default function SecretVisitorLogModal({ isOpen, onClose, secretPin = '7776', lang = 'mr' }) {
+export default function SecretVisitorLogModal({
+  isOpen,
+  onClose,
+  secretPin = '7776',
+  lang = 'mr',
+  onVisitorDeletedSelf,
+  onVisitorListUpdated
+}) {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({ total_count: 0, visitors: [] });
   const [search, setSearch] = useState('');
@@ -15,7 +22,7 @@ export default function SecretVisitorLogModal({ isOpen, onClose, secretPin = '77
     setError('');
     try {
       const res = await fetchSecretVisitorsLog(secretPin);
-      setData(res);
+      setData(res || { total_count: 0, visitors: [] });
     } catch (err) {
       console.error('Failed to fetch visitor log:', err);
       setError('व्हिजिटर डेटा लोड करता आला नाही. कृपया पिन तपासा किंवा पुन्हा प्रयत्न करा.');
@@ -35,24 +42,34 @@ export default function SecretVisitorLogModal({ isOpen, onClose, secretPin = '77
 
   if (!isOpen) return null;
 
-  const handleDelete = async (id, name) => {
+  const handleDelete = async (id, name, deviceId) => {
     if (!window.confirm(`खरोखर '${name}' या व्हिजिटरची नोंद हटवायची आहे का?`)) return;
     setDeletingId(id);
     try {
       await deleteSecretVisitor(id, secretPin);
-      setData((prev) => ({
-        ...prev,
-        total_count: Math.max(0, prev.total_count - 1),
-        visitors: prev.visitors.filter((v) => v.id !== id)
-      }));
+
+      // Check if the deleted user is currently registered on this device
+      const myProfile = JSON.parse(localStorage.getItem('payal_visitor_profile') || 'null');
+      const myDeviceId = localStorage.getItem('payal_visitor_device_id');
+      const isSelf = (myProfile && (myProfile.id === id || myProfile.visitorNumber === id)) || (deviceId && deviceId === myDeviceId);
+
+      if (isSelf) {
+        localStorage.removeItem('payal_visitor_profile');
+        if (onVisitorDeletedSelf) onVisitorDeletedSelf();
+      } else {
+        if (onVisitorListUpdated) onVisitorListUpdated();
+      }
+
+      // Re-fetch to get newly calculated sequential numbers (1, 2, 3...)
+      await loadData();
     } catch (err) {
-      alert('हटवता आले नाही: ' + err.message);
+      alert('हटवता आले नाही: ' + (err.message || 'त्रुटी आली'));
     } finally {
       setDeletingId(null);
     }
   };
 
-  const filtered = data.visitors.filter((v) => {
+  const filtered = (data.visitors || []).filter((v) => {
     if (!search.trim()) return true;
     const q = search.toLowerCase();
     return (
@@ -62,18 +79,22 @@ export default function SecretVisitorLogModal({ isOpen, onClose, secretPin = '77
     );
   });
 
+  // Date and Time formatted in English (e.g. 29 Oct, 2026, 02:20 PM)
   const formatDate = (dateStr) => {
     if (!dateStr) return '-';
     try {
       const d = new Date(dateStr);
-      return d.toLocaleString('mr-IN', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      });
+      const day = String(d.getDate()).padStart(2, '0');
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const month = months[d.getMonth()];
+      const year = d.getFullYear();
+      let hours = d.getHours();
+      const minutes = String(d.getMinutes()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12;
+      const formattedHours = String(hours).padStart(2, '0');
+      return `${day} ${month}, ${year}, ${formattedHours}:${minutes} ${ampm}`;
     } catch {
       return dateStr;
     }
@@ -91,7 +112,7 @@ export default function SecretVisitorLogModal({ isOpen, onClose, secretPin = '77
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '1rem',
+        padding: '0.85rem',
         animation: 'fadeInSecret 0.25s ease-out'
       }}
       onClick={(e) => {
@@ -103,12 +124,11 @@ export default function SecretVisitorLogModal({ isOpen, onClose, secretPin = '77
         aria-modal="true"
         style={{
           width: '100%',
-          maxWidth: '680px',
-          maxHeight: '90vh',
+          maxWidth: '560px',
           background: 'linear-gradient(165deg, #0f1f38 0%, #081426 100%)',
           border: '1.5px solid rgba(56, 189, 248, 0.35)',
-          borderRadius: '24px',
-          boxShadow: '0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(56, 189, 248, 0.2)',
+          borderRadius: '22px',
+          boxShadow: '0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(56, 189, 248, 0.2)',
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
@@ -116,38 +136,60 @@ export default function SecretVisitorLogModal({ isOpen, onClose, secretPin = '77
           color: '#ffffff'
         }}
       >
-        {/* Top Header Bar */}
+        {/* Top Header Bar: Fixed (never scrolls) */}
         <div
           style={{
-            padding: '1.25rem 1.5rem',
+            padding: '1rem 1.25rem',
             borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '1rem',
-            background: 'rgba(15, 23, 42, 0.6)'
+            gap: '0.75rem',
+            background: 'rgba(15, 23, 42, 0.75)',
+            flexShrink: 0
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+          {/* Logo icon + Title directly in front + 1-line subtitle underneath */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0, flex: 1 }}>
             <div
               style={{
-                width: '42px',
-                height: '42px',
+                width: '40px',
+                height: '40px',
                 borderRadius: '12px',
                 background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 4px 12px rgba(2, 132, 199, 0.4)'
+                boxShadow: '0 4px 12px rgba(2, 132, 199, 0.4)',
+                flexShrink: 0
               }}
             >
-              <Users size={22} color="#ffffff" />
+              <Users size={20} color="#ffffff" />
             </div>
-            <div>
-              <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#ffffff' }}>
-                {lang === 'mr' ? 'गुप्त व्हिजिटर यादी (Visitor Log)' : 'Secret Visitor Log'}
+
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div
+                style={{
+                  fontSize: '1.12rem',
+                  fontWeight: 800,
+                  color: '#ffffff',
+                  lineHeight: 1.2,
+                  letterSpacing: '-0.01em'
+                }}
+              >
+                {lang === 'mr' ? 'गुप्त व्हिजिटर यादी' : 'Secret Visitor Log'}
               </div>
-              <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+              <div
+                style={{
+                  fontSize: '0.73rem',
+                  color: '#94a3b8',
+                  marginTop: '3px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}
+                title="पायल फाउंडेशन — सर्व सन्माननीय व्हिजिटर्सची नावे व आकडेवारी"
+              >
                 पायल फाउंडेशन — सर्व सन्माननीय व्हिजिटर्सची नावे व आकडेवारी
               </div>
             </div>
@@ -160,14 +202,15 @@ export default function SecretVisitorLogModal({ isOpen, onClose, secretPin = '77
               background: 'rgba(255, 255, 255, 0.08)',
               border: 'none',
               color: '#cbd5e1',
-              width: '34px',
-              height: '34px',
+              width: '32px',
+              height: '32px',
               borderRadius: '50%',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
+              flexShrink: 0
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = 'rgba(239, 68, 68, 0.25)';
@@ -179,21 +222,22 @@ export default function SecretVisitorLogModal({ isOpen, onClose, secretPin = '77
             }}
             aria-label="Close"
           >
-            <X size={18} />
+            <X size={17} />
           </button>
         </div>
 
-        {/* Stats & Search Toolbar */}
+        {/* Stats & Search Toolbar: Fixed (never scrolls) */}
         <div
           style={{
-            padding: '1rem 1.5rem',
-            background: 'rgba(15, 23, 42, 0.35)',
+            padding: '0.85rem 1.25rem',
+            background: 'rgba(15, 23, 42, 0.45)',
             borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '0.75rem',
-            flexWrap: 'wrap'
+            gap: '0.65rem',
+            flexWrap: 'wrap',
+            flexShrink: 0
           }}
         >
           {/* Total Count Badge */}
@@ -201,25 +245,26 @@ export default function SecretVisitorLogModal({ isOpen, onClose, secretPin = '77
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '0.5rem',
+              gap: '0.45rem',
               background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(217, 119, 6, 0.15) 100%)',
               border: '1px solid rgba(245, 158, 11, 0.45)',
-              padding: '0.4rem 0.9rem',
+              padding: '0.35rem 0.8rem',
               borderRadius: '9999px',
-              fontSize: '0.85rem',
+              fontSize: '0.82rem',
               fontWeight: 800,
-              color: '#fbbf24'
+              color: '#fbbf24',
+              flexShrink: 0
             }}
           >
-            <Sparkles size={16} />
+            <Sparkles size={14} />
             <span>एकूण व्हिजिटर्स: {data.total_count}</span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: '1', minWidth: '220px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: '1', minWidth: '180px' }}>
             {/* Search Input */}
             <div style={{ position: 'relative', flex: 1 }}>
               <Search
-                size={16}
+                size={14}
                 color="#64748b"
                 style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }}
               />
@@ -230,12 +275,12 @@ export default function SecretVisitorLogModal({ isOpen, onClose, secretPin = '77
                 onChange={(e) => setSearch(e.target.value)}
                 style={{
                   width: '100%',
-                  padding: '0.45rem 0.75rem 0.45rem 2.2rem',
+                  padding: '0.4rem 0.65rem 0.4rem 2rem',
                   borderRadius: '10px',
                   background: 'rgba(15, 23, 42, 0.7)',
                   border: '1px solid rgba(255, 255, 255, 0.18)',
                   color: '#ffffff',
-                  fontSize: '0.85rem',
+                  fontSize: '0.82rem',
                   outline: 'none'
                 }}
               />
@@ -251,49 +296,57 @@ export default function SecretVisitorLogModal({ isOpen, onClose, secretPin = '77
                 background: 'rgba(255, 255, 255, 0.08)',
                 border: '1px solid rgba(255, 255, 255, 0.15)',
                 color: '#93c5fd',
-                width: '36px',
-                height: '36px',
-                borderRadius: '10px',
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                flexShrink: 0
               }}
             >
-              <RefreshCw size={16} className={loading ? 'spin' : ''} />
+              <RefreshCw size={14} className={loading ? 'spin' : ''} />
             </button>
           </div>
         </div>
 
-        {/* Content Body / Visitors List */}
-        <div style={{ padding: '1rem 1.5rem', overflowY: 'auto', flex: 1 }}>
+        {/* Content Body / Visitors List (Only this section scrolls; fits ~4 cards before scrolling) */}
+        <div
+          style={{
+            padding: '0.85rem 1.15rem',
+            overflowY: 'auto',
+            maxHeight: '325px', // Sized so 4 cards fit cleanly, then scrolls downwards
+            minHeight: '120px'
+          }}
+        >
           {error && (
             <div
               style={{
-                padding: '0.75rem 1rem',
+                padding: '0.65rem 0.85rem',
                 background: 'rgba(239, 68, 68, 0.15)',
                 border: '1px solid rgba(239, 68, 68, 0.35)',
-                borderRadius: '12px',
+                borderRadius: '10px',
                 color: '#fca5a5',
-                fontSize: '0.85rem',
-                marginBottom: '1rem'
+                fontSize: '0.82rem',
+                marginBottom: '0.75rem'
               }}
             >
               {error}
             </div>
           )}
 
-          {loading && data.visitors.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#94a3b8' }}>
+          {loading && (data.visitors || []).length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '2.5rem 1rem', color: '#94a3b8', fontSize: '0.88rem' }}>
               व्हिजिटर्स माहिती लोड होत आहे...
             </div>
           ) : filtered.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#94a3b8' }}>
+            <div style={{ textAlign: 'center', padding: '2.5rem 1rem', color: '#94a3b8', fontSize: '0.88rem' }}>
               {search ? 'या नावाने कोणताही व्हिजिटर सापडला नाही.' : 'अद्याप कोणत्याही व्हिजिटरची नोंद झालेली नाही.'}
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
               {filtered.map((v, idx) => (
                 <div
                   key={v.id || idx}
@@ -302,10 +355,10 @@ export default function SecretVisitorLogModal({ isOpen, onClose, secretPin = '77
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     gap: '0.75rem',
-                    padding: '0.75rem 1rem',
+                    padding: '0.65rem 0.85rem',
                     background: 'rgba(15, 23, 42, 0.65)',
                     border: '1px solid rgba(255, 255, 255, 0.08)',
-                    borderRadius: '14px',
+                    borderRadius: '12px',
                     transition: 'all 0.2s ease'
                   }}
                   onMouseEnter={(e) => {
@@ -317,8 +370,8 @@ export default function SecretVisitorLogModal({ isOpen, onClose, secretPin = '77
                     e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
                   }}
                 >
-                  {/* Left: Number & Name */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0 }}>
+                  {/* Left: Number badge & Name */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', minWidth: 0 }}>
                     <div
                       style={{
                         width: '32px',
@@ -328,7 +381,7 @@ export default function SecretVisitorLogModal({ isOpen, onClose, secretPin = '77
                         border: '1px solid rgba(245, 158, 11, 0.35)',
                         color: '#fbbf24',
                         fontWeight: 800,
-                        fontSize: '0.78rem',
+                        fontSize: '0.76rem',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -341,7 +394,7 @@ export default function SecretVisitorLogModal({ isOpen, onClose, secretPin = '77
                     <div style={{ minWidth: 0 }}>
                       <div
                         style={{
-                          fontSize: '0.98rem',
+                          fontSize: '0.94rem',
                           fontWeight: 700,
                           color: '#ffffff',
                           whiteSpace: 'nowrap',
@@ -353,7 +406,7 @@ export default function SecretVisitorLogModal({ isOpen, onClose, secretPin = '77
                       </div>
                       <div
                         style={{
-                          fontSize: '0.74rem',
+                          fontSize: '0.72rem',
                           color: '#94a3b8',
                           display: 'flex',
                           alignItems: 'center',
@@ -372,7 +425,7 @@ export default function SecretVisitorLogModal({ isOpen, onClose, secretPin = '77
                     <button
                       type="button"
                       disabled={deletingId === v.id}
-                      onClick={() => handleDelete(v.id, v.full_name)}
+                      onClick={() => handleDelete(v.id, v.full_name, v.device_id)}
                       title="नोंद हटवा (Delete)"
                       style={{
                         background: 'rgba(239, 68, 68, 0.15)',
@@ -396,7 +449,7 @@ export default function SecretVisitorLogModal({ isOpen, onClose, secretPin = '77
                         e.currentTarget.style.color = '#f87171';
                       }}
                     >
-                      <Trash2 size={14} />
+                      <Trash2 size={13} />
                     </button>
                   </div>
                 </div>
@@ -423,4 +476,3 @@ export default function SecretVisitorLogModal({ isOpen, onClose, secretPin = '77
     document.body
   );
 }
-

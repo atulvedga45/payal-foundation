@@ -2,7 +2,7 @@ import os
 import shutil
 import time
 from contextlib import asynccontextmanager
-from typing import List
+from typing import List, Optional
 from fastapi import FastAPI, Depends, HTTPException, Header, status, UploadFile, File, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -383,6 +383,14 @@ def record_visitor_endpoint(payload: schemas.VisitorCreate, db: Session = Depend
     if not payload.full_name or len(payload.full_name.strip()) < 3:
         raise HTTPException(status_code=400, detail="Full name is required")
     return crud.record_visitor(db, payload.full_name, payload.device_id)
+
+@app.get("/api/visitors/status")
+def get_visitor_status_endpoint(
+    device_id: Optional[str] = None,
+    visitor_id: Optional[int] = None,
+    db: Session = Depends(get_db)
+):
+    return crud.get_visitor_status(db, device_id=device_id, visitor_id=visitor_id)
 
 @app.get("/api/visitors/secret-log")
 def get_secret_visitors_endpoint(

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { translations } from './translations';
-import { fetchTrustInfo, fetchTrustees, fetchInitiatives, fetchHomeStats, fetchGallery } from './api';
+import { fetchTrustInfo, fetchTrustees, fetchInitiatives, fetchHomeStats, fetchGallery, fetchVisitorStatusApi } from './api';
 
 import TopBar from './components/TopBar';
 import Navbar from './components/Navbar';
@@ -196,16 +196,64 @@ export default function App() {
   const [secretVisitorLogOpen, setSecretVisitorLogOpen] = useState(false);
   const [visitorSecretPin, setVisitorSecretPin] = useState('7776');
 
-  // Trigger welcome modal on first visit once splash is dismissed or after small delay
-  useEffect(() => {
+  // Synchronize visitor status with server:
+  // 1. If admin deleted this visitor -> remove local profile and re-open welcome card
+  // 2. If someone else was deleted -> update this visitor's sequential number (#2 -> #1) in real-time
+  const syncVisitorStatus = useCallback(async () => {
+    const deviceId = localStorage.getItem('payal_visitor_device_id');
     const cached = localStorage.getItem('payal_visitor_profile');
-    if (!cached) {
+
+    if (!deviceId && !cached) {
       const timer = setTimeout(() => {
         setWelcomeModalOpen(true);
-      }, 2000);
+      }, 1800);
       return () => clearTimeout(timer);
     }
+
+    try {
+      const parsed = cached ? JSON.parse(cached) : null;
+      const res = await fetchVisitorStatusApi(deviceId, parsed?.id);
+      if (res) {
+        if (res.exists && res.visitor) {
+          const updated = {
+            id: res.visitor.id,
+            fullName: res.visitor.full_name,
+            firstName: res.visitor.first_name,
+            visitorNumber: res.visitor.visitor_number,
+            totalCount: res.visitor.total_count,
+            registeredAt: res.visitor.created_at || (parsed ? parsed.registeredAt : new Date().toISOString())
+          };
+          setVisitorProfile(updated);
+          localStorage.setItem('payal_visitor_profile', JSON.stringify(updated));
+        } else if (!res.exists) {
+          // Visitor was deleted from visitor panel by admin!
+          localStorage.removeItem('payal_visitor_profile');
+          setVisitorProfile(null);
+          setVisitorCardOpen(false);
+          setWelcomeModalOpen(true);
+        }
+      }
+    } catch (err) {
+      console.warn('Visitor sync check error:', err);
+    }
   }, []);
+
+  useEffect(() => {
+    syncVisitorStatus();
+    const handleFocus = () => syncVisitorStatus();
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [syncVisitorStatus]);
+
+  const handleOpenVisitorCard = async () => {
+    await syncVisitorStatus();
+    const current = localStorage.getItem('payal_visitor_profile');
+    if (current) {
+      setVisitorCardOpen(true);
+    } else {
+      setWelcomeModalOpen(true);
+    }
+  };
 
   const handleSplashFinish = useCallback(() => setShowSplash(false), []);
 
@@ -362,7 +410,7 @@ export default function App() {
         setIsPinModalOpen={setIsPinModalOpen}
         onOpenPinModal={() => setIsPinModalOpen(true)}
         visitorProfile={visitorProfile}
-        onOpenVisitorCard={() => setVisitorCardOpen(true)}
+        onOpenVisitorCard={handleOpenVisitorCard}
       />
 
       {/* Dynamic Live Impact Announcement Ticker */}
@@ -404,7 +452,7 @@ export default function App() {
           onOpenAdmin={() => setAdminOpen(true)}
           isPinModalOpen={isPinModalOpen}
           visitorProfile={visitorProfile}
-          onOpenVisitorCard={() => setVisitorCardOpen(true)}
+          onOpenVisitorCard={handleOpenVisitorCard}
           onOpenWelcomeModal={() => setWelcomeModalOpen(true)}
         />
       )}
@@ -525,6 +573,12 @@ export default function App() {
         onClose={() => setSecretVisitorLogOpen(false)}
         secretPin={visitorSecretPin}
         lang={lang}
+        onVisitorDeletedSelf={() => {
+          setVisitorProfile(null);
+          setVisitorCardOpen(false);
+          setWelcomeModalOpen(true);
+        }}
+        onVisitorListUpdated={syncVisitorStatus}
       />
 
       {/* Floating Scroll To Top Button with Circular Progress */}

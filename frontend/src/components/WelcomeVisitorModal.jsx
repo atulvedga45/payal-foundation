@@ -52,6 +52,7 @@ export default function WelcomeVisitorModal({ isOpen, onClose, onRegistered, lan
 
       const res = await recordVisitorApi(cleanName, deviceId);
       const visitorProfile = {
+        id: res.id,
         fullName: cleanName,
         firstName: res.first_name || words[0],
         visitorNumber: res.visitor_number || res.id || 1,

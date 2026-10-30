@@ -2,6 +2,7 @@ import base64
 import os
 import time
 import uuid
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from . import models, schemas
 
@@ -311,28 +312,36 @@ def record_visitor(db: Session, full_name: str, device_id: str = None):
         db.commit()
         db.refresh(visitor)
 
-    total_count = db.query(models.Visitor).count()
+    total_count = db.query(func.count(models.Visitor.id)).scalar()
+    visitor_number = db.query(func.count(models.Visitor.id)).filter(models.Visitor.id <= visitor.id).scalar()
+
     return {
         "id": visitor.id,
         "full_name": visitor.full_name,
         "first_name": visitor.first_name,
         "created_at": visitor.created_at,
-        "visitor_number": visitor.id,
-        "total_count": total_count
+        "visitor_number": visitor_number,
+        "total_count": total_count,
+        "device_id": visitor.device_id
     }
 
 def get_visitors_list(db: Session, limit: int = 500):
-    total_count = db.query(models.Visitor).count()
-    visitors = db.query(models.Visitor).order_by(models.Visitor.id.desc()).limit(limit).all()
+    visitors_asc = db.query(models.Visitor).order_by(models.Visitor.id.asc()).all()
+    total_count = len(visitors_asc)
     out = []
-    for v in visitors:
+    for idx, v in enumerate(visitors_asc):
         out.append({
             "id": v.id,
             "full_name": v.full_name,
             "first_name": v.first_name,
             "created_at": v.created_at,
-            "visitor_number": v.id
+            "visitor_number": idx + 1,
+            "device_id": v.device_id
         })
+    # Display newest first, preserving their sequential ranking numbers
+    out.reverse()
+    if limit and len(out) > limit:
+        out = out[:limit]
     return {
         "total_count": total_count,
         "visitors": out
@@ -345,3 +354,29 @@ def delete_visitor(db: Session, visitor_id: int):
     db.delete(visitor)
     db.commit()
     return True
+
+def get_visitor_status(db: Session, device_id: str = None, visitor_id: int = None):
+    visitor = None
+    if device_id:
+        visitor = db.query(models.Visitor).filter(models.Visitor.device_id == device_id).first()
+    elif visitor_id:
+        visitor = db.query(models.Visitor).filter(models.Visitor.id == visitor_id).first()
+
+    if not visitor:
+        return {"exists": False}
+
+    total_count = db.query(func.count(models.Visitor.id)).scalar()
+    visitor_number = db.query(func.count(models.Visitor.id)).filter(models.Visitor.id <= visitor.id).scalar()
+
+    return {
+        "exists": True,
+        "visitor": {
+            "id": visitor.id,
+            "full_name": visitor.full_name,
+            "first_name": visitor.first_name,
+            "created_at": visitor.created_at,
+            "visitor_number": visitor_number,
+            "total_count": total_count,
+            "device_id": visitor.device_id
+        }
+    }

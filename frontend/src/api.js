@@ -585,3 +585,17 @@ export async function deleteSecretVisitor(visitorId, secretPin) {
     throw err;
   }
 }
+
+export async function fetchVisitorStatusApi(deviceId, visitorId) {
+  try {
+    const params = new URLSearchParams();
+    if (deviceId) params.append("device_id", deviceId);
+    if (visitorId) params.append("visitor_id", visitorId);
+    const res = await fetch(`${API_BASE}/visitors/status?${params.toString()}`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.warn("Check visitor status error:", err);
+    return null;
+  }
+}
