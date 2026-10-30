@@ -34,15 +34,11 @@ export default async function handler(req, res) {
     const cleanPhone = (phone || 'N/A').trim();
     const cleanPhoneForTel = cleanPhone.replace(/[^0-9+]/g, '');
     const cleanPhone2 = phone2 && phone2.trim() ? phone2.trim() : '';
+    const cleanAddress = address && address.trim() && address.trim() !== 'दिलेला नाही' ? address.trim() : 'दिलेला नाही';
+    const cleanTaluka = taluka && taluka.trim() && taluka.trim() !== 'दिलेला नाही' ? taluka.trim() : 'दिलेला नाही';
+    const cleanDistrict = district && district.trim() && district.trim() !== 'दिलेला नाही' ? district.trim() : 'दिलेला नाही';
 
-    // Combine address parts neatly: Address, Taluka, District
-    const addressParts = [];
-    if (address && address.trim() && address.trim() !== 'दिलेला नाही') addressParts.push(address.trim());
-    if (taluka && taluka.trim() && taluka.trim() !== 'दिलेला नाही') addressParts.push(taluka.trim());
-    if (district && district.trim() && district.trim() !== 'दिलेला नाही') addressParts.push(district.trim());
-    const fullAddressStr = addressParts.length > 0 ? addressParts.join(', ') : 'दिलेला नाही';
-
-    // Format current date and time in IST (e.g. 22-10-2026 09:26 AM)
+    // Format current date and time in IST with comma between date and time (e.g. 30-10-2026, 03:51 PM)
     const now = new Date();
     const istTime = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
     const day = String(istTime.getUTCDate()).padStart(2, '0');
@@ -54,7 +50,7 @@ export default async function handler(req, res) {
     hours = hours % 12;
     hours = hours ? hours : 12;
     const formattedHours = String(hours).padStart(2, '0');
-    const dateTimeStr = `${day}-${month}-${year} ${formattedHours}:${minutes} ${ampm}`;
+    const dateTimeStr = `${day}-${month}-${year}, ${formattedHours}:${minutes} ${ampm}`;
 
     // Clean Phone for WhatsApp link
     const digitsOnly = cleanPhone.replace(/\D/g, '');
@@ -115,7 +111,23 @@ export default async function handler(req, res) {
                     📍 पत्ता (Address)
                   </td>
                   <td style="padding: 10px 8px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: 600;">
-                    ${fullAddressStr}
+                    ${cleanAddress}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 10px 8px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-weight: 600;">
+                    🏛️ तालुका (Taluka)
+                  </td>
+                  <td style="padding: 10px 8px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: 600;">
+                    ${cleanTaluka}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 10px 8px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-weight: 600;">
+                    🌍 जिल्हा (District)
+                  </td>
+                  <td style="padding: 10px 8px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: 600;">
+                    ${cleanDistrict}
                   </td>
                 </tr>
                 <tr>

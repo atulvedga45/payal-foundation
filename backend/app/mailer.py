@@ -38,18 +38,12 @@ def send_contact_email_notification(
     clean_phone_digits = "".join([c for c in clean_phone if c.isdigit()])
     clean_phone_for_tel = "".join([c for c in clean_phone if c.isdigit() or c == '+'])
     clean_phone2 = phone2.strip() if phone2 and phone2.strip() else ""
+    clean_address = address.strip() if address and address.strip() and address.strip() != "दिलेला नाही" else "दिलेला नाही"
+    clean_taluka = taluka.strip() if taluka and taluka.strip() and taluka.strip() != "दिलेला नाही" else "दिलेला नाही"
+    clean_district = district.strip() if district and district.strip() and district.strip() != "दिलेला नाही" else "दिलेला नाही"
 
-    # Combine address
-    addr_parts = []
-    if address and address.strip() and address.strip() != "दिलेला नाही":
-        addr_parts.append(address.strip())
-    if taluka and taluka.strip() and taluka.strip() != "दिलेला नाही":
-        addr_parts.append(taluka.strip())
-    if district and district.strip() and district.strip() != "दिलेला नाही":
-        addr_parts.append(district.strip())
-    full_address_str = ", ".join(addr_parts) if addr_parts else "दिलेला नाही"
-
-    now_str = datetime.now().strftime("%d-%m-%Y %I:%M %p")
+    # Date and Time with comma between date and time (e.g. 30-10-2026, 03:51 PM)
+    now_str = datetime.now().strftime("%d-%m-%Y, %I:%M %p")
 
     # WhatsApp link
     wa_number = f"91{clean_phone_digits}" if len(clean_phone_digits) == 10 else clean_phone_digits
@@ -65,7 +59,9 @@ def send_contact_email_notification(
 नाव (Name): {clean_name}
 फोन नंबर: {clean_phone}
 {f'फोन २: {clean_phone2}' if clean_phone2 else ''}
-पत्ता (Address): {full_address_str}
+पत्ता (Address): {clean_address}
+तालुका (Taluka): {clean_taluka}
+जिल्हा (District): {clean_district}
 तारीख व वेळ: {now_str}
 
 संदेश (Message):
@@ -128,7 +124,23 @@ def send_contact_email_notification(
             📍 पत्ता (Address)
           </td>
           <td style="padding: 10px 8px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: 600;">
-            {full_address_str}
+            {clean_address}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 10px 8px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-weight: 600;">
+            🏛️ तालुका (Taluka)
+          </td>
+          <td style="padding: 10px 8px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: 600;">
+            {clean_taluka}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 10px 8px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-weight: 600;">
+            🌍 जिल्हा (District)
+          </td>
+          <td style="padding: 10px 8px; border-bottom: 1px solid #f1f5f9; color: #0f172a; font-weight: 600;">
+            {clean_district}
           </td>
         </tr>
         <tr>
