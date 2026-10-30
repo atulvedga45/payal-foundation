@@ -133,7 +133,7 @@ export function fileToDataUrl(file) {
 
 export async function fetchTrustInfo() {
   try {
-    const res = await fetch(`${API_BASE}/info`);
+    const res = await fetch(`${API_BASE}/info?_t=${Date.now()}`, { cache: "no-store", headers: { "Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache" } });
     if (!res.ok) throw new Error("Failed to fetch info");
     return await res.json();
   } catch (err) {
@@ -144,7 +144,7 @@ export async function fetchTrustInfo() {
 
 export async function fetchTrustees() {
   try {
-    const res = await fetch(`${API_BASE}/trustees`);
+    const res = await fetch(`${API_BASE}/trustees?_t=${Date.now()}`, { cache: "no-store", headers: { "Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache" } });
     if (!res.ok) throw new Error("Failed to fetch trustees");
     return await res.json();
   } catch (err) {
@@ -155,7 +155,7 @@ export async function fetchTrustees() {
 
 export async function fetchInitiatives() {
   try {
-    const res = await fetch(`${API_BASE}/initiatives`);
+    const res = await fetch(`${API_BASE}/initiatives?_t=${Date.now()}`, { cache: "no-store", headers: { "Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache" } });
     if (!res.ok) throw new Error("Failed to fetch initiatives");
     return await res.json();
   } catch (err) {
@@ -259,7 +259,7 @@ export async function fetchAllDonations() {
 
 export async function fetchHomeStats() {
   try {
-    const res = await fetch(`${API_BASE}/home-stats`);
+    const res = await fetch(`${API_BASE}/home-stats?_t=${Date.now()}`, { cache: "no-store", headers: { "Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache" } });
     if (!res.ok) throw new Error("Failed to fetch home stats");
     const data = await res.json();
     if (data) {
@@ -425,7 +425,7 @@ export async function deleteTrustee(token, id) {
 // Gallery API
 export async function fetchGallery() {
   try {
-    const res = await fetch(`${API_BASE}/gallery`);
+    const res = await fetch(`${API_BASE}/gallery?_t=${Date.now()}`, { cache: "no-store", headers: { "Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache" } });
     if (!res.ok) throw new Error("Failed to fetch gallery");
     return await res.json();
   } catch (err) {

@@ -62,8 +62,8 @@ export default function TeamSection({ t, trustees, lang, trustInfo }) {
   const [copiedField, setCopiedField] = useState(null);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  // Keep strictly 6 trustees (3 per row)
-  const displayTrustees = (trustees && trustees.length > 0 ? trustees : []).slice(0, 6);
+  // Display all trustees without any 6-card limitation
+  const displayTrustees = (trustees && trustees.length > 0) ? trustees : [];
 
   const defaultUpi = (trustInfo?.upi_id && trustInfo.upi_id !== 'payalfoundation@ybl' && trustInfo.upi_id !== '9225243552@ybl')
     ? trustInfo.upi_id

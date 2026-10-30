@@ -28,6 +28,7 @@ import {
   updateGalleryItem,
   deleteGalleryItem,
   updateTrustInfo,
+  fetchTrustInfo,
   getImageUrl,
   compressImage,
   compressImageToDataUrl,
@@ -245,7 +246,7 @@ export default function AdminModal({
   const trusteeQrRef = useRef(null);
 
   useEffect(() => {
-    if (trustees && trustees.length > 0) {
+    if (Array.isArray(trustees)) {
       setLocalTrustees(trustees);
     }
   }, [trustees]);
@@ -263,9 +264,8 @@ export default function AdminModal({
   useEffect(() => {
     async function loadTrustInfo() {
       try {
-        const res = await fetch((import.meta.env.VITE_API_BASE || 'http://localhost:8000/api') + '/info');
-        if (res.ok) {
-          const data = await res.json();
+        const data = await fetchTrustInfo();
+        if (data) {
           setTrustInfoForm({
             name: data.name || '',
             tagline: data.tagline || '',
@@ -555,33 +555,38 @@ export default function AdminModal({
 
       if (onUpdateInitiatives) onUpdateInitiatives(updatedList);
 
-      // 2. Sync to Backend in background
-      try {
-        if (isNew) {
-          const created = await createInitiative(token, payload);
-          if (created && created.id) {
-            const syncedList = updatedList.map(item => item.id === tempId ? { ...item, id: created.id } : item);
-            setLocalInitiatives(syncedList);
-            try {
-              localStorage.setItem('payal_initiatives', JSON.stringify(syncedList));
-            } catch (_) {}
-            if (onUpdateInitiatives) onUpdateInitiatives(syncedList);
-          }
-        } else {
-          await updateInitiative(token, editingInit.id, payload);
-        }
-      } catch (backendErr) {
-        console.warn("Backend sync failed, saved locally in browser storage:", backendErr);
-      }
-
+      // Instant optimistic close and confirmation
       setEditingInit(null);
       setActiveTab('initiatives');
-      setInitMsg({ type: 'success', text: '✅ उपक्रम यशस्वीरीत्या सेव्ह झाला!' });
+      setInitSaving(false);
+      setInitMsg({ type: 'success', text: '✅ उपक्रम यशस्वीरीत्या सेव्ह झाला! (Website वर लगेच अपडेट झाले!)' });
       setTimeout(() => setInitMsg({ type: '', text: '' }), 4000);
+
+      // 2. Sync to Backend in background
+      (async () => {
+        try {
+          if (isNew) {
+            const created = await createInitiative(token, payload);
+            if (created && created.id) {
+              setLocalInitiatives(prev => {
+                const syncedList = prev.map(item => item.id === tempId ? { ...item, id: created.id } : item);
+                try {
+                  localStorage.setItem('payal_initiatives', JSON.stringify(syncedList));
+                } catch (_) {}
+                if (onUpdateInitiatives) onUpdateInitiatives(syncedList);
+                return syncedList;
+              });
+            }
+          } else {
+            await updateInitiative(token, editingInit.id, payload);
+          }
+        } catch (backendErr) {
+          console.warn("Backend sync failed, saved locally in browser storage:", backendErr);
+        }
+      })();
     } catch (err) {
       console.error(err);
       setInitMsg({ type: 'error', text: 'उपक्रम सेव्ह करताना त्रुटी आली.' });
-    } finally {
       setInitSaving(false);
     }
   };
@@ -695,40 +700,47 @@ export default function AdminModal({
         localStorage.setItem('payal_trustees', JSON.stringify(updatedList));
       } catch (_) {}
 
-      // 2. Sync to Backend so all devices see the update
-      try {
-        if (isNew) {
-          const created = await createTrustee(token, payload);
-          if (created && created.id) {
-            const syncedList = updatedList.map(item => item.id === tempId ? created : item);
-            setLocalTrustees(syncedList);
-            if (onUpdateTrustees) onUpdateTrustees(syncedList);
-            try {
-              localStorage.setItem('payal_trustees', JSON.stringify(syncedList));
-            } catch (_) {}
-          }
-        } else {
-          const saved = await updateTrustee(token, editingTrustee.id, payload);
-          if (saved) {
-            const syncedList = updatedList.map(item => item.id === editingTrustee.id ? { ...item, ...saved } : item);
-            setLocalTrustees(syncedList);
-            if (onUpdateTrustees) onUpdateTrustees(syncedList);
-            try {
-              localStorage.setItem('payal_trustees', JSON.stringify(syncedList));
-            } catch (_) {}
-          }
-        }
-      } catch (backendErr) {
-        console.warn('Backend trustee sync warning:', backendErr);
-      }
-
+      // Immediately close form and show instant success
       setEditingTrustee(null);
-      setTrusteeMsg({ type: 'success', text: '✅ विश्वस्त माहिती यशस्वीरीत्या सेव्ह झाली! (Trustee saved successfully!)' });
+      setTrusteeSaving(false);
+      setTrusteeMsg({ type: 'success', text: '✅ विश्वस्त माहिती लगेच सेव्ह झाली! (Website वर त्वरित अपडेट झाले!)' });
       setTimeout(() => setTrusteeMsg({ type: '', text: '' }), 4000);
+
+      // 2. Sync to Backend in background so all devices see the update
+      (async () => {
+        try {
+          if (isNew) {
+            const created = await createTrustee(token, payload);
+            if (created && created.id) {
+              setLocalTrustees(prev => {
+                const syncedList = prev.map(item => item.id === tempId ? created : item);
+                if (onUpdateTrustees) onUpdateTrustees(syncedList);
+                try {
+                  localStorage.setItem('payal_trustees', JSON.stringify(syncedList));
+                } catch (_) {}
+                return syncedList;
+              });
+            }
+          } else {
+            const saved = await updateTrustee(token, editingTrustee.id, payload);
+            if (saved) {
+              setLocalTrustees(prev => {
+                const syncedList = prev.map(item => item.id === editingTrustee.id ? { ...item, ...saved } : item);
+                if (onUpdateTrustees) onUpdateTrustees(syncedList);
+                try {
+                  localStorage.setItem('payal_trustees', JSON.stringify(syncedList));
+                } catch (_) {}
+                return syncedList;
+              });
+            }
+          }
+        } catch (backendErr) {
+          console.warn('Backend trustee sync warning:', backendErr);
+        }
+      })();
     } catch (err) {
       console.error(err);
       setTrusteeMsg({ type: 'error', text: 'विश्वस्त सेव्ह करताना अडचण आली.' });
-    } finally {
       setTrusteeSaving(false);
     }
   };
@@ -737,17 +749,21 @@ export default function AdminModal({
     if (!window.confirm('हा विश्वस्त खरोखर हटवायचा आहे का? (Are you sure you want to delete this trustee?)')) {
       return;
     }
+    // Instant local removal
+    const updatedList = localTrustees.filter(item => item.id !== id);
+    setLocalTrustees(updatedList);
+    if (onUpdateTrustees) onUpdateTrustees(updatedList);
+    try {
+      localStorage.setItem('payal_trustees', JSON.stringify(updatedList));
+    } catch (_) {}
+    setTrusteeMsg({ type: 'success', text: '✅ विश्वस्त यशस्वीरीत्या हटवला गेला! (Website वरून लगेच हटवले!)' });
+    setTimeout(() => setTrusteeMsg({ type: '', text: '' }), 4000);
+
+    // Sync deletion on backend in background
     try {
       await deleteTrustee(token, id);
-      const updatedList = localTrustees.filter(item => item.id !== id);
-      setLocalTrustees(updatedList);
-      if (onUpdateTrustees) onUpdateTrustees(updatedList);
-      localStorage.setItem('payal_trustees', JSON.stringify(updatedList));
-      setTrusteeMsg({ type: 'success', text: 'विश्वस्त यशस्वीरीत्या हटवला गेला! (Trustee deleted!)' });
-      setTimeout(() => setTrusteeMsg({ type: '', text: '' }), 4000);
     } catch (err) {
-      console.error(err);
-      setTrusteeMsg({ type: 'error', text: 'विश्वस्त हटवताना त्रुटी आली.' });
+      console.warn('Backend trustee delete warning:', err);
     }
   };
 
@@ -794,13 +810,13 @@ export default function AdminModal({
         order: Number(editingGallery.order) || localGallery.length + 1
       };
 
+      const tempId = editingGallery.id === 'new' ? Date.now() : editingGallery.id;
+      const localItem = { ...payload, id: tempId };
       if (editingGallery.id === 'new') {
-        const created = await createGalleryItem(token, payload);
-        updatedList = [...localGallery, created];
+        updatedList = [...localGallery, localItem];
       } else {
-        const saved = await updateGalleryItem(token, editingGallery.id, payload);
         updatedList = localGallery.map(item =>
-          String(item.id) === String(editingGallery.id) ? (saved || { ...item, ...payload }) : item
+          String(item.id) === String(editingGallery.id) ? { ...item, ...payload } : item
         );
       }
 
@@ -809,14 +825,39 @@ export default function AdminModal({
 
       setLocalGallery(updatedList);
       if (onUpdateGallery) onUpdateGallery(updatedList);
-      localStorage.setItem('payal_gallery', JSON.stringify(updatedList));
+      try {
+        localStorage.setItem('payal_gallery', JSON.stringify(updatedList));
+      } catch (_) {}
+
+      // Instant UI update
       setEditingGallery(null);
-      setGalleryMsg({ type: 'success', text: 'छायाचित्र यशस्वीरीत्या सेव्ह झाले! (Photo saved successfully!)' });
+      setGallerySaving(false);
+      setGalleryMsg({ type: 'success', text: '✅ छायाचित्र लगेच सेव्ह झाले! (Website वर त्वरित अपडेट झाले!)' });
       setTimeout(() => setGalleryMsg({ type: '', text: '' }), 4000);
+
+      // Background sync to backend
+      (async () => {
+        try {
+          if (editingGallery.id === 'new') {
+            const created = await createGalleryItem(token, payload);
+            if (created && created.id) {
+              setLocalGallery(prev => {
+                const synced = prev.map(item => item.id === tempId ? created : item);
+                if (onUpdateGallery) onUpdateGallery(synced);
+                try { localStorage.setItem('payal_gallery', JSON.stringify(synced)); } catch (_) {}
+                return synced;
+              });
+            }
+          } else {
+            await updateGalleryItem(token, editingGallery.id, payload);
+          }
+        } catch (err) {
+          console.warn('Backend gallery sync warning:', err);
+        }
+      })();
     } catch (err) {
       console.error(err);
       setGalleryMsg({ type: 'error', text: 'छायाचित्र सेव्ह करताना त्रुटी आली.' });
-    } finally {
       setGallerySaving(false);
     }
   };
@@ -825,17 +866,21 @@ export default function AdminModal({
     if (!window.confirm('हे छायाचित्र खरोखर हटवायचे आहे का? (Are you sure you want to delete this photo?)')) {
       return;
     }
+    // Instant local delete
+    const updatedList = localGallery.filter(item => String(item.id) !== String(id));
+    setLocalGallery(updatedList);
+    if (onUpdateGallery) onUpdateGallery(updatedList);
+    try {
+      localStorage.setItem('payal_gallery', JSON.stringify(updatedList));
+    } catch (_) {}
+    setGalleryMsg({ type: 'success', text: '✅ छायाचित्र यशस्वीरीत्या हटवले गेले!' });
+    setTimeout(() => setGalleryMsg({ type: '', text: '' }), 4000);
+
+    // Background sync to backend
     try {
       await deleteGalleryItem(token, id);
-      const updatedList = localGallery.filter(item => String(item.id) !== String(id));
-      setLocalGallery(updatedList);
-      if (onUpdateGallery) onUpdateGallery(updatedList);
-      localStorage.setItem('payal_gallery', JSON.stringify(updatedList));
-      setGalleryMsg({ type: 'success', text: 'छायाचित्र यशस्वीरीत्या हटवले गेले! (Photo deleted!)' });
-      setTimeout(() => setGalleryMsg({ type: '', text: '' }), 4000);
     } catch (err) {
-      console.error(err);
-      setGalleryMsg({ type: 'error', text: 'छायाचित्र हटवताना त्रुटी आली.' });
+      console.warn('Backend gallery delete warning:', err);
     }
   };
 
