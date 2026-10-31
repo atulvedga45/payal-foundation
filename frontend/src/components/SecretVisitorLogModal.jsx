@@ -6,7 +6,7 @@ import { fetchSecretVisitorsLog, deleteSecretVisitor } from '../api';
 export default function SecretVisitorLogModal({
   isOpen,
   onClose,
-  secretPin = '7776',
+  secretPin = '941027',
   lang = 'mr',
   onVisitorDeletedSelf,
   onVisitorListUpdated

@@ -194,7 +194,7 @@ export default function App() {
   const [welcomeModalOpen, setWelcomeModalOpen] = useState(false);
   const [visitorCardOpen, setVisitorCardOpen] = useState(false);
   const [secretVisitorLogOpen, setSecretVisitorLogOpen] = useState(false);
-  const [visitorSecretPin, setVisitorSecretPin] = useState('7776');
+  const [visitorSecretPin, setVisitorSecretPin] = useState('941027');
 
   // Synchronize visitor status with server:
   // 1. If admin deleted this visitor -> remove local profile and re-open welcome card
@@ -565,7 +565,7 @@ export default function App() {
           setIsPinModalOpen(false);
         }}
         onOpenVisitorLog={(pin) => {
-          setVisitorSecretPin(pin || '7776');
+          setVisitorSecretPin(pin || '941027');
           setIsPinModalOpen(false);
           setSecretVisitorLogOpen(true);
         }}

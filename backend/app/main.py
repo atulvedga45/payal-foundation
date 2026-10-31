@@ -367,7 +367,7 @@ async def upload_image_endpoint(
     return {"url": f"/uploads/{clean_name}", "filename": clean_name}
 
 # Visitor Tracking & Secret Log Endpoints
-VISITOR_SECRET_PINS = ["7776", "2121", "8888", "1113", "04703", "040703", "sonya-payal@palghar@1741", "admin123"]
+VISITOR_SECRET_PINS = ["941027", "004703", "7776", "2121", "8888", "1113", "04703", "040703", "sonya-payal@palghar@1741", "admin123"]
 
 def verify_visitor_access(x_visitor_pin: str = Header(None), x_admin_key: str = Header(None)):
     pin = x_visitor_pin or x_admin_key

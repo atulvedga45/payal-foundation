@@ -557,7 +557,7 @@ export async function fetchSecretVisitorsLog(secretPin) {
   try {
     const res = await fetch(`${API_BASE}/visitors/secret-log`, {
       headers: {
-        "x-visitor-pin": secretPin || "7776",
+        "x-visitor-pin": secretPin || "941027",
         "x-admin-key": getAdminKey()
       }
     });
@@ -574,7 +574,7 @@ export async function deleteSecretVisitor(visitorId, secretPin) {
     const res = await fetch(`${API_BASE}/visitors/${visitorId}`, {
       method: "DELETE",
       headers: {
-        "x-visitor-pin": secretPin || "7776",
+        "x-visitor-pin": secretPin || "941027",
         "x-admin-key": getAdminKey()
       }
     });
