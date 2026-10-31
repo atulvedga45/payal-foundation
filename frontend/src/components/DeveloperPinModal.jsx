@@ -364,24 +364,24 @@ export default function DeveloperPinModal({ isOpen, onClose, onSuccess, onOpenVi
             )}
           </div>
 
-          {/* Title */}
-          <h3
-            style={{
-              fontSize: '1.28rem',
-              fontWeight: 700,
-              margin: '0 0 0.35rem 0',
-              color: '#ffffff',
-              letterSpacing: '-0.01em'
-            }}
-          >
-            {success
-              ? successType === 'visitor'
-                ? (lang === 'mr' ? 'गुप्त व्हिजिटर यादी उघडत आहे...' : 'Opening Secret Visitor Log...')
-                : (lang === 'mr' ? 'अ‍ॅडमिन पॅनेल अनलॉक झाले!' : 'Admin Panel Unlocked!')
-              : isLocked
-              ? (lang === 'mr' ? 'सुरक्षा लॉक सक्रिय आहे' : 'Security Lockout Active')
-              : 'About Us'}
-          </h3>
+          {/* Title - "About Us" text removed as requested */}
+          {(success || isLocked) && (
+            <h3
+              style={{
+                fontSize: '1.25rem',
+                fontWeight: 700,
+                margin: '0 0 0.35rem 0',
+                color: '#ffffff',
+                letterSpacing: '-0.01em'
+              }}
+            >
+              {success
+                ? successType === 'visitor'
+                  ? (lang === 'mr' ? 'गुप्त व्हिजिटर यादी उघडत आहे...' : 'Opening Secret Visitor Log...')
+                  : (lang === 'mr' ? 'अ‍ॅडमिन पॅनेल अनलॉक झाले!' : 'Admin Panel Unlocked!')
+                : (lang === 'mr' ? 'सुरक्षा लॉक सक्रिय आहे' : 'Security Lockout Active')}
+            </h3>
+          )}
 
           {/* Subtitle */}
           <p
@@ -505,7 +505,7 @@ export default function DeveloperPinModal({ isOpen, onClose, onSuccess, onOpenVi
                     borderRadius: '12px',
                     color: isLocked ? '#94a3b8' : '#ffffff',
                     fontSize: '1.15rem',
-                    letterSpacing: showPin ? '0.15em' : '0.25em',
+                    letterSpacing: pin ? (showPin ? '0.15em' : '0.25em') : 'normal',
                     textAlign: 'center',
                     outline: 'none',
                     cursor: isLocked ? 'not-allowed' : 'text',
